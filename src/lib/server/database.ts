@@ -86,10 +86,26 @@ const teams = [
     },
 ];
 
+const events = [
+    {
+        id: "1",
+        allDay: false,
+        start: new Date("2024-08-23T12:00:00Z"),
+        end: new Date("2024-08-23T13:00:00Z"),
+        title: "Test Event 1",
+        display: 'auto',
+        backgroundColor: '#154734',
+    }
+]
+
 export function getBlogs() {
     return blogs;
 }
 
 export function getTeams() {
     return teams;
+}
+
+export function getEvents() {
+    return events;
 }

@@ -35,7 +35,7 @@ div.top-banner h1 {
     margin: 0;
 }
 
-nav {
+nav.main-navbar {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -44,7 +44,7 @@ nav {
     background-color: var(--cal-poly-secondary);
 }
 
-nav ul {
+nav.main-navbar ul {
     display: flex;
     flex-direction: row;
     list-style: none;
@@ -53,17 +53,17 @@ nav ul {
     padding-inline-start: 0;
 }
 
-nav ul li {
+nav.main-navbar ul li {
     margin: 0 1.5rem;
 }
 
-nav ul li a {
+nav.main-navbar ul li a {
     color: var(--text-bright);
     font-size: 2rem;
     text-decoration: none;
 }
 
-nav ul li a:hover {
+nav.main-navbar ul li a:hover {
     color: var(--text-dark);
 }
 
@@ -92,4 +92,8 @@ table.team-members td {
     padding: 0.5rem;
     text-align: center;
     font-size: 1.2rem;
+}
+
+div.ec {
+    width: 100%;
 }

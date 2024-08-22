@@ -6,7 +6,7 @@
     <div class="top-banner">
         <h1>Cal Poly Esports</h1>
     </div>
-    <nav>
+    <nav class="main-navbar">
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/about">About</a></li>
