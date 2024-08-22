@@ -54,6 +54,7 @@
         font-size: 1.5rem;
         font-weight: bold;
 		border: none;
+		cursor: pointer;
 	}
 
 	button[aria-expanded='true'] .vert {
