@@ -1,11 +1,28 @@
-const blogs = [
+const articles = [
     {
-        title: "Blog 1",
-        content: "This is the first blog",
+        title: "Article 1",
+        summary: "This is the first article",
+        link: "https://www.google.com",
     },
     {
-        title: "Blog 2",
-        content: "This is the second blog",
+        title: "Article 2",
+        summary: "This is the second article",
+        link: "https://www.google.com",
+    },
+    {
+        title: "Article 3",
+        summary: "This is the third article",
+        link: "https://www.google.com",
+    },
+    {
+        title: "Article 4",
+        summary: "This is the fourth article",
+        link: "https://www.google.com",
+    },
+    {
+        title: "Article 5",
+        summary: "This is the fifth article",
+        link: "https://www.google.com",
     },
 ];
 
@@ -98,8 +115,8 @@ const events = [
     }
 ]
 
-export function getBlogs() {
-    return blogs;
+export function getArticles() {
+    return articles;
 }
 
 export function getTeams() {

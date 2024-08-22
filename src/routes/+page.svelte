@@ -1,12 +1,16 @@
 <script>
+    import NewsFeed from './NewsFeed.svelte';
+
     export let data;
 </script>
 
-<h2>News Feed</h2>
+<div>
+    <NewsFeed articles={data.articles} />
+</div>
 
-{#each data.blogs as item}
-    <div>
-        <h3>{item.title}</h3>
-        <p>{item.content}</p>
-    </div>
-{/each}
+<style>
+    div {
+        margin-top: 3rem;
+        width: 100%;
+    }
+</style>
