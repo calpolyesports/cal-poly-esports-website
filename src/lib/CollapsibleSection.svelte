@@ -3,6 +3,8 @@
 <script>
 	// based on suggestions from:
 	// Inclusive Components by Heydon Pickering https://inclusive-components.design/collapsible-sections/
+	import { slide } from "svelte/transition";
+
 	export let headerText;
 
 	let expanded = false;
@@ -19,15 +21,21 @@
 		</button>
 	</h3>
 
-	<div class="contents" hidden={!expanded}>
-		<slot />
-	</div>
+	{#if expanded}
+		<div class="contents" in:slide out:slide>
+			<slot />
+		</div>
+	{/if}
 </div>
 
 <style>
 	.collapsible {
         width: 100%;
         margin: 0.5rem 0;
+	}
+	
+	.contents {
+		padding: 1rem;
 	}
 
 	h3 {
@@ -41,22 +49,15 @@
 		width: 100%;
 		margin: 0;
 		padding: 1em 0.5em;
-		color: var(--gray-darkest, #282828);
-        font-size: 1.2rem;
+		background-color: #00000000; /* transparent - idk why needed???? */
+		color: #282828;
+        font-size: 1.5rem;
         font-weight: bold;
 		border: none;
 	}
 
-	button[aria-expanded='true'] {
-		border-bottom: 1px solid var(--gray-light, #eee);
-	}
-
 	button[aria-expanded='true'] .vert {
 		display: none;
-	}
-
-	button:focus svg {
-		outline: 2px solid;
 	}
 
 	svg {
