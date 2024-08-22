@@ -66,3 +66,30 @@ nav ul li a {
 nav ul li a:hover {
     color: var(--text-dark);
 }
+
+table.team-members {
+    width: 80%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 2rem auto;
+}
+
+table.team-members tr {
+    border: solid;
+    border-width: 1px 0;
+    border-color: #aaa;
+}
+
+table.team-members tr:first-child {
+    border-top: 0;
+}
+
+table.team-members tr:last-child {
+    border-bottom: 0;
+}
+
+table.team-members td {
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 1.2rem;
+}
