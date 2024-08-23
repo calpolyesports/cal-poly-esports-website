@@ -35,9 +35,8 @@
 			setTimeout(() => {
 				moveUnderline(true);
 				resolve();
-			}, 50);
+			}, 100);
 		});
-		moveUnderline(true);
 		content.style.visibility = 'visible';
 		
 		window.addEventListener('resize', () => moveUnderline(true));
