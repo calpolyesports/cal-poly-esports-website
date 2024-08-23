@@ -1,28 +1,21 @@
 const articles = [
     {
-        title: "Article 1",
-        summary: "This is the first article",
+        title: "Esports Opens New Lab for Students",
+        summary: "Cal Poly's first computer building event",
         link: "https://www.google.com",
+        image: "/images/articles/P1011922.JPG",
     },
     {
-        title: "Article 2",
-        summary: "This is the second article",
+        title: "Gamers Play Volleyball",
+        summary: "Why? I'm not sure but looks fun",
         link: "https://www.google.com",
+        image: "/images/articles/IMG_9385.jpg"
     },
     {
-        title: "Article 3",
-        summary: "This is the third article",
+        title: "Why Kazuma Kiryu Should Be in Fortnite",
+        summary: "Featuring the insane ramblings of Bernardo",
         link: "https://www.google.com",
-    },
-    {
-        title: "Article 4",
-        summary: "This is the fourth article",
-        link: "https://www.google.com",
-    },
-    {
-        title: "Article 5",
-        summary: "This is the fifth article",
-        link: "https://www.google.com",
+        image: "/images/articles/10_13 - PP Night.jpg",
     },
 ];
 
