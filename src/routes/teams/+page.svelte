@@ -5,10 +5,18 @@
     export let data;
 </script>
 
-<h2>Teams</h2>
+<h1>Teams</h1>
 
 {#each data.teams as team}
     <CollapsibleSection headerText={team.name}>
         <TeamTable members={team.members} />
     </CollapsibleSection>
 {/each}
+
+<style>
+    h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 1rem 0;
+    }
+</style>

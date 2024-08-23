@@ -38,7 +38,7 @@
     div.news-feed a.main-article {
         width: 60%;
         height: 100%;
-        margin: 0 1rem;
+        margin-right: 0.5rem;
         background-color: #aaa;
         text-decoration: none;
         color: #000;
@@ -61,7 +61,7 @@
         align-items: center;
         width: 40%;
         height: 100%;
-        margin: 0 1rem;
+        margin-left: 0.5rem;
     }
     
     div.news-feed div.side-articles a.side-article {

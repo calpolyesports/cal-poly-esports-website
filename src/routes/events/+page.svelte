@@ -8,10 +8,18 @@
     let options = {
         view: 'timeGridWeek',
         events: data.events,
-        height: '50rem',
+        height: '40rem',
     };
 </script>
 
-<h2>Event Calendar</h2>
+<h1>Event Calendar</h1>
 
 <Calendar {plugins} {options} />
+
+<style>
+    h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 1rem 0;
+    }
+</style>
