@@ -59,12 +59,12 @@
     }
     
     a.main-article h2 {
-        margin: 0.5rem 1rem;
+        margin: 0 1rem;
         font-size: 2.5rem;
     }
     
     a.main-article p {
-        margin: 0.5rem 1rem;
+        margin: 0 1rem;
         font-size: 1.5rem;
     }
     
@@ -93,12 +93,12 @@
     }
     
     a.side-article h3 {
-        margin: 0.5rem 1rem;
+        margin: 0 1rem;
         font-size: 2rem;
     }    
 
     a.side-article p {
-        margin: 0.5rem 1rem;
+        margin: 0 1rem;
         font-size: 1.2rem;
     }
     

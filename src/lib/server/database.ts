@@ -1,3 +1,5 @@
+import * as models from '../models';
+
 const articles = [
     {
         title: "Esports Opens New Lab for Students",
@@ -19,7 +21,7 @@ const articles = [
     },
 ];
 
-const gameRosters = [
+const gameRosters: models.Game[] = [
     {
         id: 1,
         name: "Overwatch 2",
@@ -29,36 +31,46 @@ const gameRosters = [
                 name: "Overwatch Gold",
                 members: [
                     {
+                        name: "Aiden Smith",
                         username: "Thundderr",
                         role: "Tank",
+                        picture: "/images/players/Thundderr.jpg",
                     },
                     {
+                        name: "Ethan Ng",
                         username: "Copy",
-                        role: "Support",
+                        role: "Tank",
+                        picture: "/images/players/Copy.jpg",
                     },
                     {
-                        username: "Pied",
-                        role: "Hitscan DPS",
-                    },
-                    {
+                        name: "Jason Chen",
                         username: "ignitor135",
-                        role: "Flex DPS",
+                        role: "Hitscan DPS",
+                        picture: "/images/players/ignitor135.png",
                     },
                     {
+                        name: "Carson Wong",
+                        username: "Pied",
+                        role: "Flex DPS",
+                        picture: "/images/players/Pied.jpg",
+                    },
+                    {
+                        name: "Hingsun Luu",
                         username: "Gark",
                         role: "Main Support",
+                        picture: "/images/players/Gark.png",
                     },
                     {
+                        name: "Tarsa Yuen",
                         username: "Mustard",
                         role: "Main Support",
+                        picture: "/images/players/Mustard.jpg",
                     },
                     {
-                        username: "vexed",
-                        role: "Flex Support",
-                    },
-                    {
+                        name: "Jordan Twitty",
                         username: "Rouffle",
                         role: "Flex Support",
+                        picture: "/images/players/Rouffle.jpg",
                     },
                 ],
             }
@@ -73,7 +85,7 @@ const gameRosters = [
     {
         id: 3,
         name: "Valorant",
-        icon: "/images/games/Valorant.webp",
+        icon: "/images/games/Valorant.png",
         teams: [],
     }
 ];

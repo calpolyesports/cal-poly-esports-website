@@ -23,11 +23,15 @@ export class Team {
 }
 
 export class Member {
+    name: string;
     username: string;
     role: string;
+    picture?: string;
 
-    constructor(username: string, role: string) {
+    constructor(name: string, username: string, role: string, picture?: string) {
+        this.name = name;
         this.username = username;
         this.role = role;
+        this.picture = picture;
     }
 }

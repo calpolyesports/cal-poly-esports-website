@@ -4,7 +4,7 @@
 	import { onMount, tick } from "svelte";
 
 	import * as models from "$lib/models";
-	import TeamTable from "./TeamTable.svelte";
+	import MemberGrid from "./MemberGrid.svelte";
 
 	export let games: models.Game[] = [];
 	export let activeGameId = 1;
@@ -53,7 +53,7 @@
 			{#each game.teams as team}
 				<h2>{team.name}</h2>
 				<div class="box">
-					<TeamTable members={team.members} />
+					<MemberGrid members={team.members} />
 				</div>
 			{/each}
 		{/if}
@@ -87,6 +87,7 @@
 		padding: 0.5rem 2rem;
 		border: none;
 		cursor: pointer;
+		background-color: transparent;
 	}
 
 	button img {
