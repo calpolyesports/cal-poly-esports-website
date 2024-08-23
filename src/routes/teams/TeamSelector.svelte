@@ -1,0 +1,123 @@
+<!-- from https://svelte.dev/repl/cf05bd4a4ca14fb8ace8b6cdebbb58da?version=3.17.0 -->
+
+<script lang="ts">
+	import { onMount, tick } from "svelte";
+
+	import * as models from "$lib/models";
+	import TeamTable from "./TeamTable.svelte";
+
+	export let games: models.Game[] = [];
+	export let activeGameId = 1;
+
+	function moveUnderline(instant: boolean) {
+		let element = document.getElementById(activeGameId.toString());
+		if (element) {
+			let underline = document.querySelector(".underline") as HTMLElement;
+			underline.style.width = `${element.clientWidth}px`;
+			let bottomPos = element.offsetTop + element.clientHeight;
+			underline.style.transform = `translate(${element.offsetLeft}px, ${bottomPos}px)`;
+			if (instant) {
+				underline.style.transition = "none";
+			} else {
+				underline.style.transition = "transform 0.3s";
+			}
+		}
+	}
+
+	const handleClick = (tabValue: number) => () => {
+		activeGameId = tabValue;
+		moveUnderline(false);
+	};
+
+	onMount(() => {
+		moveUnderline(true);
+	});
+</script>
+
+<div class="everything">
+	<ul>
+		{#each games as game}
+			<li class={activeGameId === game.id ? 'active' : ''} id="{game.id.toString()}">
+				<button on:click={handleClick(game.id)}>
+					<img src={game.icon} alt={game.name} />
+				</button>
+			</li>
+		{/each}
+	</ul>
+	
+	<div class="underline"></div>
+	
+	{#each games as game}
+		{#if activeGameId == game.id}
+			<h1>{game.name}</h1>
+			{#each game.teams as team}
+				<h2>{team.name}</h2>
+				<div class="box">
+					<TeamTable members={team.members} />
+				</div>
+			{/each}
+		{/if}
+	{/each}
+</div>
+
+<style>
+	.everything {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 100%;
+		text-transform: uppercase;
+	}
+
+	div.box {
+		margin: 1rem 0;
+		width: 100%;
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		padding-left: 0;
+		margin-bottom: 0;
+		list-style: none;
+	}
+
+	button {
+		padding: 0.5rem 2rem;
+		border: none;
+		cursor: pointer;
+	}
+
+	button img {
+		height: 3rem;
+		transition: 0.3s;
+	}
+
+	button img:hover {
+		transform: scale(1.1);
+	}
+
+	.underline {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 0;
+		height: 0.2rem;
+		background-color: var(--true-neutral);
+		margin: 1rem 0;
+	}
+
+	h1 {
+		font-size: 3rem;
+		font-weight: bold;
+		margin-top: 3rem;
+		margin-bottom: 0;
+	}
+
+	h2 {
+		font-size: 2rem;
+		font-weight: bold;
+		margin-top: 2rem;
+	}
+</style>

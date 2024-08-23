@@ -1,5 +1,7 @@
-<script>
-    export let members;
+<script lang="ts">
+    import * as models from '$lib/models';
+
+    export let members: models.Member[] = [];
 </script>
 
 <table class="team-members">
