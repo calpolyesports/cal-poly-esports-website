@@ -1,7 +1,7 @@
 <!-- from https://svelte.dev/repl/cf05bd4a4ca14fb8ace8b6cdebbb58da?version=3.17.0 -->
 
 <script lang="ts">
-	import { onMount, tick } from "svelte";
+	import { onDestroy, onMount, tick } from "svelte";
 
 	import * as models from "$lib/models";
 	import MemberGrid from "./MemberGrid.svelte";
@@ -19,7 +19,7 @@
 			if (instant) {
 				underline.style.transition = "none";
 			} else {
-				underline.style.transition = "transform 0.3s";
+				underline.style.transition = "width 0.5s, transform 0.5s";
 			}
 		}
 	}
@@ -29,12 +29,28 @@
 		moveUnderline(false);
 	};
 
-	onMount(() => {
+	onMount(async () => {
+		let content = document.querySelector('.content') as HTMLElement;
+		await new Promise<void>((resolve) => {
+			setTimeout(() => {
+				moveUnderline(true);
+				resolve();
+			}, 50);
+		});
 		moveUnderline(true);
+		content.style.visibility = 'visible';
+		
+		window.addEventListener('resize', () => moveUnderline(true));
+	});
+
+	onDestroy(() => {
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('resize', () => moveUnderline(true));
+		}
 	});
 </script>
 
-<div class="everything">
+<div class="content">
 	<ul>
 		{#each games as game}
 			<li class={activeGameId === game.id ? 'active' : ''} id="{game.id.toString()}">
@@ -61,13 +77,14 @@
 </div>
 
 <style>
-	.everything {
+	.content {
 		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		width: 100%;
 		text-transform: uppercase;
+		visibility: hidden;
 	}
 
 	div.box {
@@ -106,6 +123,7 @@
 		width: 0;
 		height: 0.2rem;
 		background-color: var(--true-neutral);
+		transition: width 0.5s, transform 0.5s;
 		margin: 1rem 0;
 	}
 
