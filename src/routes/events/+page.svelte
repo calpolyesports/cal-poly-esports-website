@@ -8,7 +8,9 @@
     let options = {
         view: 'timeGridWeek',
         events: data.events,
-        height: '40rem',
+        height: '50rem',
+        slotMinTime: '08:00:00',
+        slotMaxTime: '22:00:00',
     };
 </script>
 
