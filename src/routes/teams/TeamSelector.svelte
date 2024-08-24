@@ -1,13 +1,13 @@
 <!-- from https://svelte.dev/repl/cf05bd4a4ca14fb8ace8b6cdebbb58da?version=3.17.0 -->
 
 <script lang="ts">
-	import { onDestroy, onMount, tick } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 
 	import * as models from "$lib/models";
 	import MemberGrid from "./MemberGrid.svelte";
 
 	export let games: models.Game[] = [];
-	export let activeGameId = 1;
+	export let activeGameId = games[0].id;
 
 	function moveUnderline(instant: boolean) {
 		let element = document.getElementById(activeGameId.toString());
@@ -24,7 +24,7 @@
 		}
 	}
 
-	const handleClick = (tabValue: number) => () => {
+	const handleClick = (tabValue: string) => () => {
 		activeGameId = tabValue;
 		moveUnderline(false);
 	};

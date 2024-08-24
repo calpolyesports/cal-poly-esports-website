@@ -1,7 +1,8 @@
 import * as db from '$lib/server/database';
 
-export function load() {
+export async function load() {
+    const articles = await db.getArticles();
     return {
-        articles: db.getArticles(),
+        articles,
     }
 }

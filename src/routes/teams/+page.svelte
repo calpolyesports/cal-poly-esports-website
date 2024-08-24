@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import TeamSelector from "./TeamSelector.svelte";
 
     export let data;

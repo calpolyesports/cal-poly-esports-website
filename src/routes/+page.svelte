@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import NewsFeed from './NewsFeed.svelte';
     import TwitchEmbed from './TwitchEmbed.svelte';
     import TwitterEmbed from './TwitterEmbed.svelte';

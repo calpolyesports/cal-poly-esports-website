@@ -1,5 +1,7 @@
-<script>
-    export let articles;
+<script lang="ts">
+    import { Article } from "$lib/models";
+
+    export let articles: Article[];
 
     let mainArticle = articles[0];
     let sideArticles = articles.slice(1, 3);
