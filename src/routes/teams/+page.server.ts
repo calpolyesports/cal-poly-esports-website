@@ -1,7 +1,8 @@
 import * as db from '$lib/server/database';
 
-export function load() {
+export async function load() {
+    const games = await db.getRosters();
     return {
-        games: db.getGameRosters(),
+        games,
     }
 }

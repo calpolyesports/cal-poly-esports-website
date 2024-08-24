@@ -1,94 +1,25 @@
+import { MongoClient, ServerApiVersion, type MongoClientOptions } from 'mongodb';
+import { DB_CONN_STRING, DB_NAME, ROSTERS_COLLECTION_NAME, ARTICLES_COLLECTION_NAME } from '$env/static/private';
+
 import * as models from '../models';
 
-const articles = [
-    {
-        title: "Esports Opens New Lab for Students",
-        summary: "Cal Poly's first computer building event",
-        link: "https://www.google.com",
-        image: "/images/articles/P1011922.JPG",
+const client = new MongoClient(DB_CONN_STRING, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
     },
-    {
-        title: "Gamers Play Volleyball",
-        summary: "Why? I'm not sure but looks fun",
-        link: "https://www.google.com",
-        image: "/images/articles/IMG_9385.jpg"
-    },
-    {
-        title: "Why Kazuma Kiryu Should Be in Fortnite",
-        summary: "Featuring the insane ramblings of Bernardo",
-        link: "https://www.google.com",
-        image: "/images/articles/10_13 - PP Night.jpg",
-    },
-];
+} as MongoClientOptions);
 
-const gameRosters: models.Game[] = [
-    {
-        id: 1,
-        name: "Overwatch 2",
-        icon: "/images/games/Overwatch 2.png",
-        teams: [
-            {
-                name: "Overwatch Gold",
-                members: [
-                    {
-                        name: "Aiden Smith",
-                        username: "Thundderr",
-                        role: "Tank",
-                        picture: "/images/players/Thundderr.jpg",
-                    },
-                    {
-                        name: "Ethan Ng",
-                        username: "Copy",
-                        role: "Tank",
-                        picture: "/images/players/Copy.jpg",
-                    },
-                    {
-                        name: "Jason Chen",
-                        username: "ignitor135",
-                        role: "Hitscan DPS",
-                        picture: "/images/players/ignitor135.png",
-                    },
-                    {
-                        name: "Carson Wong",
-                        username: "Pied",
-                        role: "Flex DPS",
-                        picture: "/images/players/Pied.jpg",
-                    },
-                    {
-                        name: "Hingsun Luu",
-                        username: "Gark",
-                        role: "Main Support",
-                        picture: "/images/players/Gark.png",
-                    },
-                    {
-                        name: "Tarsa Yuen",
-                        username: "Mustard",
-                        role: "Main Support",
-                        picture: "/images/players/Mustard.jpg",
-                    },
-                    {
-                        name: "Jordan Twitty",
-                        username: "Rouffle",
-                        role: "Flex Support",
-                        picture: "/images/players/Rouffle.jpg",
-                    },
-                ],
-            }
-        ]
-    },
-    {
-        id: 2,
-        name: "League of Legends",
-        icon: "/images/games/LOL.png",
-        teams: [],
-    },
-    {
-        id: 3,
-        name: "Valorant",
-        icon: "/images/games/Valorant.png",
-        teams: [],
-    }
-];
+async function run() {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+}
+console.log("Connecting to MongoDB...");
+run().catch(console.dir);
 
 const events = [
     {
@@ -102,12 +33,16 @@ const events = [
     }
 ]
 
-export function getArticles() {
-    return articles;
+export async function getArticles() {
+    const response = await client.db(DB_NAME).collection<models.Article>(ARTICLES_COLLECTION_NAME).find().toArray();
+    const articles = response.map(article => models.Article.fromMongo(article));
+    return articles.map(article => article.toJSON());
 }
 
-export function getGameRosters() {
-    return gameRosters;
+export async function getRosters() {
+    const response = await client.db(DB_NAME).collection<models.Game>(ROSTERS_COLLECTION_NAME).find().toArray();
+    const games = response.map(game => models.Game.fromMongo(game));
+    return games.map(game => game.toJSON());
 }
 
 export function getEvents() {
