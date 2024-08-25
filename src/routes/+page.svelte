@@ -3,6 +3,8 @@
     import TwitchEmbed from './TwitchEmbed.svelte';
     import TwitterEmbed from './TwitterEmbed.svelte';
 
+    import { PUBLIC_PAGE_URL } from '$env/static/public';
+
     export let data;
 </script>
 
@@ -13,7 +15,7 @@
 <div class="container">
     <div class="embeds">
         <div class="livestream">
-            <TwitchEmbed channel="CalPoly_Esports" />
+            <TwitchEmbed channel="CalPoly_Esports" parentUrl={PUBLIC_PAGE_URL} />
         </div>
 
         <div class="twitter">

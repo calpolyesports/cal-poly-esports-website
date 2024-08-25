@@ -23,10 +23,8 @@ jobs:
 
       - name: npm install, build, and test
         env:
+          PUBLIC_PAGE_URL: ${{ secrets.PUBLIC_PAGE_URL }}
           DB_CONN_STRING: ${{ secrets.DB_CONN_STRING }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          ROSTERS_COLLECTION_NAME: ${{ secrets.ROSTERS_COLLECTION_NAME }}
-          ARTICLES_COLLECTION_NAME: ${{ secrets.ARTICLES_COLLECTION_NAME }}
         run: |
           npm install
           npm run build

@@ -34,13 +34,13 @@ const events = [
 ]
 
 export async function getArticles() {
-    const response = await client.db(env.DB_NAME).collection<models.Article>(env.ARTICLES_COLLECTION_NAME).find().toArray();
+    const response = await client.db('website').collection<models.Article>('articles').find().toArray();
     const articles = response.map(article => models.Article.fromMongo(article));
     return articles.map(article => article.toJSON());
 }
 
 export async function getRosters() {
-    const response = await client.db(env.DB_NAME).collection<models.Game>(env.ROSTERS_COLLECTION_NAME).find().toArray();
+    const response = await client.db('website').collection<models.Game>('rosters').find().toArray();
     const games = response.map(game => models.Game.fromMongo(game));
     return games.map(game => game.toJSON());
 }
