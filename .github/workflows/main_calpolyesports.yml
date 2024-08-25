@@ -72,5 +72,5 @@ jobs:
         with:
           app-name: 'calpolyesports'
           slot-name: 'Production'
-          package: .
+          package: release.zip
           
