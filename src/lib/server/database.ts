@@ -1,9 +1,9 @@
 import { MongoClient, ServerApiVersion, type MongoClientOptions } from 'mongodb';
-import { DB_CONN_STRING, DB_NAME, ROSTERS_COLLECTION_NAME, ARTICLES_COLLECTION_NAME } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import * as models from '../models';
 
-const client = new MongoClient(DB_CONN_STRING, {
+const client = new MongoClient(env.DB_CONN_STRING, {
     serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
@@ -34,13 +34,13 @@ const events = [
 ]
 
 export async function getArticles() {
-    const response = await client.db(DB_NAME).collection<models.Article>(ARTICLES_COLLECTION_NAME).find().toArray();
+    const response = await client.db(env.DB_NAME).collection<models.Article>(env.ARTICLES_COLLECTION_NAME).find().toArray();
     const articles = response.map(article => models.Article.fromMongo(article));
     return articles.map(article => article.toJSON());
 }
 
 export async function getRosters() {
-    const response = await client.db(DB_NAME).collection<models.Game>(ROSTERS_COLLECTION_NAME).find().toArray();
+    const response = await client.db(env.DB_NAME).collection<models.Game>(env.ROSTERS_COLLECTION_NAME).find().toArray();
     const games = response.map(game => models.Game.fromMongo(game));
     return games.map(game => game.toJSON());
 }
