@@ -1,10 +1,9 @@
 <script>
     import TopNav from "./TopNav.svelte";
-    import { fly } from "svelte/transition";
 
     const topNavItems = [
         { name: "Home", link: "/" },
-        { name: "Events", link: "/events" },
+        { name: "Calendar", link: "/calendar" },
         { name: "Teams", link: "/teams" },
         { name: "About", link: "/about" },
         { name: "Contact", link: "/contact" },
