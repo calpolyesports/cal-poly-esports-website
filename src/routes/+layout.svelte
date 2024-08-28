@@ -4,11 +4,14 @@
 
     const topNavItems = [
         { name: "Home", link: "/" },
+        { name: "Clubs", link:"javascript:void(0)" },
         { name: "Events", link: "/events" },
         { name: "Teams", link: "/teams" },
         { name: "About", link: "/about" },
         { name: "Contact", link: "/contact" },
     ];
+
+    export let data;
 </script>
 
 <svelte:head>
@@ -18,7 +21,7 @@
 
 <div class="everything">
     <header>
-        <TopNav items={topNavItems} icon="/images/Main Logo/White Logo.png" />
+        <TopNav items={topNavItems} icon="/images/Main Logo/White Logo.png" clubs={data.clubs}/>
     </header>
     
     <div class="main-body">
