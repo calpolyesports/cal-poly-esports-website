@@ -6,7 +6,6 @@
     export let data;
     let club = data.club;
 
-    // Watch for URL changes and update the club data accordingly
     $: {
         const { slug } = get(page).params;
         if (slug) {
@@ -26,7 +25,8 @@
                 {#if member.profileImage}
                     <img src={member.profileImage} alt={member.name} />
                 {/if}
-                <p>{member.name} - {member.position}</p>
+                <p>{member.name}</p>
+                <p>{member.position}</p>
             </li>
         {/each}
     </ul>
@@ -48,22 +48,29 @@
     ul {
         list-style: none;
         padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
     }
 
     ul li {
         display: flex;
+        flex-direction: column;
         align-items: center;
         margin-bottom: 1.5rem;
+        width: 150px;
     }
 
     ul li img {
-        width: 4rem;
-        height: 4rem;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
-        margin-right: 1rem;
+        margin-bottom: 1rem;
     }
 
     ul li p {
         font-size: 1.2rem;
+        margin: 0.5rem 0;
+        text-align: center;
     }
 </style>
