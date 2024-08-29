@@ -1,16 +1,31 @@
-<script>
+<script lang="ts">
+    import { Club } from "$lib/models";
+
     export let items;
     export let icon;
+
+    export let clubs: Club[];
 </script>
 
 <nav>
     <div class="icon-container">
-        <a href="/"><img src="{icon}" alt="icon" /></a>
+        <a href="/"><img src={icon} alt="icon" /></a>
     </div>
     <ul>
         {#each items as item}
             <li>
-                <a href="{item.link}">{item.name}</a>
+                {#if item.name === "Clubs"}
+                    <div class="dropdown">
+                        <a href={item.link}>{item.name}</a>
+                        <div class="dropdown-content">
+                            {#each clubs as club}
+                                <a href={`/clubs/${club.urlName}`}>{club.clubName}</a>
+                            {/each}
+                        </div>
+                    </div>
+                {:else}
+                    <a href={item.link}>{item.name}</a>
+                {/if}
             </li>
         {/each}
     </ul>
@@ -57,5 +72,37 @@
         color: var(--neutral-bright);
         font-size: 2rem;
         text-decoration: none;
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 12rem;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        flex-direction: column;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        display: block;
+        border: 1px solid gray;
+    }
+
+    .dropdown-content a:hover {
+        background-color: var(--cal-poly-secondary);
+        color: white;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: flex;
     }
 </style>
