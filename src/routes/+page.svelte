@@ -11,6 +11,23 @@
     <img class="banner" src="/images/Banner.png" alt="Banner" />
 </div>
 
+<div class="container">
+    <div class="embeds">
+        <div class="livestream">
+            <TwitchEmbed channel="CalPoly_Esports" parentUrl={PUBLIC_PAGE_URL} />
+        </div>
+
+        <div class="text-box">
+            <h1>Lab Information</h1>
+            <br>
+            <p>Come check out our new Esports and Gaming Lab, equipped with <strong>six high-end gaming PCs!</strong></p>
+            <p>The lab is currently located in <a href="https://maps.calpoly.edu/place/bldg-021-0">Building 21</a>, Room 233. You can find <a href="/calendar">open hours for free usage here.</a></p>
+        </div>
+    </div>
+</div>
+
+<h1>Socials</h1>
+
 <div class="links">
     <a class="link" href="https://discord.gg/sd6bUz7">
         <img src="images/social/Discord.png" alt="Discord" />
@@ -31,18 +48,10 @@
 </div>
 
 <div class="container">
-    <div class="embeds">
-        <div class="livestream">
-            <TwitchEmbed channel="CalPoly_Esports" parentUrl={PUBLIC_PAGE_URL} />
-        </div>
-
-        <div class="text-box">
-            <h1>Lab Information</h1>
-            <p>Come check out our new Esports and Gaming Lab, equipped with <strong>six high-end gaming PCs!</strong></p>
-            <p>The lab is currently located in <a href="https://maps.calpoly.edu/place/bldg-021-0">Building 21</a>, Room 233. You can find <a href="/calendar">open hours for free usage here.</a></p>
-        </div>
-    </div>
+    <NewsFeed articles={data.articles} />
 </div>
+
+<h1>Featured Games</h1>
 
 <div class="games">
     <img src="/images/games/Valorant.png" alt="Valorant" />
@@ -51,10 +60,6 @@
     <img src="/images/games/CS2.jpg" alt="Counter Strike 2" />
     <img src="/images/games/Smash.png" alt="Smash" />
     <img src="/images/games/TF2.png" alt="Team Fortress 2" />
-</div>
-
-<div class="container">
-    <NewsFeed articles={data.articles} />
 </div>
 
 <style>
@@ -79,6 +84,16 @@
         height: 100%;
         outline: 3px solid var(--cal-poly-primary);
         overflow: hidden; /* Temporary fix; make responsive later */
+    }
+
+    div.text-box h1 {
+        font-size: 3rem;
+        margin: 1rem 0;
+    }
+
+    div.text-box p {
+        font-size: 1.6rem;
+        margin: 0.5rem 3rem;
     }
 
     div.games {
@@ -128,11 +143,16 @@
     }
 
     h1 {
-        font-size: 3rem;
+        font-size: 5rem;
         font-weight: bold;
-        margin: 1rem 2rem;
-        color: var(--cal-poly-secondary);
+        margin: 0 2rem;
+        margin-top: 4rem;
+        color: black;
         text-align: center;
+        text-decoration-line: underline;
+        text-decoration-color: var(--cal-poly-secondary);
+        text-decoration-thickness: 0.2rem;
+        text-underline-offset: 2rem;
     }
 
     p {
