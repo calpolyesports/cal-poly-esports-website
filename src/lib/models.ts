@@ -67,3 +67,25 @@ export class Article {
         return {...this};
     }
 }
+
+export class Club {
+    clubName: string;
+    aboutText: string;
+    boardMembers: { name: string; position: string; profileImage: string }[];
+    urlName: string;
+
+    constructor(clubName: string, urlName: string, aboutText: string, boardMembers: { name: string; position: string; profileImage: string }[]) {
+        this.clubName = clubName;
+        this.aboutText = aboutText;
+        this.boardMembers = boardMembers;
+        this.urlName = urlName;
+    }
+
+    static fromMongo(doc: any) {
+        return new Club(doc.clubName, doc.urlName, doc.aboutText, doc.boardMembers);
+    }
+
+    toJSON() {
+        return {...this};
+    }
+}

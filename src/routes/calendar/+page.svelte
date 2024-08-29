@@ -14,7 +14,7 @@
     };
 </script>
 
-<h1>Event Calendar</h1>
+<h1>Calendar</h1>
 
 <Calendar {plugins} {options} />
 

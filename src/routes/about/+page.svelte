@@ -21,9 +21,16 @@
         margin-top: 2rem;
     }
 
+    h1, h2 {
+        text-decoration-line: underline;
+        text-decoration-color: var(--cal-poly-secondary);
+        text-decoration-thickness: 0.2rem;
+        text-underline-offset: 2rem;
+    }
+
     p {
         font-size: 1.5rem;
-        margin: 1rem 0;
+        margin: 2rem 0;
         text-align: center;
     }
 </style>

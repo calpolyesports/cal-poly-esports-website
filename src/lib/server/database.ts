@@ -48,3 +48,25 @@ export async function getRosters() {
 export function getEvents() {
     return events;
 }
+
+export async function getClubByName(urlName: string) {
+    await client.connect();
+    const db = client.db('website');
+    const collection = db.collection('clubs');
+    const club = await collection.findOne({ urlName: urlName });
+
+    if (club) {
+        return {
+            clubName: club.clubName,
+            aboutText: club.aboutText,
+            boardMembers: club.boardMembers,
+        };
+    }
+    return null;
+}
+
+export async function getClubs() {
+    const response = await client.db('website').collection<models.Club>('clubs').find().toArray();
+    const clubs = response.map(club => models.Club.fromMongo(club));
+    return clubs.map(club => club.toJSON());
+}
