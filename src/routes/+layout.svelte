@@ -7,7 +7,6 @@
         { name: "Calendar", link: "/calendar" },
         { name: "Teams", link: "/teams" },
         { name: "About", link: "/about" },
-        { name: "Contact", link: "/contact" },
     ];
 
     export let data;
