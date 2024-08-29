@@ -40,7 +40,7 @@
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        height: 30rem;
+        height: 35rem;
         width: 100%;
         margin: 0;
     }
