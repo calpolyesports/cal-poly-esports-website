@@ -8,7 +8,26 @@
 </script>
 
 <div class="container">
-    <img src="/images/Banner.png" alt="Banner" />
+    <img class="banner" src="/images/Banner.png" alt="Banner" />
+</div>
+
+<div class="links">
+    <a class="link" href="https://discord.gg/sd6bUz7">
+        <img src="images/social/Discord.png" alt="Discord" />
+        <p>Discord</p>
+    </a>
+    <a class="link" href="https://twitch.tv/CalPoly_Esports">
+        <img src="images/social/Twitch.png" alt="Twitch" />
+        <p>Twitch</p>
+    </a>
+    <a class="link" href="https://x.com/calpolyesports">
+        <img src="images/social/Twitter.png" alt="Twitter" />
+        <p>Twitter</p>
+    </a>
+    <a class="link" href="https://www.instagram.com/calpolyesports/">
+        <img src="images/social/Instagram.png" alt="Instagram" />
+        <p>Instagram</p>
+    </a>
 </div>
 
 <div class="container">
@@ -23,6 +42,15 @@
             <p>The lab is currently located in <a href="https://maps.calpoly.edu/place/bldg-021-0">Building 21</a>, Room 233. You can find <a href="/calendar">open hours for free usage here.</a></p>
         </div>
     </div>
+</div>
+
+<div class="games">
+    <img src="/images/games/Valorant.png" alt="Valorant" />
+    <img src="/images/games/LOL.png" alt="League of Legends" />
+    <img src="/images/games/Overwatch 2.png" alt="Overwatch 2" />
+    <img src="/images/games/CS2.jpg" alt="Counter Strike 2" />
+    <img src="/images/games/Smash.png" alt="Smash" />
+    <img src="/images/games/TF2.png" alt="Team Fortress 2" />
 </div>
 
 <div class="container">
@@ -50,9 +78,52 @@
         width: 44%;
         height: 100%;
         outline: 3px solid var(--cal-poly-primary);
+        overflow: hidden; /* Temporary fix; make responsive later */
     }
 
-    img {
+    div.games {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        margin: 5rem 0;
+        height: 10rem;
+    }
+
+    div.games img {
+        height: 100%;
+    }
+
+    div.links {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        margin: 4rem 0;
+    }
+
+    a.link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        font-family: 'abolition', sans-serif;
+    }
+
+    a.link img {
+        height: 10rem;
+        transition: transform 0.2s;
+    }
+
+    a.link img:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+    }
+
+    a.link p {
+        font-size: 2.5rem;
+        margin-top: 1rem;
+    }
+
+    img.banner {
         width: 100%;
     }
 
