@@ -10,16 +10,14 @@ const client = new MongoClient(env.DB_CONN_STRING, {
         deprecationErrors: true,
     },
 } as MongoClientOptions);
-
-async function run() {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-}
 console.log("Connecting to MongoDB...");
-run().catch(console.dir);
+await client.connect();
+await client.db("admin").command({ ping: 1 });
+console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+export const Website = client.db('website');
+export const User = Website.collection<models.UserDoc>('users');
+export const Session = Website.collection<models.SessionDoc>('sessions');
 
 const events = [
     {

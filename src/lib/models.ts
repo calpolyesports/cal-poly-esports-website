@@ -1,3 +1,15 @@
+export interface UserDoc {
+    _id: string;
+    username: string;
+    password_hash: string;
+}
+
+export interface SessionDoc {
+    _id: string;
+	expires_at: Date;
+	user_id: string;
+}
+
 export class Game {
     id: string;
     name: string;
@@ -81,6 +93,7 @@ export class Club {
         this.urlName = urlName;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static fromMongo(doc: any) {
         return new Club(doc.clubName, doc.urlName, doc.aboutText, doc.boardMembers);
     }

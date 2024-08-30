@@ -16,6 +16,10 @@
 
 <h1>Calendar</h1>
 
+{#if data.username}
+    <h2>Welcome, {data.username}!</h2>
+{/if}
+
 <Calendar {plugins} {options} />
 
 <style>
