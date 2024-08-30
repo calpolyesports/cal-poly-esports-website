@@ -2,7 +2,7 @@ export interface UserDoc {
     _id: string;
     username: string;
     password_hash: string;
-    adminFor: string[];
+    admin_for: string[];
 }
 
 export interface SessionDoc {

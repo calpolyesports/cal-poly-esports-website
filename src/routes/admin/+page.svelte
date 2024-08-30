@@ -13,7 +13,7 @@
 	</form>
     
     <h3>Clubs</h3>
-    {#each data.clubs as club}
+    {#each data.adminFor as club}
         <a href="/clubs/{club.urlName}">{club.clubName}</a>
     {/each}
 </div>
