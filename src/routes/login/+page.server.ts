@@ -18,11 +18,13 @@ export const actions: Actions = {
             !/^[a-z0-9_-]+$/.test(username)
         ) {
             return fail(400, {
+                username,
                 message: 'Invalid username'
             });
         }
         if (typeof password !== 'string' || password.length < 6 || password.length > 255) {
             return fail(400, {
+                username,
                 message: 'Invalid password'
             });
         }
@@ -30,6 +32,7 @@ export const actions: Actions = {
         const existingUser = await User.findOne({ username });
         if (!existingUser) {
             return fail(400, {
+                username,
                 message: 'Invalid username or password'
             });
         }
@@ -42,6 +45,7 @@ export const actions: Actions = {
         });
         if (!passwordIsValid) {
             return fail(400, {
+                username,
                 message: 'Invalid username or password'
             });
         }
