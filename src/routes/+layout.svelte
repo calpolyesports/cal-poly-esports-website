@@ -45,6 +45,13 @@
                 <a href="/teams">Teams</a>
                 <a href="/about">About</a>
                 <a href="/contact">Contact</a>
+                <a href="/login">Admin Login</a>
+            </div>
+            <div class="column">
+                <h3>Clubs</h3>
+                {#each data.clubs as club}
+                    <a href="/clubs/{club.urlName}">{club.clubName}</a>
+                {/each}
             </div>
         </div>
     </div>
