@@ -3,10 +3,16 @@ import { User } from '$lib/server/database';
 import { fail, redirect } from '@sveltejs/kit';
 import { verify } from '@node-rs/argon2';
 
-import type { Actions } from '@sveltejs/kit';
+import type { ServerLoad, Actions } from '@sveltejs/kit';
+
+export const load: ServerLoad = async (event) => {
+	if (event.locals.user) {
+        redirect(302, "/admin");
+    }
+};
 
 export const actions: Actions = {
-    login: async (event) => {
+    default: async (event) => {
         const formData = await event.request.formData();
         const username = formData.get('username');
         const password = formData.get('password');
@@ -56,17 +62,6 @@ export const actions: Actions = {
             path: '.',
             ...sessionCookie.attributes
         });
-    },
-    logout: async (event) => {
-        if (!event.locals.session) {
-            return fail(401);
-        }
-        await lucia.invalidateSession(event.locals.session.id);
-        const sessionCookie = lucia.createBlankSessionCookie();
-        event.cookies.set(sessionCookie.name, sessionCookie.value, {
-            path: '.',
-            ...sessionCookie.attributes
-        });
-        redirect(302, '/');
+        redirect(302, '/admin');
     }
 };

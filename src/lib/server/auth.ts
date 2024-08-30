@@ -15,6 +15,7 @@ export const lucia = new Lucia(adapter, {
     getUserAttributes: (attributes) => {
         return {
             username: attributes.username,
+            adminFor: attributes.adminFor,
         };
     }
 });
@@ -29,4 +30,5 @@ declare module "lucia" {
 interface DatabaseUserAttributes {
     username: string;
     password_hash: string;
+    adminFor: string[];
 }

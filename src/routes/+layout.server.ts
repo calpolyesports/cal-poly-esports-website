@@ -7,5 +7,6 @@ export const load: ServerLoad = async (event) => {
     return {
         clubs,
         username: event.locals.user?.username,
+        adminFor: event.locals.user?.adminFor,
     };
 }

@@ -2,8 +2,9 @@
     import { Club } from "$lib/models";
 
     export let items;
+    export let adminItem;
+    export let isAdmin;
     export let icon;
-
     export let clubs: Club[];
 </script>
 
@@ -28,6 +29,11 @@
                 {/if}
             </li>
         {/each}
+        {#if isAdmin}
+            <li>
+                <a href={adminItem.link}>{adminItem.name}</a>
+            </li>
+        {/if}
     </ul>
 </nav>
 
