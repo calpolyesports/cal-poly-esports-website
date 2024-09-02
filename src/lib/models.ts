@@ -81,22 +81,52 @@ export class Article {
     }
 }
 
+export class Event {
+    title: string;
+    allDay: boolean;
+    start: Date;
+    end: Date;
+    club: string;
+    backgroundColor: string;
+
+    constructor(title: string, allDay: boolean, start: Date, end: Date, club: string, backgroundColor: string) {
+        this.title = title;
+        this.allDay = allDay;
+        this.start = start;
+        this.end = end;
+        this.club = club;
+        this.backgroundColor = backgroundColor;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static fromMongo(obj: any): Event {
+        const backgroundColor = '#154734';
+        return new Event(obj.title, obj.allDay, obj.start, obj.end, obj.club, backgroundColor);
+    }
+
+    toJSON() {
+        return {...this};
+    }
+}
+
 export class Club {
     clubName: string;
     aboutText: string;
     boardMembers: { name: string; position: string; profileImage: string }[];
     urlName: string;
+    color: string;
 
-    constructor(clubName: string, urlName: string, aboutText: string, boardMembers: { name: string; position: string; profileImage: string }[]) {
+    constructor(clubName: string, urlName: string, aboutText: string, boardMembers: { name: string; position: string; profileImage: string }[], color: string) {
         this.clubName = clubName;
         this.aboutText = aboutText;
         this.boardMembers = boardMembers;
         this.urlName = urlName;
+        this.color = color;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static fromMongo(doc: any) {
-        return new Club(doc.clubName, doc.urlName, doc.aboutText, doc.boardMembers);
+        return new Club(doc.clubName, doc.urlName, doc.aboutText, doc.boardMembers, doc.color);
     }
 
     toJSON() {

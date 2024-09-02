@@ -18,33 +18,38 @@ console.log("Pinged your deployment. You successfully connected to MongoDB!");
 export const Website = client.db('website');
 export const User = Website.collection<models.UserDoc>('users');
 export const Session = Website.collection<models.SessionDoc>('sessions');
-
-const events = [
-    {
-        id: "1",
-        allDay: false,
-        start: new Date("2024-08-23T12:00:00Z"),
-        end: new Date("2024-08-23T13:00:00Z"),
-        title: "Test Event 1",
-        display: 'auto',
-        backgroundColor: '#154734',
-    }
-]
+export const Article = Website.collection<models.Article>('articles');
+export const Roster = Website.collection<models.Game>('rosters');
+export const Event = Website.collection<models.Event>('events');
+export const Club = Website.collection<models.Club>('clubs');
 
 export async function getArticles() {
-    const response = await client.db('website').collection<models.Article>('articles').find().toArray();
+    const response = await Article.find().toArray();
     const articles = response.map(article => models.Article.fromMongo(article));
     return articles.map(article => article.toJSON());
 }
 
 export async function getRosters() {
-    const response = await client.db('website').collection<models.Game>('rosters').find().toArray();
+    const response = await Roster.find().toArray();
     const games = response.map(game => models.Game.fromMongo(game));
     return games.map(game => game.toJSON());
 }
 
-export function getEvents() {
-    return events;
+export async function getEvents() {
+    const response = await Event.find().toArray();
+    const events = response.map(event => models.Event.fromMongo(event));
+    const clubs = await Club.find().toArray();
+    events.forEach((event) => {
+        const club = clubs.find(club => club.urlName === event.club);
+        if (club) {
+            event.backgroundColor = club.color
+        }
+    });
+    return events.map(event => event.toJSON());
+}
+
+export async function addEvent(event: models.Event) {
+    await Event.insertOne(event);
 }
 
 export async function getClubByName(urlName: string) {
@@ -58,13 +63,14 @@ export async function getClubByName(urlName: string) {
             clubName: club.clubName,
             aboutText: club.aboutText,
             boardMembers: club.boardMembers,
+            color: club.color,
         };
     }
     return null;
 }
 
 export async function getClubs() {
-    const response = await client.db('website').collection<models.Club>('clubs').find().toArray();
+    const response = await Club.find().toArray();
     const clubs = response.map(club => models.Club.fromMongo(club));
     return clubs.map(club => club.toJSON());
 }
