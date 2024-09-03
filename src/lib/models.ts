@@ -114,6 +114,16 @@ export class Event {
         return new Event(id, doc.title, doc.allDay, doc.start, doc.end, doc.club, backgroundColor);
     }
 
+    toMongo() {
+        return {
+            title: this.title,
+            allDay: this.allDay,
+            start: this.start,
+            end: this.end,
+            club: this.club
+        } as EventDoc;
+    }
+
     toJSON() {
         return {...this};
     }
