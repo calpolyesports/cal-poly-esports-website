@@ -20,7 +20,7 @@ export const User = Website.collection<models.UserDoc>('users');
 export const Session = Website.collection<models.SessionDoc>('sessions');
 export const Article = Website.collection<models.Article>('articles');
 export const Roster = Website.collection<models.Game>('rosters');
-export const Event = Website.collection<models.Event>('events');
+export const Event = Website.collection<models.EventDoc>('events');
 export const Club = Website.collection<models.Club>('clubs');
 
 export async function getArticles() {
@@ -35,29 +35,41 @@ export async function getRosters() {
     return games.map(game => game.toJSON());
 }
 
-export async function getEvents() {
+export async function getEvents(adminFor?: string[]) {
     const response = await Event.find().toArray();
-    const events = response.map(event => models.Event.fromMongo(event));
+    const events = response.map(event => models.Event.fromMongo(event._id.toString(), event));
     const clubs = await Club.find().toArray();
     events.forEach((event) => {
         const club = clubs.find(club => club.urlName === event.club);
         if (club) {
             event.backgroundColor = club.color
         }
+        if (adminFor && adminFor.includes(event.club)) {
+            event.editable = true;
+        }
     });
     return events.map(event => event.toJSON());
 }
 
-export async function addEvent(event: models.Event) {
-    await Event.insertOne(event);
+export async function addEvent(event: models.EventDoc) {
+    const result = await Event.insertOne(event);
+    return result.insertedId;
 }
 
-export async function getEventById(id: string) {
-    const event = await Event.findOne({ _id: new ObjectId(id) });
-    if (!event) {
+export async function getEventById(id: string, adminFor?: string[]) {
+    const eventDoc = await Event.findOne({ _id: new ObjectId(id) });
+    if (!eventDoc) {
         return null;
     }
-    return models.Event.fromMongo(event).toJSON();
+    const event = models.Event.fromMongo(eventDoc._id.toString(), eventDoc);
+    const club = await Club.findOne({ urlName: event.club });
+    if (club) {
+        event.backgroundColor = club.color;
+        if (adminFor && adminFor.includes(event.club)) {
+            event.editable = true;
+        }
+    }
+    return event;
 }
 
 export async function updateEvent(event: models.Event) {

@@ -81,6 +81,14 @@ export class Article {
     }
 }
 
+export interface EventDoc {
+    title: string;
+    allDay: boolean;
+    start: Date;
+    end: Date;
+    club: string;
+}
+
 export class Event {
     id: string;
     title: string;
@@ -101,10 +109,9 @@ export class Event {
         this.backgroundColor = backgroundColor;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    static fromMongo(obj: any): Event {
+    static fromMongo(id: string, doc: EventDoc): Event {
         const backgroundColor = '#154734';
-        return new Event(obj._id.toString(), obj.title, obj.allDay, obj.start, obj.end, obj.club, backgroundColor);
+        return new Event(id, doc.title, doc.allDay, doc.start, doc.end, doc.club, backgroundColor);
     }
 
     toJSON() {
