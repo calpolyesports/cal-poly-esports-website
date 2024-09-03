@@ -1,4 +1,4 @@
-import { MongoClient, ServerApiVersion, type MongoClientOptions } from 'mongodb';
+import { MongoClient, ObjectId, ServerApiVersion, type MongoClientOptions } from 'mongodb';
 import { env } from '$env/dynamic/private';
 
 import * as models from '../models';
@@ -50,6 +50,24 @@ export async function getEvents() {
 
 export async function addEvent(event: models.Event) {
     await Event.insertOne(event);
+}
+
+export async function getEventById(id: string) {
+    const event = await Event.findOne({ _id: new ObjectId(id) });
+    if (!event) {
+        return null;
+    }
+    return models.Event.fromMongo(event).toJSON();
+}
+
+export async function updateEvent(event: models.Event) {
+    const result = await Event.updateOne({ _id: new ObjectId(event.id) }, { $set: event });
+    return result.matchedCount !== 0;
+}
+
+export async function deleteEvent(id: string) {
+    const result = await Event.deleteOne({ _id: new ObjectId(id) });
+    return result.deletedCount !== 0;
 }
 
 export async function getClubByName(urlName: string) {

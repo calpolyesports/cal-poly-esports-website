@@ -82,14 +82,17 @@ export class Article {
 }
 
 export class Event {
+    id: string;
     title: string;
     allDay: boolean;
     start: Date;
     end: Date;
     club: string;
     backgroundColor: string;
+    editable: boolean = false;
 
-    constructor(title: string, allDay: boolean, start: Date, end: Date, club: string, backgroundColor: string) {
+    constructor(id: string, title: string, allDay: boolean, start: Date, end: Date, club: string, backgroundColor: string) {
+        this.id = id;
         this.title = title;
         this.allDay = allDay;
         this.start = start;
@@ -101,7 +104,7 @@ export class Event {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static fromMongo(obj: any): Event {
         const backgroundColor = '#154734';
-        return new Event(obj.title, obj.allDay, obj.start, obj.end, obj.club, backgroundColor);
+        return new Event(obj._id.toString(), obj.title, obj.allDay, obj.start, obj.end, obj.club, backgroundColor);
     }
 
     toJSON() {

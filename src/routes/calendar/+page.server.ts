@@ -5,14 +5,20 @@ import type { ServerLoad, Actions } from '@sveltejs/kit';
 
 import * as models from '$lib/models';
 
-export const load: ServerLoad = async () => {
+export const load: ServerLoad = async (event) => {
+    const events = await db.getEvents();
+    events.forEach((calEvent) => {
+        if (event.locals.user?.admin_for.includes(calEvent.club)) {
+            calEvent.editable = true;
+        }
+    });
     return {
-        events: await db.getEvents(),
+        events: events,
     }
 }
 
 export const actions: Actions = {
-    default: async (event) => {
+    add: async (event) => {
         const formData = await event.request.formData();
         const title = formData.get('title');
         const allDay = formData.get('allDay') !== null;
@@ -66,5 +72,5 @@ export const actions: Actions = {
             end: new Date(end),
             club,
         } as models.Event);
-    }
+    },
 }
