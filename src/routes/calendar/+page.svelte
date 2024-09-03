@@ -127,6 +127,11 @@
                 options.events = events;
             }
         });
+
+        (document.getElementById('title') as HTMLInputElement).value = '';
+        (document.getElementById('allDay') as HTMLInputElement).checked = false;
+        (document.getElementById('start') as HTMLInputElement).value = '';
+        (document.getElementById('end') as HTMLInputElement).value = '';
     };
 </script>
 
