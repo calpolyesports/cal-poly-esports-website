@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
     import Calendar from '@event-calendar/core';
     import TimeGrid from '@event-calendar/time-grid';
     import Interaction from '@event-calendar/interaction';
@@ -78,7 +77,7 @@
 
 {#if data.adminFor.length > 0}
     <h1>Add New Event</h1>
-    <form method="post" action="?/add" use:enhance>
+    <form method="post" action="?/add">
         <label for="title">Title</label>
         <input type="text" id="title" name="title" required>
 
