@@ -42,10 +42,18 @@
     };
 
     const getModalFields = () => {
+        let startDate = new Date(newEventStart);
+        let endDate = new Date(newEventEnd);
+        if (startDate.getTime() > endDate.getTime()) {
+            const temp = startDate;
+            startDate = endDate;
+            endDate = temp;
+        }
+
         return {
             title: newEventTitle,
-            start: new Date(newEventStart),
-            end: new Date(newEventEnd),
+            start: startDate,
+            end: endDate,
             club: newEventClub,
         };
     };
@@ -129,6 +137,7 @@
     const onClickAdd = () => {
         modalIsEdit = false;
         modalEvent = undefined;
+        setModalFields();
         modalVisible = true;
     };
 
@@ -231,10 +240,10 @@
         <input type="text" id="title" name="title" bind:value={newEventTitle} required>
     
         <label for="start">Start</label>
-        <input type="datetime-local" id="start" name="start" bind:value={newEventStart} required>
+        <input type="datetime-local" id="start" name="start" step="300" bind:value={newEventStart} required>
     
         <label for="end">End</label>
-        <input type="datetime-local" id="end" name="end" bind:value={newEventEnd} required>
+        <input type="datetime-local" id="end" name="end" step="300" bind:value={newEventEnd} required>
     
         <label for="club">Club</label>
         <select id="club" name="club" bind:value={newEventClub} required>
