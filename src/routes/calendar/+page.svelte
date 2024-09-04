@@ -25,6 +25,10 @@
     let newEventEnd = '';
     let newEventClub = '';
 
+    /////////////////////
+    // MODAL FUNCTIONS //
+    /////////////////////
+
     const setModalFields = (modalEvent?: ModalEvent) => {
         if (modalEvent) {
             const adjustedStart = new Date(modalEvent.start.getTime() - modalEvent.start.getTimezoneOffset() * 60000);
@@ -58,6 +62,10 @@
         };
     };
 
+    //////////////////////
+    // CALENDAR HELPERS //
+    //////////////////////
+
     const syncEventTimeInfo = (event: Calendar.Event) => {
         const targetEvent = events.find((e) => e.id === event.id);
         if (!targetEvent) {
@@ -67,6 +75,17 @@
         targetEvent.end = event.end;
         return targetEvent;
     };
+
+    const hasPermissions = (event: Event) => {
+        if (event.club === 'general') {
+            return data.isGeneralAdmin;
+        }
+        return data.adminFor.find((club) => club.urlName === event.club);
+    };
+
+    //////////////////////
+    // API INTERACTIONS //
+    //////////////////////
 
     const sendAddEvent = async (event: ModalEvent) => {
         const response = await fetch("/calendar", {
@@ -134,6 +153,10 @@
         return false;
     };
 
+    //////////////////////
+    // EVENT HANDLERS   //
+    //////////////////////
+
     const onClickAdd = () => {
         modalIsEdit = false;
         modalEvent = undefined;
@@ -193,11 +216,18 @@
         setModalFields();
         modalVisible = false;
     };
+    
+    //////////////////////
+    // CALENDAR OPTIONS //
+    //////////////////////
 
     let plugins = [TimeGrid, Interaction] as Calendar.Plugin[];
     let options = {
         view: 'timeGridWeek',
-        selectable: true,
+        selectable: false,
+        editable: false,
+        eventDurationEditable: false,
+        eventStartEditable: false,
         events: events,
         display: 'auto',
         height: '50rem',
@@ -218,7 +248,7 @@
         eventClick: async (event) => {
             const clickedEvent = event.event;
             const eventInfo = events.find((e) => e.id === clickedEvent.id);
-            if (!eventInfo) {
+            if (!eventInfo || !hasPermissions(eventInfo)) {
                 return;
             }
             onClickEdit(eventInfo);
@@ -247,6 +277,9 @@
     
         <label for="club">Club</label>
         <select id="club" name="club" bind:value={newEventClub} required>
+            {#if data.isGeneralAdmin}
+                <option value="general">General</option>
+            {/if}
             {#each data.adminFor as club}
                 <option value={club.urlName}>{club.clubName}</option>
             {/each}
@@ -302,5 +335,6 @@
         color: white;
         border: none;
         border-radius: 0.5rem;
+        cursor: pointer;
     }
 </style>

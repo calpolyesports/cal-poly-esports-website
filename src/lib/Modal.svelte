@@ -5,7 +5,7 @@
 
 <div class="modal" style="display: {show ? 'flex' : 'none'}">
     <div class="modal-content">
-        <span class="close" on:click={() => show = false}>&times;</span>
+        <button class="close" on:click={() => show = false}>&times;</button>
         <h2>{title}</h2>
         <slot></slot>
     </div>
@@ -40,6 +40,8 @@
         float: right;
         font-size: 2.5rem;
         font-weight: bold;
+        border: none;
+        background-color: transparent;
     }
 
     .close:hover,
