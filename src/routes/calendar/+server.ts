@@ -41,17 +41,6 @@ export const POST: RequestHandler = async (event) => {
         });
     }
 
-    if (
-        typeof club !== "string" ||
-        club.length < 1 ||
-        club.length > 255
-    ) {
-        return json({
-            status: 400,
-            message: "Invalid club"
-        });
-    }
-
     if (!event.locals.user?.admin_for.includes(club)) {
         return json({
             status: 403,
@@ -87,8 +76,11 @@ export const POST: RequestHandler = async (event) => {
 export const PUT: RequestHandler = async (event) => {
     const body = await event.request.json();
     const id = body.id;
+    const newTitle = body.title;
+    const newAllDay = body.allDay;
     const newStart = body.start;
     const newEnd = body.end;
+    const newClub = body.club;
     
     const oldEvent = await db.getEventById(id);
 
@@ -99,10 +91,31 @@ export const PUT: RequestHandler = async (event) => {
         });
     }
 
-    if (!event.locals.user?.admin_for.includes(oldEvent.club)) {
+    if (!event.locals.user?.admin_for.includes(oldEvent.club) ||
+        !event.locals.user?.admin_for.includes(newClub)) {
         return json({
             status: 403,
             message: "You do not have permission to update events for this club"
+        });
+    }
+
+    if (
+        typeof newTitle !== "string" ||
+        newTitle.length < 1 ||
+        newTitle.length > 255
+    ) {
+        return json({
+            status: 400,
+            message: "Invalid title"
+        });
+    }
+
+    if (
+        typeof newAllDay !== "boolean"
+    ) {
+        return json({
+            status: 400,
+            message: "Invalid allDay"
         });
     }
 
@@ -116,8 +129,11 @@ export const PUT: RequestHandler = async (event) => {
         });
     }
 
+    oldEvent.title = newTitle;
+    oldEvent.allDay = newAllDay;
     oldEvent.start = new Date(newStart);
     oldEvent.end = new Date(newEnd);
+    oldEvent.club = newClub;
 
     const success = await db.updateEvent(oldEvent);
 
