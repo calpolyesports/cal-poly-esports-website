@@ -1,6 +1,8 @@
 <script lang="ts">
     import Calendar from '@event-calendar/core';
+    import DayGrid from '@event-calendar/day-grid';
     import TimeGrid from '@event-calendar/time-grid';
+    import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
     import { Event } from '$lib/models.js';
 	import Modal from '$lib/Modal.svelte';
@@ -24,6 +26,8 @@
     let newEventStart = '';
     let newEventEnd = '';
     let newEventClub = '';
+
+    let ec: Calendar;
 
     /////////////////////
     // MODAL FUNCTIONS //
@@ -81,6 +85,10 @@
             return data.isGeneralAdmin;
         }
         return data.adminFor.find((club) => club.urlName === event.club);
+    };
+
+    const setView = (view: string) => {
+        ec.setOption('view', view);
     };
 
     //////////////////////
@@ -169,8 +177,8 @@
         sendAddEvent(newEvent).then((event) => {
             if (event) {
                 event.editable = true;
-                events = [...events, event];
-                options.events = events;
+                events.push(event);
+                ec.addEvent(event);
             }
         });
         setModalFields();
@@ -201,7 +209,7 @@
         sendUpdateEvent(updatedEvent).then((success) => {
             if (success) {
                 events = events.map((e) => e.id === updatedEvent.id ? updatedEvent : e);
-                options.events = events;
+                ec.updateEvent(updatedEvent);
             }
         });
         setModalFields();
@@ -210,9 +218,8 @@
 
     const onSubmitDelete = () => {
         sendDeleteEvent(modalEvent).then((success) => {
-            if (success) {
-                events = events.filter((e) => e.id !== modalEvent?.id);
-                options.events = events;
+            if (success && modalEvent) {
+                ec.removeEventById(modalEvent.id);
             }
         });
         setModalFields();
@@ -223,13 +230,14 @@
     // CALENDAR OPTIONS //
     //////////////////////
 
-    let plugins = [TimeGrid, Interaction] as Calendar.Plugin[];
+    let plugins = [DayGrid, TimeGrid, List, Interaction] as Calendar.Plugin[];
     let options = {
         view: 'timeGridWeek',
         selectable: false,
         editable: false,
         eventDurationEditable: false,
         eventStartEditable: false,
+        nowIndicator: true,
         events: events,
         display: 'auto',
         height: '50rem',
@@ -257,6 +265,11 @@
             }
             onClickEdit(eventInfo);
         },
+        headerToolbar: {
+            start: 'title prev,next today',
+            center: '',
+            end: 'dayGridMonth,timeGridWeek,listMonth',
+        }
     } as Calendar.Options;
 </script>
 
@@ -266,7 +279,7 @@
     <button on:click={onClickAdd}>Add Event</button>
 {/if}
 
-<Calendar {plugins} {options} />
+<Calendar bind:this={ec} {plugins} {options} />
 
 <Modal bind:show={modalVisible} title={modalTitle}>
     <div class="form">
