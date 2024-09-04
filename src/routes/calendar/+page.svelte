@@ -113,7 +113,10 @@
         return false;
     };
 
-    const sendDeleteEvent = async (event: Calendar.Event) => {
+    const sendDeleteEvent = async (event?: Event) => {
+        if (!event) {
+            return false;
+        }
         const response = await fetch("/calendar", {
             method: 'DELETE',
             headers: {
@@ -172,6 +175,17 @@
         sendUpdateEvent(updatedEvent).then((success) => {
             if (success) {
                 events = events.map((e) => e.id === updatedEvent.id ? updatedEvent : e);
+                options.events = events;
+            }
+        });
+        setModalFields();
+        modalVisible = false;
+    };
+
+    const onSubmitDelete = () => {
+        sendDeleteEvent(modalEvent).then((success) => {
+            if (success) {
+                events = events.filter((e) => e.id !== modalEvent?.id);
                 options.events = events;
             }
         });
@@ -241,6 +255,10 @@
         </select>
     
         <button on:click={modalIsEdit ? onSubmitEdit : onSubmitAdd}>Confirm</button>
+
+        {#if modalIsEdit}
+            <button on:click={onSubmitDelete}>Delete</button>
+        {/if}
     </div>
 </Modal>
 
