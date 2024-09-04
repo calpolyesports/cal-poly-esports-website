@@ -83,7 +83,6 @@ export class Article {
 
 export interface EventDoc {
     title: string;
-    allDay: boolean;
     start: Date;
     end: Date;
     club: string;
@@ -92,17 +91,15 @@ export interface EventDoc {
 export class Event {
     id: string;
     title: string;
-    allDay: boolean;
     start: Date;
     end: Date;
     club: string;
     backgroundColor: string;
     editable: boolean = false;
 
-    constructor(id: string, title: string, allDay: boolean, start: Date, end: Date, club: string, backgroundColor: string) {
+    constructor(id: string, title: string, start: Date, end: Date, club: string, backgroundColor: string) {
         this.id = id;
         this.title = title;
-        this.allDay = allDay;
         this.start = start;
         this.end = end;
         this.club = club;
@@ -111,13 +108,12 @@ export class Event {
 
     static fromMongo(id: string, doc: EventDoc): Event {
         const backgroundColor = '#154734';
-        return new Event(id, doc.title, doc.allDay, doc.start, doc.end, doc.club, backgroundColor);
+        return new Event(id, doc.title, doc.start, doc.end, doc.club, backgroundColor);
     }
 
     toMongo() {
         return {
             title: this.title,
-            allDay: this.allDay,
             start: this.start,
             end: this.end,
             club: this.club

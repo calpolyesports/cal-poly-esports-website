@@ -6,7 +6,6 @@ import type { EventDoc } from "$lib/models";
 export const POST: RequestHandler = async (event) => {
     const body = await event.request.json();
     const title = body.title;
-    const allDay = body.allDay;
     const start = body.start;
     const end = body.end;
     const club = body.club;
@@ -19,15 +18,6 @@ export const POST: RequestHandler = async (event) => {
         return json({
             status: 400,
             message: "Invalid title"
-        });
-    }
-
-    if (
-        typeof allDay !== "boolean"
-    ) {
-        return json({
-            status: 400,
-            message: "Invalid allDay"
         });
     }
 
@@ -50,7 +40,6 @@ export const POST: RequestHandler = async (event) => {
 
     const newDoc = {
         title,
-        allDay,
         start: new Date(start),
         end: new Date(end),
         club
@@ -77,7 +66,6 @@ export const PUT: RequestHandler = async (event) => {
     const body = await event.request.json();
     const id = body.id;
     const newTitle = body.title;
-    const newAllDay = body.allDay;
     const newStart = body.start;
     const newEnd = body.end;
     const newClub = body.club;
@@ -111,15 +99,6 @@ export const PUT: RequestHandler = async (event) => {
     }
 
     if (
-        typeof newAllDay !== "boolean"
-    ) {
-        return json({
-            status: 400,
-            message: "Invalid allDay"
-        });
-    }
-
-    if (
         typeof newStart !== "string" ||
         typeof newEnd !== "string"
     ) {
@@ -130,7 +109,6 @@ export const PUT: RequestHandler = async (event) => {
     }
 
     oldEvent.title = newTitle;
-    oldEvent.allDay = newAllDay;
     oldEvent.start = new Date(newStart);
     oldEvent.end = new Date(newEnd);
     oldEvent.club = newClub;

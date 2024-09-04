@@ -7,7 +7,6 @@
 
     interface ModalEvent {
         title: string,
-        allDay: boolean,
         start: Date,
         end: Date,
         club: string,
@@ -22,7 +21,6 @@
     $: modalTitle = modalIsEdit ? 'Edit Event' : 'Add Event';
 
     let newEventTitle = '';
-    let newEventAllDay = false;
     let newEventStart = '';
     let newEventEnd = '';
     let newEventClub = '';
@@ -32,13 +30,11 @@
             const adjustedStart = new Date(modalEvent.start.getTime() - modalEvent.start.getTimezoneOffset() * 60000);
             const adjustedEnd = new Date(modalEvent.end.getTime() - modalEvent.end.getTimezoneOffset() * 60000);
             newEventTitle = modalEvent.title;
-            newEventAllDay = modalEvent.allDay;
             newEventStart = adjustedStart.toISOString().slice(0, 16);
             newEventEnd = adjustedEnd.toISOString().slice(0, 16);
             newEventClub = modalEvent.club;
         } else {
             newEventTitle = '';
-            newEventAllDay = false;
             newEventStart = '';
             newEventEnd = '';
             newEventClub = data.adminFor[0].urlName;
@@ -48,7 +44,6 @@
     const getModalFields = () => {
         return {
             title: newEventTitle,
-            allDay: newEventAllDay,
             start: new Date(newEventStart),
             end: new Date(newEventEnd),
             club: newEventClub,
@@ -60,7 +55,6 @@
         if (!targetEvent) {
             return;
         }
-        targetEvent.allDay = event.allDay;
         targetEvent.start = event.start;
         targetEvent.end = event.end;
         return targetEvent;
@@ -81,7 +75,6 @@
                 return new Event(
                     newEvent.event.id,
                     newEvent.event.title,
-                    newEvent.event.allDay,
                     new Date(newEvent.event.start),
                     new Date(newEvent.event.end),
                     newEvent.event.club,
@@ -166,7 +159,6 @@
         const updatedEvent = new Event(
             modalEvent.id,
             updatedEventInfo.title,
-            updatedEventInfo.allDay,
             updatedEventInfo.start,
             updatedEventInfo.end,
             updatedEventInfo.club,
@@ -237,9 +229,6 @@
     <div class="form">
         <label for="title">Title</label>
         <input type="text" id="title" name="title" bind:value={newEventTitle} required>
-    
-        <label for="allDay">All Day</label>
-        <input type="checkbox" id="allDay" name="allDay" bind:value={newEventAllDay}>
     
         <label for="start">Start</label>
         <input type="datetime-local" id="start" name="start" bind:value={newEventStart} required>
