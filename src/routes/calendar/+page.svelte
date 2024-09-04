@@ -168,6 +168,7 @@
         const newEvent = getModalFields();
         sendAddEvent(newEvent).then((event) => {
             if (event) {
+                event.editable = true;
                 events = [...events, event];
                 options.events = events;
             }
@@ -196,6 +197,7 @@
             updatedEventInfo.club,
             modalEvent.backgroundColor,
         );
+        updatedEvent.editable = true;
         sendUpdateEvent(updatedEvent).then((success) => {
             if (success) {
                 events = events.map((e) => e.id === updatedEvent.id ? updatedEvent : e);
@@ -233,6 +235,8 @@
         height: '50rem',
         slotMinTime: '08:00:00',
         slotMaxTime: '22:00:00',
+        flexibleSlotTimeLimits: true,
+        allDaySlot: false,
         eventDrop: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
             if (!await sendUpdateEvent(editedEvent)) {
