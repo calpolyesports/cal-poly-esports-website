@@ -1,7 +1,7 @@
 <script>
     import TopNav from "./TopNav.svelte";
 
-    const topNavItems = [
+    let topNavItems = [
         { name: "Home", link: "/" },
         { name: "Clubs", link:"javascript:void(0)" },
         { name: "Calendar", link: "/calendar" },
@@ -19,7 +19,13 @@
 
 <div class="everything">
     <header>
-        <TopNav items={topNavItems} icon="/images/Main Logo/White Logo.png" clubs={data.clubs}/>
+        <TopNav
+            items={topNavItems}
+            adminItem={{ name: "Admin", link: "/admin" }}
+            isAdmin={data.username !== undefined}
+            icon="/images/Main Logo/White Logo.png"
+            clubs={data.clubs}
+        />
     </header>
     
     <div class="main-body">
@@ -45,6 +51,13 @@
                 <a href="/teams">Teams</a>
                 <a href="/about">About</a>
                 <a href="/contact">Contact</a>
+                <a href="/login">Admin Login</a>
+            </div>
+            <div class="column">
+                <h3>Clubs</h3>
+                {#each data.clubs as club}
+                    <a href="/clubs/{club.urlName}">{club.clubName}</a>
+                {/each}
             </div>
         </div>
     </div>

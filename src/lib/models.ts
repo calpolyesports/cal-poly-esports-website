@@ -1,3 +1,16 @@
+export interface UserDoc {
+    _id: string;
+    username: string;
+    password_hash: string;
+    admin_for: string[];
+}
+
+export interface SessionDoc {
+    _id: string;
+	expires_at: Date;
+	user_id: string;
+}
+
 export class Game {
     id: string;
     name: string;
@@ -68,21 +81,68 @@ export class Article {
     }
 }
 
+export interface EventDoc {
+    title: string;
+    start: Date;
+    end: Date;
+    club: string;
+}
+
+export class Event {
+    id: string;
+    title: string;
+    start: Date;
+    end: Date;
+    club: string;
+    backgroundColor: string;
+    editable: boolean = false;
+
+    constructor(id: string, title: string, start: Date, end: Date, club: string, backgroundColor: string) {
+        this.id = id;
+        this.title = title;
+        this.start = start;
+        this.end = end;
+        this.club = club;
+        this.backgroundColor = backgroundColor;
+    }
+
+    static fromMongo(id: string, doc: EventDoc): Event {
+        const backgroundColor = '#154734';
+        return new Event(id, doc.title, doc.start, doc.end, doc.club, backgroundColor);
+    }
+
+    toMongo() {
+        return {
+            title: this.title,
+            start: this.start,
+            end: this.end,
+            club: this.club
+        } as EventDoc;
+    }
+
+    toJSON() {
+        return {...this};
+    }
+}
+
 export class Club {
     clubName: string;
     aboutText: string;
     boardMembers: { name: string; position: string; profileImage: string }[];
     urlName: string;
+    color: string;
 
-    constructor(clubName: string, urlName: string, aboutText: string, boardMembers: { name: string; position: string; profileImage: string }[]) {
+    constructor(clubName: string, urlName: string, aboutText: string, boardMembers: { name: string; position: string; profileImage: string }[], color: string) {
         this.clubName = clubName;
         this.aboutText = aboutText;
         this.boardMembers = boardMembers;
         this.urlName = urlName;
+        this.color = color;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static fromMongo(doc: any) {
-        return new Club(doc.clubName, doc.urlName, doc.aboutText, doc.boardMembers);
+        return new Club(doc.clubName, doc.urlName, doc.aboutText, doc.boardMembers, doc.color);
     }
 
     toJSON() {
