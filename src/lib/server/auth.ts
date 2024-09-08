@@ -1,9 +1,9 @@
 import { Lucia, TimeSpan } from 'lucia';
 import { MongodbAdapter } from '@lucia-auth/adapter-mongodb';
 import { dev } from "$app/environment";
-import { Session, User } from './database';
+import { SESSION, USER } from './database';
 
-const adapter = new MongodbAdapter(Session, User);
+const adapter = new MongodbAdapter(SESSION, USER);
 
 export const lucia = new Lucia(adapter, {
     sessionCookie: {

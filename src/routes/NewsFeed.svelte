@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Article } from "$lib/models";
+    import { Article } from "$lib/types";
 
     export let articles: Article[];
 

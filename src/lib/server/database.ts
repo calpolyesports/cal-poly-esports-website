@@ -1,7 +1,8 @@
 import { MongoClient, ObjectId, ServerApiVersion, type MongoClientOptions } from 'mongodb';
 import { env } from '$env/dynamic/private';
 
-import * as models from '../models';
+import * as models from './models';
+import * as types from '../types';
 
 const client = new MongoClient(env.DB_CONN_STRING, {
     serverApi: {
@@ -15,30 +16,48 @@ await client.connect();
 await client.db("admin").command({ ping: 1 });
 console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
-export const Website = client.db('website');
-export const User = Website.collection<models.UserDoc>('users');
-export const Session = Website.collection<models.SessionDoc>('sessions');
-export const Article = Website.collection<models.Article>('articles');
-export const Roster = Website.collection<models.Game>('rosters');
-export const Event = Website.collection<models.EventDoc>('events');
-export const Club = Website.collection<models.Club>('clubs');
+export const WEBSITE = client.db('website');
+export const USER = WEBSITE.collection<models.UserDoc>('users');
+export const SESSION = WEBSITE.collection<models.SessionDoc>('sessions');
+export const ARTICLE = WEBSITE.collection<models.ArticleDoc>('articles');
+export const ROSTER_GAME = WEBSITE.collection<models.RosterGameDoc>('games');
+export const ROSTER_TEAM = WEBSITE.collection<models.RosterTeamDoc>('teams');
+export const ROSTER_MEMBER = WEBSITE.collection<models.RosterMemberDoc>('members');
+export const EVENT = WEBSITE.collection<models.EventDoc>('events');
+export const CLUB = WEBSITE.collection<models.ClubDoc>('clubs');
 
 export async function getArticles() {
-    const response = await Article.find().toArray();
-    const articles = response.map(article => models.Article.fromMongo(article));
+    const response = await ARTICLE.find().toArray();
+    const articles = response.map(article => types.Article.fromMongo(article));
     return articles.map(article => article.toJSON());
 }
 
 export async function getRosters() {
-    const response = await Roster.find().toArray();
-    const games = response.map(game => models.Game.fromMongo(game));
+    const allGameDocs = await ROSTER_GAME.find().toArray();
+    const allTeamDocs = await ROSTER_TEAM.find().toArray();
+    const allMemberDocs = await ROSTER_MEMBER.find().toArray();
+    const membersByTeamId: { [teamId: string]: models.RosterMemberDoc[] } = {};
+    allMemberDocs.forEach((member) => {
+        const teamIdString = member.team.toString();
+        if (!membersByTeamId[teamIdString]) {
+            membersByTeamId[teamIdString] = [];
+        }
+        membersByTeamId[teamIdString].push(member);
+    });
+
+    const games: types.RosterGame[] = [];
+    allGameDocs.forEach((gameDoc) => {
+        const teamDocs = allTeamDocs.filter((team) => team.game.equals(gameDoc._id));
+        games.push(types.RosterGame.fromMongo(gameDoc, teamDocs, membersByTeamId));
+    });
+
     return games.map(game => game.toJSON());
 }
 
 export async function getEvents(adminFor?: string[]) {
-    const response = await Event.find().toArray();
-    const events = response.map(event => models.Event.fromMongo(event._id.toString(), event));
-    const clubs = await Club.find().toArray();
+    const response = await EVENT.find().toArray();
+    const events = response.map(event => types.Event.fromMongo(event));
+    const clubs = await CLUB.find().toArray();
     events.forEach((event) => {
         const club = clubs.find(club => club.urlName === event.club);
         if (club) {
@@ -52,17 +71,17 @@ export async function getEvents(adminFor?: string[]) {
 }
 
 export async function addEvent(event: models.EventDoc) {
-    const result = await Event.insertOne(event);
+    const result = await EVENT.insertOne(event);
     return result.insertedId;
 }
 
 export async function getEventById(id: string, adminFor?: string[]) {
-    const eventDoc = await Event.findOne({ _id: new ObjectId(id) });
+    const eventDoc = await EVENT.findOne({ _id: new ObjectId(id) });
     if (!eventDoc) {
         return null;
     }
-    const event = models.Event.fromMongo(eventDoc._id.toString(), eventDoc);
-    const club = await Club.findOne({ urlName: event.club });
+    const event = types.Event.fromMongo(eventDoc);
+    const club = await CLUB.findOne({ urlName: event.club });
     if (club) {
         event.backgroundColor = club.color;
         if (adminFor && adminFor.includes(event.club)) {
@@ -72,13 +91,13 @@ export async function getEventById(id: string, adminFor?: string[]) {
     return event;
 }
 
-export async function updateEvent(event: models.Event) {
-    const result = await Event.updateOne({ _id: new ObjectId(event.id) }, { $set: event.toMongo() });
+export async function updateEvent(event: types.Event) {
+    const result = await EVENT.updateOne({ _id: new ObjectId(event.id) }, { $set: event.toMongo() });
     return result.matchedCount !== 0;
 }
 
 export async function deleteEvent(id: string) {
-    const result = await Event.deleteOne({ _id: new ObjectId(id) });
+    const result = await EVENT.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount !== 0;
 }
 
@@ -100,7 +119,7 @@ export async function getClubByName(urlName: string) {
 }
 
 export async function getClubs() {
-    const response = await Club.find().toArray();
-    const clubs = response.map(club => models.Club.fromMongo(club));
+    const response = await CLUB.find().toArray();
+    const clubs = response.map(club => types.Club.fromMongo(club));
     return clubs.map(club => club.toJSON());
 }

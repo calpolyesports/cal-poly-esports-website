@@ -1,5 +1,5 @@
 import { lucia } from '$lib/server/auth';
-import { User } from '$lib/server/database';
+import { USER } from '$lib/server/database';
 import { fail, redirect } from '@sveltejs/kit';
 import { verify } from '@node-rs/argon2';
 
@@ -35,7 +35,7 @@ export const actions: Actions = {
             });
         }
 
-        const existingUser = await User.findOne({ username });
+        const existingUser = await USER.findOne({ username });
         if (!existingUser) {
             return fail(400, {
                 username,

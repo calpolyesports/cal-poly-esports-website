@@ -3,10 +3,10 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
 
-	import * as models from "$lib/models";
+	import * as types from "$lib/types";
 	import MemberGrid from "./MemberGrid.svelte";
 
-	export let games: models.Game[] = [];
+	export let games: types.RosterGame[] = [];
 	export let activeGameId = games[0].id;
 
 	function moveUnderline(instant: boolean) {

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import * as models from '$lib/models';
+    import * as types from '$lib/types';
 
-    export let player: models.Member;
+    export let player: types.RosterMember;
 </script>
 
 <div class="player-card">

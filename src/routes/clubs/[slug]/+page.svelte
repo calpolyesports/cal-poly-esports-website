@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import { get } from 'svelte/store';
 

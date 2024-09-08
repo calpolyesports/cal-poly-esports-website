@@ -1,8 +1,8 @@
 <script lang="ts">
-    import * as models from '$lib/models';
+    import * as types from '$lib/types';
     import PlayerCard from './PlayerCard.svelte';
 
-    export let members: models.Member[];
+    export let members: types.RosterMember[];
 </script>
 
 <div class="member-grid">

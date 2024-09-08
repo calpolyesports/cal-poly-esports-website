@@ -4,7 +4,7 @@
     import TimeGrid from '@event-calendar/time-grid';
     import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
-    import { Event } from '$lib/models.js';
+    import { Event } from '$lib/types.js';
 	import Modal from '$lib/Modal.svelte';
 
     interface ModalEvent {
@@ -114,6 +114,7 @@
                     new Date(newEvent.event.end),
                     newEvent.event.club,
                     newEvent.event.backgroundColor,
+                    false,
                 );
             }
         }
@@ -204,8 +205,8 @@
             updatedEventInfo.end,
             updatedEventInfo.club,
             modalEvent.backgroundColor,
+            modalEvent.editable,
         );
-        updatedEvent.editable = true;
         sendUpdateEvent(updatedEvent).then((success) => {
             if (success) {
                 events = events.map((e) => e.id === updatedEvent.id ? updatedEvent : e);
