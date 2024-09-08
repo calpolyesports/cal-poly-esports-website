@@ -87,15 +87,11 @@
         return data.adminFor.find((club) => club.urlName === event.club);
     };
 
-    const setView = (view: string) => {
-        ec.setOption('view', view);
-    };
-
     //////////////////////
     // API INTERACTIONS //
     //////////////////////
 
-    const sendAddEvent = async (event: ModalEvent) => {
+    const sendAddEvent = async (event: ModalEvent): Promise<Event | undefined> => {
         const response = await fetch("/calendar", {
             method: 'POST',
             headers: {
@@ -105,28 +101,15 @@
         });
 
         if (response.ok) {
-            const newEvent = await response.json();
-            if (newEvent.status >= 200 && newEvent.status < 300) {
-                return new Event(
-                    newEvent.event.id,
-                    newEvent.event.title,
-                    new Date(newEvent.event.start),
-                    new Date(newEvent.event.end),
-                    newEvent.event.club,
-                    newEvent.event.backgroundColor,
-                    false,
-                );
-            }
+            const data = await response.json();
+            return data.event;
         }
 
         return undefined;
     };
     
-    const sendUpdateEvent = async (event?: Event) => {
-        if (!event) {
-            return false;
-        }
-        const response = await fetch("/calendar", {
+    const sendUpdateEvent = async (id: string, event: ModalEvent): Promise<Event | undefined> => {
+        const response = await fetch(`/calendar/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -135,28 +118,20 @@
         });
 
         if (response.ok) {
-            const updatedEvent = await response.json();
-            return updatedEvent.status >= 200 && updatedEvent.status < 300;
+            const data = await response.json();
+            return data.event;
         }
 
-        return false;
+        return undefined;
     };
 
-    const sendDeleteEvent = async (event?: Event) => {
-        if (!event) {
-            return false;
-        }
-        const response = await fetch("/calendar", {
+    const sendDeleteEvent = async (id: string): Promise<boolean> => {
+        const response = await fetch(`/calendar/${id}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(event),
         });
 
         if (response.ok) {
-            const deletedEvent = await response.json();
-            return deletedEvent.status >= 200 && deletedEvent.status < 300;
+            return true;
         }
 
         return false;
@@ -177,7 +152,9 @@
         const newEvent = getModalFields();
         sendAddEvent(newEvent).then((event) => {
             if (event) {
-                event.editable = true;
+                // correct date timezones for calendar
+                event.start = new Date(event.start);
+                event.end = new Date(event.end);
                 events.push(event);
                 ec.addEvent(event);
             }
@@ -198,17 +175,11 @@
             return;
         }
         const updatedEventInfo = getModalFields();
-        const updatedEvent = new Event(
-            modalEvent.id,
-            updatedEventInfo.title,
-            updatedEventInfo.start,
-            updatedEventInfo.end,
-            updatedEventInfo.club,
-            modalEvent.backgroundColor,
-            modalEvent.editable,
-        );
-        sendUpdateEvent(updatedEvent).then((success) => {
-            if (success) {
+        sendUpdateEvent(modalEvent.id, updatedEventInfo).then((updatedEvent) => {
+            if (updatedEvent) {
+                // correct date timezones for calendar
+                updatedEvent.start = new Date(updatedEvent.start);
+                updatedEvent.end = new Date(updatedEvent.end);
                 events = events.map((e) => e.id === updatedEvent.id ? updatedEvent : e);
                 ec.updateEvent(updatedEvent);
             }
@@ -218,9 +189,13 @@
     };
 
     const onSubmitDelete = () => {
-        sendDeleteEvent(modalEvent).then((success) => {
-            if (success && modalEvent) {
-                ec.removeEventById(modalEvent.id);
+        if (!modalEvent) {
+            return;
+        }
+        const clickedEvent = modalEvent;
+        sendDeleteEvent(clickedEvent.id).then((success) => {
+            if (success) {
+                ec.removeEventById(clickedEvent.id);
             }
         });
         setModalFields();
@@ -248,13 +223,13 @@
         allDaySlot: false,
         eventDrop: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
-            if (!await sendUpdateEvent(editedEvent)) {
+            if (editedEvent && !await sendUpdateEvent(editedEvent.id, editedEvent)) {
                 event.revert();
             }
         },
         eventResize: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
-            if (!await sendUpdateEvent(editedEvent)) {
+            if (editedEvent && !await sendUpdateEvent(editedEvent.id, editedEvent)) {
                 event.revert();
             }
         },

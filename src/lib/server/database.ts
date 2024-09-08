@@ -91,8 +91,8 @@ export async function getEventById(id: string, adminFor?: string[]) {
     return event;
 }
 
-export async function updateEvent(event: types.Event) {
-    const result = await EVENT.updateOne({ _id: new ObjectId(event.id) }, { $set: event.toMongo() });
+export async function updateEvent(id: string, event: models.EventDoc) {
+    const result = await EVENT.updateOne({ _id: new ObjectId(id) }, { $set: event });
     return result.matchedCount !== 0;
 }
 

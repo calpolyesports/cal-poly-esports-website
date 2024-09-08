@@ -2,9 +2,11 @@
     import * as types from '$lib/types';
 
     export let player: types.RosterMember;
+    export let onClick: () => void;
 </script>
 
-<div class="player-card">
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+<div class="player-card" on:click={onClick}>
     {#if player.picture}
     <div class="picture-container">
         <img src={player.picture} alt={player.username} />
