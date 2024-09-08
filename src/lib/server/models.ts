@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 
 // WILL RAISE ERROR IF IMPORTED FROM CLIENT
 // should only be used server-side (in database.ts)
+// if you need to use a model in a client-side file, you should create a new file in src/types
 
 // Authentication document with mandatory _id field
 export interface UserDoc {
