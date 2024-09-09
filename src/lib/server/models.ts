@@ -15,7 +15,7 @@ if (mongoose.models.User) {
 
 // Authentication document with mandatory _id field
 const userSchema = new Schema({
-    _id: { type: String, required: true },
+    _id: { type: Schema.Types.ObjectId, required: true },
     username: { type: String, required: true },
     password_hash: { type: String, required: true },
     admin_for: [String],
@@ -26,7 +26,7 @@ export const UserModel = model('User', userSchema);
 const sessionSchema = new Schema({
     _id: { type: String, required: true },
     expires_at: { type: Date, required: true },
-    user_id: { type: String, required: true },
+    user_id: { type: Schema.Types.ObjectId, required: true },
 });
 export const SessionModel = model('Session', sessionSchema);
 

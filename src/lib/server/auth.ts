@@ -2,7 +2,6 @@ import { Lucia, TimeSpan } from 'lucia';
 import { MongodbAdapter } from '@lucia-auth/adapter-mongodb';
 import mongoose from 'mongoose';
 import { dev } from "$app/environment";
-import { SessionModel, UserModel } from './models';
 
 const adapter = new MongodbAdapter(
     mongoose.connection.collection('sessions'),
