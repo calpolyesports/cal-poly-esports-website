@@ -26,6 +26,7 @@ export interface RosterGame {
     name: string;
     icon: string;
     teams: RosterTeam[];
+    adminRole: string;
 }
 
 export interface RosterTeam {

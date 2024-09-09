@@ -44,6 +44,7 @@ const rosterGameSchema = new Schema({
     name: { type: String, required: true },
     icon: { type: String, required: true },
     teams: [{ type: Schema.Types.ObjectId, ref: 'RosterTeam' }],
+    adminRole: { type: String, required: true },
 });
 export const RosterGameModel = model('RosterGame', rosterGameSchema);
 
@@ -54,7 +55,6 @@ const rosterTeamSchema = new Schema({
 export const RosterTeamModel = model('RosterTeam', rosterTeamSchema);
 
 const rosterMemberSchema = new Schema({
-    team: { type: Schema.Types.ObjectId, ref: 'RosterTeam' },
     name: { type: String, required: true },
     username: { type: String, required: true },
     role: { type: String, required: true },
