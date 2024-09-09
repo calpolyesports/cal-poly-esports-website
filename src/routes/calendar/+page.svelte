@@ -87,6 +87,17 @@
         return data.adminFor.find((club) => club.urlName === event.club);
     };
 
+    const convertToCalendarEvent = (event: Event): Calendar.EventInput => {
+        return {
+            id: event._id,
+            title: event.title,
+            start: event.start,
+            end: event.end,
+            backgroundColor: event.backgroundColor,
+            editable: event.editable,
+        };
+    };
+
     //////////////////////
     // API INTERACTIONS //
     //////////////////////
@@ -152,16 +163,11 @@
         const newEventInfo = getModalFields();
         sendAddEvent(newEventInfo).then((event) => {
             if (event) {
-                const newEvent = {
-                    ...event,
-                    start: new Date(event.start),
-                    end: new Date(event.end),
-                };
-                events.push(newEvent);
-                ec.addEvent({
-                    id: newEvent._id,
-                    ...newEvent,
-                });
+                // correct date timezones for calendar
+                event.start = new Date(event.start);
+                event.end = new Date(event.end);
+                events.push(event);
+                ec.addEvent(convertToCalendarEvent(event));
             }
         });
         setModalFields();
@@ -186,10 +192,7 @@
                 updatedEvent.start = new Date(updatedEvent.start);
                 updatedEvent.end = new Date(updatedEvent.end);
                 events = events.map((e) => e._id === updatedEvent._id ? updatedEvent : e);
-                ec.updateEvent({
-                    id: updatedEvent._id,
-                    ...updatedEvent,
-                });
+                ec.updateEvent(convertToCalendarEvent(updatedEvent));
             }
         });
         setModalFields();
@@ -222,7 +225,7 @@
         eventDurationEditable: false,
         eventStartEditable: false,
         nowIndicator: true,
-        events: events,
+        events: events.map(convertToCalendarEvent),
         display: 'auto',
         height: '50rem',
         slotMinTime: '08:00:00',

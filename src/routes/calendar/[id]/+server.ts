@@ -3,6 +3,7 @@ import { json } from "@sveltejs/kit";
 import * as db from "$lib/server/database";
 import * as models from "$lib/server/models";
 import type { InferRawDocType } from "mongoose";
+import { ObjectId } from "mongodb";
 
 export const PUT: RequestHandler = async (event) => {
     const id = event.params.id;
@@ -18,7 +19,7 @@ export const PUT: RequestHandler = async (event) => {
         }, { status: 400 });
     }
 
-    const oldEvent = await db.getEventById(id);
+    const oldEvent = await db.getEventById(new ObjectId(id));
 
     if (!oldEvent) {
         return json({
@@ -40,9 +41,9 @@ export const PUT: RequestHandler = async (event) => {
         club: newClub
     } as InferRawDocType<typeof models.EventModel>;
 
-    await db.updateEvent(id, newDoc);
+    await db.updateEvent(new ObjectId(id), newDoc);
 
-    const newEvent = await db.getEventById(oldEvent._id.toString(), event.locals.user?.admin_for);
+    const newEvent = await db.getEventById(oldEvent._id, event.locals.user?.admin_for);
 
     return json({
         event: newEvent,
@@ -52,7 +53,7 @@ export const PUT: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
     const id = event.params.id;
 
-    const oldEvent = await db.getEventById(id!);
+    const oldEvent = await db.getEventById(new ObjectId(id!));
 
     if (!oldEvent) {
         return json({
@@ -67,7 +68,7 @@ export const DELETE: RequestHandler = async (event) => {
         });
     }
 
-    await db.deleteEvent(id!);
+    await db.deleteEvent(new ObjectId(id!));
 
     return new Response(null, { status: 204 });
 }

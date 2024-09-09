@@ -32,7 +32,7 @@ export const POST: RequestHandler = async (event) => {
         }, { status: 500 });
     }
 
-    const newEvent = await db.getEventById(newId.toString(), event.locals.user?.admin_for);
+    const newEvent = await db.getEventById(newId, event.locals.user?.admin_for);
 
     return json({
         event: newEvent
