@@ -1,6 +1,7 @@
 <script lang="ts">
-    import * as types from '$lib/types';
     import PlayerCard from './PlayerCard.svelte';
+
+    import * as types from '$lib/types';
 
     interface ModalMember {
         name: string;
@@ -29,13 +30,13 @@
         if (response.ok) {
             const data = await response.json();
             if (data.status >= 200 && data.status < 300) {
-                return new types.RosterMember(
-                    data.member.id,
-                    data.member.name,
-                    data.member.username,
-                    data.member.role,
-                    data.member.picture,
-                );
+                return {
+                    _id: data.member.id,
+                    name: data.member.name,
+                    username: data.member.username,
+                    role: data.member.role,
+                    picture: data.member.picture,
+                } as types.RosterMember;
             }
         }
         return undefined;

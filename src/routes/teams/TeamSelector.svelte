@@ -7,7 +7,7 @@
 	import MemberGrid from "./MemberGrid.svelte";
 
 	export let games: types.RosterGame[] = [];
-	export let activeGameId = games[0].id;
+	let activeGameId = games.length > 0 ? games[0]._id : '';
 
 	function moveUnderline(instant: boolean) {
 		let element = document.getElementById(activeGameId.toString());
@@ -52,8 +52,8 @@
 <div class="content">
 	<ul>
 		{#each games as game}
-			<li class={activeGameId === game.id ? 'active' : ''} id="{game.id.toString()}">
-				<button on:click={handleClick(game.id)}>
+			<li class={activeGameId === game._id ? 'active' : ''} id="{game._id.toString()}">
+				<button on:click={handleClick(game._id)}>
 					<img src={game.icon} alt={game.name} />
 				</button>
 			</li>
@@ -63,7 +63,7 @@
 	<div class="underline"></div>
 	
 	{#each games as game}
-		{#if activeGameId == game.id}
+		{#if activeGameId == game._id}
 			<h1>{game.name}</h1>
 			{#each game.teams as team}
 				<h2>{team.name}</h2>

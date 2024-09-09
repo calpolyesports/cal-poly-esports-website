@@ -1,8 +1,8 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import * as db from "$lib/server/database";
-import type { EventDoc } from "$lib/server/models";
-import { verifyString, verifyDate, verifyClubPermissions } from "$lib/util";
+import * as models from "$lib/server/models";
+import { type InferRawDocType } from 'mongoose';
 
 export const POST: RequestHandler = async (event) => {
     const body = await event.request.json();
@@ -11,31 +11,9 @@ export const POST: RequestHandler = async (event) => {
     const end = body.end;
     const club = body.club;
 
-    const titleVerification = verifyString(title, 1, 255);
-    if (titleVerification) {
+    if (!event.locals.user?.admin_for.includes(club)) {
         return json({
-            message: `Invalid title: ${titleVerification}`
-        }, { status: 400 });
-    }
-
-    const startVerification = verifyDate(start);
-    if (startVerification) {
-        return json({
-            message: `Invalid start date: ${startVerification}`
-        }, { status: 400 });
-    }
-
-    const endVerification = verifyDate(end);
-    if (endVerification) {
-        return json({
-            message: `Invalid end date: ${endVerification}`
-        }, { status: 400 });
-    }
-
-    const clubPermission = verifyClubPermissions([club], event.locals.user ?? undefined);
-    if (clubPermission) {
-        return json({
-            message: clubPermission,
+            message: "You do not have permission to add events for this club"
         }, { status: 403 });
     }
 
@@ -44,7 +22,7 @@ export const POST: RequestHandler = async (event) => {
         start: new Date(start),
         end: new Date(end),
         club
-    } as EventDoc;
+    } as InferRawDocType<typeof models.EventModel>;
 
     const newId = await db.addEvent(newDoc);
 

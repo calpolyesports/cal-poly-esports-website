@@ -1,168 +1,67 @@
-export class Event {
-    id: string;
+export interface User {
+    _id: string;
+    username: string;
+    password_hash: string;
+    admin_for: string[];
+}
+
+export interface Session {
+    _id: string;
+    expires_at: Date;
+    user_id: string;
+}
+
+export interface Event {
+    _id: string;
     title: string;
     start: Date;
     end: Date;
     club: string;
     backgroundColor: string;
-    editable: boolean = false;
-
-    constructor(id: string, title: string, start: Date, end: Date, club: string, backgroundColor: string, editable: boolean) {
-        this.id = id;
-        this.title = title;
-        this.start = start;
-        this.end = end;
-        this.club = club;
-        this.backgroundColor = backgroundColor;
-        this.editable = editable;
-    }
-
-    static fromMongo(doc: any): Event {
-        const backgroundColor = '#154734';
-        return new Event(doc._id.toString(), doc.title, doc.start, doc.end, doc.club, backgroundColor, false);
-    }
-
-    toMongo() {
-        return {
-            title: this.title,
-            start: this.start,
-            end: this.end,
-            club: this.club
-        };
-    }
-
-    toJSON() {
-        return {...this};
-    }
+    editable: boolean;
 }
 
-export class RosterGame {
-    id: string;
+export interface RosterGame {
+    _id: string;
     name: string;
     icon: string;
     teams: RosterTeam[];
-
-    constructor(id: string, name: string, icon: string, teams: RosterTeam[]) {
-        this.id = id;
-        this.name = name;
-        this.icon = icon;
-        this.teams = teams;
-    }
-
-    static fromMongo(
-        doc: any,
-        teams: any[],
-        members: { [teamId: string]: any[] }
-    ): RosterGame {
-        return new RosterGame(
-            doc._id.toString(),
-            doc.name,
-            doc.icon,
-            teams.map((team) => RosterTeam.fromMongo(team, members[team._id.toString()] ?? [])),
-        );
-    }
-
-    toJSON() {
-        return {
-            ...this,
-            teams: this.teams.map((team) => team.toJSON()),
-        };
-    }
 }
 
-export class RosterTeam {
-    id: string;
+export interface RosterTeam {
+    _id: string;
     name: string;
     members: RosterMember[];
-
-    constructor(id: string, name: string, members: RosterMember[]) {
-        this.id = id;
-        this.name = name;
-        this.members = members;
-    }
-
-    static fromMongo(doc: any, members: any[]): RosterTeam {
-        return new RosterTeam(doc._id.toString(), doc.name, members.map((member) => RosterMember.fromMongo(member)));
-    }
-
-    toJSON() {
-        return {
-            ...this,
-            members: this.members.map((member) => member.toJSON()),
-        };
-    }
 }
 
-export class RosterMember {
-    id: string;
+export interface RosterMember {
+    _id: string;
     name: string;
     username: string;
     role: string;
-    picture?: string;
-
-    constructor(id: string, name: string, username: string, role: string, picture?: string) {
-        this.id = id;
-        this.name = name;
-        this.username = username;
-        this.role = role;
-        this.picture = picture;
-    }
-
-    static fromMongo(doc: any): RosterMember {
-        return new RosterMember(doc._id.toString(), doc.name, doc.username, doc.role, doc.picture);
-    }
-
-    toJSON() {
-        return {...this};
-    }
+    picture: string;
 }
 
-export class Article {
-    id: string;
+export interface Article {
+    _id: string;
     title: string;
-    summary: string;
+    summary?: string;
     link: string;
-    image: string;
-
-    constructor(id: string, title: string, summary: string, link: string, image: string) {
-        this.id = id;
-        this.title = title;
-        this.summary = summary;
-        this.link = link;
-        this.image = image;
-    }
-
-    static fromMongo(doc: any): Article {
-        return new Article(doc._id.toString(), doc.title, doc.summary, doc.link, doc.image);
-    }
-
-    toJSON() {
-        return {...this};
-    }
+    image?: string;
 }
 
-export class Club {
-    id: string;
+export interface Club {
+    _id: string;
     clubName: string;
     aboutText: string;
-    boardMembers: { name: string; position: string; profileImage: string }[];
+    boardMembers: BoardMember[];
     urlName: string;
     color: string;
+}
 
-    constructor(id: string, clubName: string, urlName: string, aboutText: string, boardMembers: { name: string; position: string; profileImage: string }[], color: string) {
-        this.id = id;
-        this.clubName = clubName;
-        this.aboutText = aboutText;
-        this.boardMembers = boardMembers;
-        this.urlName = urlName;
-        this.color = color;
-    }
-
-    static fromMongo(doc: any) {
-        return new Club(doc._id.toString(), doc.clubName, doc.urlName, doc.aboutText, doc.boardMembers, doc.color);
-    }
-
-    toJSON() {
-        return {...this};
-    }
+export interface BoardMember {
+    _id: string;
+    name: string;
+    position: string;
+    profileImage: string;
 }

@@ -1,60 +1,83 @@
-import { ObjectId } from "mongodb";
+import mongoose, { Schema, model } from 'mongoose';
 
-// WILL RAISE ERROR IF IMPORTED FROM CLIENT
-// should only be used server-side (in database.ts)
-// if you need to use a model in a client-side file, you should create a new file in src/types
+
+if (mongoose.models.User) {
+    mongoose.deleteModel('User');
+    mongoose.deleteModel('Session');
+    mongoose.deleteModel('Event');
+    mongoose.deleteModel('RosterGame');
+    mongoose.deleteModel('RosterTeam');
+    mongoose.deleteModel('RosterMember');
+    mongoose.deleteModel('Article');
+    mongoose.deleteModel('Club');
+}
+
 
 // Authentication document with mandatory _id field
-export interface UserDoc {
-    _id: string;
-    username: string;
-    password_hash: string;
-    admin_for: string[];
-}
+const userSchema = new Schema({
+    _id: { type: String, required: true },
+    username: { type: String, required: true },
+    password_hash: { type: String, required: true },
+    admin_for: [String],
+});
+export const UserModel = model('User', userSchema);
 
 // Authentication document with mandatory _id field
-export interface SessionDoc {
-    _id: string;
-	expires_at: Date;
-	user_id: string;
-}
+const sessionSchema = new Schema({
+    _id: { type: String, required: true },
+    expires_at: { type: Date, required: true },
+    user_id: { type: String, required: true },
+});
+export const SessionModel = model('Session', sessionSchema);
 
-export interface EventDoc {
-    title: string;
-    start: Date;
-    end: Date;
-    club: string;
-}
 
-export interface RosterGameDoc {
-    name: string;
-    icon: string;
-}
+const eventSchema = new Schema({
+    title: { type: String, required: true },
+    start: { type: Date, required: true },
+    end: { type: Date, required: true },
+    club: { type: String, required: true },
+});
+export const EventModel = model('Event', eventSchema);
 
-export interface RosterTeamDoc {
-    game: ObjectId;
-    name: string;
-}
 
-export interface RosterMemberDoc {
-    team: ObjectId;
-    name: string;
-    username: string;
-    role: string;
-    picture?: string;
-}
+const rosterGameSchema = new Schema({
+    name: { type: String, required: true },
+    icon: { type: String, required: true },
+    teams: [{ type: Schema.Types.ObjectId, ref: 'RosterTeam' }],
+});
+export const RosterGameModel = model('RosterGame', rosterGameSchema);
 
-export interface ArticleDoc {
-    title: string;
-    summary: string;
-    link: string;
-    image: string;
-}
+const rosterTeamSchema = new Schema({
+    name: { type: String, required: true },
+    members: [{ type: Schema.Types.ObjectId, ref: 'RosterMember' }],
+});
+export const RosterTeamModel = model('RosterTeam', rosterTeamSchema);
 
-export interface ClubDoc {
-    clubName: string;
-    aboutText: string;
-    boardMembers: { name: string; position: string; profileImage: string }[];
-    urlName: string;
-    color: string;
-}
+const rosterMemberSchema = new Schema({
+    team: { type: Schema.Types.ObjectId, ref: 'RosterTeam' },
+    name: { type: String, required: true },
+    username: { type: String, required: true },
+    role: { type: String, required: true },
+    picture: String,
+});
+export const RosterMemberModel = model('RosterMember', rosterMemberSchema);
+
+const articleSchema = new Schema({
+    title: { type: String, required: true },
+    summary: String,
+    link: { type: String, required: true },
+    image: String,
+});
+export const ArticleModel = model('Article', articleSchema);
+
+
+const clubSchema = new Schema({
+    clubName: { type: String, required: true },
+    aboutText: { type: String, required: true },
+    boardMembers: [
+        { name: String, position: String, profileImage: String }
+    ],
+    urlName: { type: String, required: true },
+    color: { type: String, required: true },
+});
+export const ClubModel = model('Club', clubSchema);

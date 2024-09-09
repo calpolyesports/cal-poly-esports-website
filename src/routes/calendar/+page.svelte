@@ -4,7 +4,7 @@
     import TimeGrid from '@event-calendar/time-grid';
     import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
-    import { Event } from '$lib/types.js';
+    import { type Event } from '$lib/types.js';
 	import Modal from '$lib/Modal.svelte';
 
     interface ModalEvent {
@@ -15,7 +15,7 @@
     }
 
     export let data;
-    let events = data.events;
+    let events: Event[] = data.events;
 
     let modalVisible = false;
     let modalIsEdit = false;
@@ -71,7 +71,7 @@
     //////////////////////
 
     const syncEventTimeInfo = (event: Calendar.Event) => {
-        const targetEvent = events.find((e) => e.id === event.id);
+        const targetEvent = events.find((e) => e._id === event.id);
         if (!targetEvent) {
             return;
         }
@@ -149,14 +149,19 @@
     };
 
     const onSubmitAdd = () => {
-        const newEvent = getModalFields();
-        sendAddEvent(newEvent).then((event) => {
+        const newEventInfo = getModalFields();
+        sendAddEvent(newEventInfo).then((event) => {
             if (event) {
-                // correct date timezones for calendar
-                event.start = new Date(event.start);
-                event.end = new Date(event.end);
-                events.push(event);
-                ec.addEvent(event);
+                const newEvent = {
+                    ...event,
+                    start: new Date(event.start),
+                    end: new Date(event.end),
+                };
+                events.push(newEvent);
+                ec.addEvent({
+                    id: newEvent._id,
+                    ...newEvent,
+                });
             }
         });
         setModalFields();
@@ -175,13 +180,16 @@
             return;
         }
         const updatedEventInfo = getModalFields();
-        sendUpdateEvent(modalEvent.id, updatedEventInfo).then((updatedEvent) => {
+        sendUpdateEvent(modalEvent._id, updatedEventInfo).then((updatedEvent) => {
             if (updatedEvent) {
                 // correct date timezones for calendar
                 updatedEvent.start = new Date(updatedEvent.start);
                 updatedEvent.end = new Date(updatedEvent.end);
-                events = events.map((e) => e.id === updatedEvent.id ? updatedEvent : e);
-                ec.updateEvent(updatedEvent);
+                events = events.map((e) => e._id === updatedEvent._id ? updatedEvent : e);
+                ec.updateEvent({
+                    id: updatedEvent._id,
+                    ...updatedEvent,
+                });
             }
         });
         setModalFields();
@@ -193,9 +201,9 @@
             return;
         }
         const clickedEvent = modalEvent;
-        sendDeleteEvent(clickedEvent.id).then((success) => {
+        sendDeleteEvent(clickedEvent._id).then((success) => {
             if (success) {
-                ec.removeEventById(clickedEvent.id);
+                ec.removeEventById(clickedEvent._id);
             }
         });
         setModalFields();
@@ -223,19 +231,19 @@
         allDaySlot: false,
         eventDrop: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
-            if (editedEvent && !await sendUpdateEvent(editedEvent.id, editedEvent)) {
+            if (editedEvent && !await sendUpdateEvent(editedEvent._id, editedEvent)) {
                 event.revert();
             }
         },
         eventResize: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
-            if (editedEvent && !await sendUpdateEvent(editedEvent.id, editedEvent)) {
+            if (editedEvent && !await sendUpdateEvent(editedEvent._id, editedEvent)) {
                 event.revert();
             }
         },
         eventClick: async (event) => {
             const clickedEvent = event.event;
-            const eventInfo = events.find((e) => e.id === clickedEvent.id);
+            const eventInfo = events.find((e) => e._id === clickedEvent.id);
             if (!eventInfo || !hasPermissions(eventInfo)) {
                 return;
             }

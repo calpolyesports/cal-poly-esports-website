@@ -1,9 +1,8 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import * as db from "$lib/server/database";
-import type { EventDoc } from "$lib/server/models";
-import { Event } from "$lib/types";
-import { verifyString, verifyDate, verifyClubPermissions } from "$lib/util";
+import * as models from "$lib/server/models";
+import type { InferRawDocType } from "mongoose";
 
 export const PUT: RequestHandler = async (event) => {
     const id = event.params.id;
@@ -13,14 +12,13 @@ export const PUT: RequestHandler = async (event) => {
     const newEnd = body.end;
     const newClub = body.club;
 
-    const verifyId = verifyString(id, 1, 255);
-    if (verifyId) {
+    if (!id) {
         return json({
-            message: `Invalid id: ${verifyId}`
+            message: "Missing id"
         }, { status: 400 });
     }
 
-    const oldEvent = await db.getEventById(id!);
+    const oldEvent = await db.getEventById(id);
 
     if (!oldEvent) {
         return json({
@@ -28,31 +26,10 @@ export const PUT: RequestHandler = async (event) => {
         }, { status: 404 });
     }
 
-    const titleVerification = verifyString(newTitle, 1, 255);
-    if (titleVerification) {
+    if (!event.locals.user?.admin_for.includes(newClub) ||
+        !event.locals.user?.admin_for.includes(oldEvent?.club)) {
         return json({
-            message: `Invalid title: ${titleVerification}`
-        }, { status: 400 });
-    }
-
-    const startVerification = verifyDate(newStart);
-    if (startVerification) {
-        return json({
-            message: `Invalid start date: ${startVerification}`
-        }, { status: 400 });
-    }
-
-    const endVerification = verifyDate(newEnd);
-    if (endVerification) {
-        return json({
-            message: `Invalid end date: ${endVerification}`
-        }, { status: 400 });
-    }
-
-    const clubPermission = verifyClubPermissions([newClub], event.locals.user ?? undefined);
-    if (clubPermission) {
-        return json({
-            message: clubPermission,
+            message: "You do not have permission to update events for this club",
         }, { status: 403 });
     }
 
@@ -61,17 +38,11 @@ export const PUT: RequestHandler = async (event) => {
         start: new Date(newStart),
         end: new Date(newEnd),
         club: newClub
-    } as EventDoc;
+    } as InferRawDocType<typeof models.EventModel>;
 
-    const success = await db.updateEvent(oldEvent.id, newDoc);
+    await db.updateEvent(id, newDoc);
 
-    if (!success) {
-        return json({
-            message: "Failed to update event"
-        }, { status: 500 });
-    }
-
-    const newEvent = await db.getEventById(oldEvent.id, event.locals.user?.admin_for);
+    const newEvent = await db.getEventById(oldEvent._id.toString(), event.locals.user?.admin_for);
 
     return json({
         event: newEvent,
@@ -81,13 +52,6 @@ export const PUT: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
     const id = event.params.id;
 
-    const verifyId = verifyString(id, 1, 255);
-    if (verifyId) {
-        return json({
-            message: `Invalid id: ${verifyId}`
-        }, { status: 400 });
-    }
-
     const oldEvent = await db.getEventById(id!);
 
     if (!oldEvent) {
@@ -96,21 +60,14 @@ export const DELETE: RequestHandler = async (event) => {
         }, { status: 404 });
     }
 
-    const clubPermission = verifyClubPermissions([oldEvent.club], event.locals.user ?? undefined);
-    if (clubPermission) {
+    if (!event.locals.user?.admin_for.includes(oldEvent.club)) {
         return json({
             status: 403,
-            message: clubPermission,
+            message: "You do not have permission to delete events for this club",
         });
     }
 
-    const success = await db.deleteEvent(id!);
-
-    if (!success) {
-        return json({
-            message: "Failed to delete event"
-        }, { status: 500 });
-    }
+    await db.deleteEvent(id!);
 
     return new Response(null, { status: 204 });
 }
