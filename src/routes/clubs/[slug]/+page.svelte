@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { get } from 'svelte/store';
+    import AboutText from './AboutText.svelte';
 
     export let data;
     let club = data.club;
@@ -15,10 +16,10 @@
 
 {#if club}
     <h1>{club.clubName} Club</h1>
-    <p>{club.aboutText}</p>
+    <AboutText html={club.aboutText} />
 
     <h2>Board Members</h2>
-    <ul>
+    <ul class="board-members">
         {#each club.boardMembers as member}
             <li>
                 {#if member.profileImage}
@@ -30,6 +31,7 @@
         {/each}
     </ul>
 {:else}
+    <h1>404</h1>
     <p>Club does not exist</p>
 {/if}
 
@@ -37,6 +39,10 @@
     h1 {
         font-size: 2.5rem;
         margin-bottom: 1rem;
+        text-decoration-line: underline;
+        text-decoration-color: var(--cal-poly-secondary);
+        text-decoration-thickness: 0.2rem;
+        text-underline-offset: 2rem;
     }
 
     p {
@@ -44,7 +50,7 @@
         margin-bottom: 2rem;
     }
 
-    ul {
+    ul.board-members {
         list-style: none;
         padding: 0;
         display: flex;
@@ -52,7 +58,7 @@
         gap: 2rem;
     }
 
-    ul li {
+    ul.board-members li {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -60,14 +66,14 @@
         width: 150px;
     }
 
-    ul li img {
+    ul.board-members li img {
         width: 100px;
         height: 100px;
         border-radius: 50%;
         margin-bottom: 1rem;
     }
 
-    ul li p {
+    ul.board-members li p {
         font-size: 1.2rem;
         margin: 0.5rem 0;
         text-align: center;
