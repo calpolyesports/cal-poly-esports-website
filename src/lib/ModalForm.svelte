@@ -67,8 +67,9 @@
                     </select>
                 {/if}
             {/each}
+            <br>
             {#each actions as action}
-                <button class="action" on:click={() => runCallbackWithFormData(action.callback)}>{action.name}</button>
+                <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)}>{action.name}</button>
             {/each}
         </div>
     </div>
@@ -144,16 +145,5 @@
         font-size: 1.25rem;
         padding: 0.5rem;
         width: 100%;
-    }
-
-    button.action {
-        font-size: 1.25rem;
-        padding: 0.5rem 1rem;
-        margin-top: 1rem;
-        background-color: var(--cal-poly-secondary);
-        color: white;
-        border: none;
-        border-radius: 0.5rem;
-        cursor: pointer;
     }
 </style>

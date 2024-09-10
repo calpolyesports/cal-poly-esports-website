@@ -239,7 +239,7 @@
 <h1>Calendar</h1>
 
 {#if data.adminFor.length > 0}
-    <button on:click={onClickAdd}>Add Event</button>
+    <button class="button-medium" on:click={onClickAdd}>Add Event</button>
 {/if}
 
 <Calendar bind:this={ec} {plugins} {options} />

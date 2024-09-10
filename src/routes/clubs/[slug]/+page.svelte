@@ -41,11 +41,11 @@
     <h1>{club.clubName} Club</h1>
     {#if canEdit && editingAbout}
         <textarea bind:value={club.aboutText}></textarea>
-        <button on:click={saveAbout}>Save</button>
+        <button class="button-medium" on:click={saveAbout}>Save</button>
     {:else}
         {#if canEdit}
             <br>
-            <button on:click={() => editingAbout = true}>Edit</button>
+            <button class="button-medium" on:click={() => editingAbout = true}>Edit</button>
         {/if}
         <AboutText html={club.aboutHtml} />
     {/if}
@@ -109,5 +109,11 @@
         font-size: 1.2rem;
         margin: 0.5rem 0;
         text-align: center;
+    }
+
+    textarea {
+        width: 50rem;
+        height: 20rem;
+        margin-bottom: 1rem;
     }
 </style>

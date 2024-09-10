@@ -9,41 +9,42 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin-top: 2rem;
     }
 
-    .about > :global(p) {
+    .about :global(p) {
         font-size: 1.2rem;
         margin: 0.2rem 0;
     }
 
-    .about > :global(h1) {
+    .about :global(h1) {
         font-size: 2.5rem;
-        margin-bottom: 0.5rem;
+        margin: 0.5rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 1.5rem;
     }
 
-    .about > :global(h2) {
+    .about :global(h2) {
         font-size: 2rem;
-        margin-bottom: 0.5rem;
+        margin: 0.5rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 1rem;
     }
 
-    .about > :global(h3) {
+    .about :global(h3) {
         font-size: 1.5rem;
-        margin-bottom: 0.5rem;
+        margin: 0.5rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 0.5rem;
     }
 
-    .about > :global(ul), :global(ol) {
+    .about :global(ul), :global(ol) {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -51,7 +52,11 @@
         margin: 0;
     }
 
-    .about > :global(ul), :global(ol) > :global(li) {
+    .about :global(ul), :global(ol) > :global(li) {
         font-size: 1.2rem;
+    }
+
+    .about :global(a) {
+        color: var(--cal-poly-secondary);
     }
 </style>

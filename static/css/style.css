@@ -26,5 +26,28 @@ button.button-small {
     border-radius: 0.25rem;
     padding: 0.25rem 0.5rem;
     margin: 0.25rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+button.button-medium {
+    background-color: var(--cal-poly-secondary);
+    color: var(--neutral-bright);
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+button.button-large {
+    background-color: var(--cal-poly-secondary);
+    color: var(--neutral-bright);
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.5rem;
+    margin: 0.25rem;
+    font-size: 1.5rem;
     cursor: pointer;
 }
