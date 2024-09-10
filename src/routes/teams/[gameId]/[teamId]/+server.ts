@@ -2,8 +2,8 @@ import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import * as db from "$lib/server/database";
 import * as models from "$lib/server/models";
-import type { InferRawDocType } from "mongoose";
 import { ObjectId } from "mongodb";
+import type { RosterTeam, RosterMember } from "$lib/types";
 
 export const POST: RequestHandler = async (event) => {
     const gameId = event.params.gameId;
@@ -42,7 +42,7 @@ export const POST: RequestHandler = async (event) => {
         username,
         role,
         picture
-    } as InferRawDocType<typeof models.RosterMemberModel>;
+    } as RosterMember;
 
     const newId = await db.addRosterMember(new ObjectId(teamId), newDoc);
 
@@ -81,8 +81,9 @@ export const PUT: RequestHandler = async (event) => {
     }
 
     const newDoc = {
-        name
-    } as InferRawDocType<typeof models.RosterTeamModel>;
+        name,
+        // purposefully omit members
+    } as RosterTeam;
 
     await db.updateRosterTeam(new ObjectId(teamId), newDoc);
 

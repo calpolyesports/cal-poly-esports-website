@@ -2,8 +2,8 @@ import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import * as db from "$lib/server/database";
 import * as models from "$lib/server/models";
-import type { InferRawDocType } from "mongoose";
 import { ObjectId } from "mongodb";
+import type { RosterTeam } from "$lib/types";
 
 export const POST: RequestHandler = async (event) => {
     const gameId = event.params.gameId;
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async (event) => {
     const newDoc = {
         name,
         members: []
-    } as InferRawDocType<typeof models.RosterTeamModel>;
+    } as RosterTeam;
 
     const newId = await db.addRosterTeam(new ObjectId(gameId), newDoc);
 

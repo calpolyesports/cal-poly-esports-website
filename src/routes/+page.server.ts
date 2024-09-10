@@ -1,5 +1,5 @@
 import * as db from '$lib/server/database';
-import type { Article } from '$lib/types';
+import type { WithStringId, Article } from '$lib/types';
 
 export async function load() {
     const articles = (await db.getArticles()).map((article) => {
@@ -7,7 +7,7 @@ export async function load() {
             ...article,
             _id: article._id.toString(),
         };
-    }) as Article[];
+    }) as WithStringId<Article>[];
     return {
         articles,
     }

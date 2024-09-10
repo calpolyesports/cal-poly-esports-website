@@ -1,8 +1,7 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import * as db from "$lib/server/database";
-import * as models from "$lib/server/models";
-import type { InferRawDocType } from "mongoose";
+import type { Event } from "$lib/types";
 import { ObjectId } from "mongodb";
 
 export const PUT: RequestHandler = async (event) => {
@@ -39,7 +38,7 @@ export const PUT: RequestHandler = async (event) => {
         start: new Date(newStart),
         end: new Date(newEnd),
         club: newClub
-    } as InferRawDocType<typeof models.EventModel>;
+    } as Event;
 
     await db.updateEvent(new ObjectId(id), newDoc);
 

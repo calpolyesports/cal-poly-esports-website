@@ -1,5 +1,5 @@
 import * as db from '$lib/server/database';
-import type { RosterGame } from '$lib/types';
+import type { WithStringId, RosterGame } from '$lib/types';
 import type { InferRawDocType } from 'mongoose';
 import * as models from '$lib/server/models';
 
@@ -21,7 +21,7 @@ export async function load() {
                 };
             }),
         };
-    }) as RosterGame[];
+    }) as WithStringId<RosterGame>[];
     return {
         games,
     }

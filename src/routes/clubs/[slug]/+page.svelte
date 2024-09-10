@@ -2,21 +2,53 @@
     import { page } from '$app/stores';
     import { get } from 'svelte/store';
     import AboutText from './AboutText.svelte';
+	import type { WithStringId, Club } from '$lib/types';
 
     export let data;
-    let club = data.club;
+    let club: WithStringId<Club> | undefined;
+    let canEdit: boolean = false;
 
     $: {
         const { slug } = get(page).params;
         if (slug) {
             club = data.club;
+            canEdit = Boolean(data.adminFor.find((admin) => admin.urlName === club?.urlName));
         }
     }
+
+    let editingAbout = false;
+
+    const saveAbout = async () => {
+        if (club) {
+            const response = await fetch(`/clubs/${club.urlName}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ aboutText: club.aboutText }),
+            });
+
+            if (response.ok) {
+                editingAbout = false;
+                const body = await response.json();
+                club.aboutHtml = body.club.aboutHtml;
+            }
+        }
+    };
 </script>
 
 {#if club}
     <h1>{club.clubName} Club</h1>
-    <AboutText html={club.aboutText} />
+    {#if canEdit && editingAbout}
+        <textarea bind:value={club.aboutText}></textarea>
+        <button on:click={saveAbout}>Save</button>
+    {:else}
+        {#if canEdit}
+            <br>
+            <button on:click={() => editingAbout = true}>Edit</button>
+        {/if}
+        <AboutText html={club.aboutHtml} />
+    {/if}
 
     <h2>Board Members</h2>
     <ul class="board-members">

@@ -1,7 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { getClubByName } from '$lib/server/database';
-import DOMPurify from 'isomorphic-dompurify';
-import { marked } from 'marked';
+import type { WithStringId, Club } from '$lib/types';
 
 export const load: PageServerLoad = async ({ params }) => {
     const club = await getClubByName(params.slug);
@@ -12,14 +11,11 @@ export const load: PageServerLoad = async ({ params }) => {
             error: 'Club not found',
         };
     }
-    
-    club.aboutText = marked.parse(club.aboutText);
-    club.aboutText = DOMPurify.sanitize(club.aboutText);
 
     return {
         club: {
             ...club,
             _id: club._id.toString(),
-        },
+        } as WithStringId<Club>,
     };
 };
