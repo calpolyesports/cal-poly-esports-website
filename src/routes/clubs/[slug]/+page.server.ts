@@ -12,6 +12,9 @@ export const load: PageServerLoad = async ({ params }) => {
     }
 
     return {
-        club,
+        club: {
+            ...club,
+            _id: club._id.toString(),
+        },
     };
 };

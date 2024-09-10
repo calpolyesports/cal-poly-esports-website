@@ -1,10 +1,103 @@
 <script lang="ts">
-    import * as models from '$lib/models';
+    import * as types from '$lib/types';
+	import ModalForm from '$lib/ModalForm.svelte';
+    import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
 
-    export let player: models.Member;
+    export let game: types.RosterGame;
+    export let team: types.RosterTeam;
+    export let player: types.RosterMember;
+    export let isAdmin: boolean;
+    export let onRemove: (id: string) => void;
+
+    interface ModalMember {
+        name: string;
+        username: string;
+        role: string;
+        picture: string;
+    }
+
+    let editMemberModal: ModalForm;
+    let editMemberModalVisible = false;
+
+    const modalFields = [
+        { name: 'name', type: 'text' },
+        { name: 'username', type: 'text' },
+        { name: 'role', type: 'text' },
+        { name: 'picture', type: 'text' },
+    ] as ModalFieldDefinition[];
+    
+    //////////////////////
+    // API INTERACTIONS //
+    //////////////////////
+
+    const sendUpdateMember = async (id: string, member: ModalMember): Promise<types.RosterMember | undefined> => {
+        const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(member),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.member;
+        }
+
+        return undefined;
+    };
+
+    const sendDeleteMember = async (id: string): Promise<boolean> => {
+        const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
+            method: 'DELETE',
+        });
+        
+        return response.ok;
+    };
+
+    ////////////////////
+    // EVENT HANDLERS //
+    ////////////////////
+    
+    const onClick = () => {
+        if (!isAdmin) return;
+        editMemberModal.fillFields({
+            name: player.name,
+            username: player.username,
+            role: player.role,
+            picture: player.picture,
+        });
+        editMemberModalVisible = true;
+    };
+
+    const onSubmitEdit = async (modalFields: FilledModalFields) => {
+        const updatedMember = {
+            name: modalFields.name as string,
+            username: modalFields.username as string,
+            role: modalFields.role as string,
+            picture: modalFields.picture as string,
+        };
+
+        const updated = await sendUpdateMember(player._id, updatedMember);
+        if (updated) {
+            player = updated;
+        }
+
+        editMemberModalVisible = false;
+    };
+
+    const onSubmitDelete = async (values: FilledModalFields) => {
+        const deleted = await sendDeleteMember(player._id);
+        if (deleted) {
+            onRemove(player._id);
+        }
+
+        editMemberModalVisible = false;
+    };
 </script>
 
-<div class="player-card">
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+<div class="player-card" on:click={onClick}>
     {#if player.picture}
     <div class="picture-container">
         <img src={player.picture} alt={player.username} />
@@ -17,6 +110,18 @@
         <h2>{player.role}</h2>
     </div>
 </div>
+
+{#if isAdmin}
+    <ModalForm
+        bind:this={editMemberModal}
+        bind:show={editMemberModalVisible}
+        title="Edit Member"
+        fields={modalFields}
+        actions={[
+            { name: 'Submit', callback: onSubmitEdit },
+            { name: 'Delete', callback: onSubmitDelete },
+        ]} />
+{/if}
 
 <style>
     div.player-card {

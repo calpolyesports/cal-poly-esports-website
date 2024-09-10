@@ -4,4 +4,4 @@
     export let data;
 </script>
 
-<TeamSelector games={data.games} />
+<TeamSelector adminFor={data.adminFor.map((club) => club.urlName)} games={data.games} />

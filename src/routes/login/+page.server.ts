@@ -1,7 +1,8 @@
 import { lucia } from '$lib/server/auth';
-import { User } from '$lib/server/database';
+import { UserModel } from '$lib/server/models';
 import { fail, redirect } from '@sveltejs/kit';
 import { verify } from '@node-rs/argon2';
+import { ObjectId } from 'mongodb';
 
 import type { ServerLoad, Actions } from '@sveltejs/kit';
 
@@ -35,7 +36,7 @@ export const actions: Actions = {
             });
         }
 
-        const existingUser = await User.findOne({ username });
+        const existingUser = await UserModel.findOne({ username });
         if (!existingUser) {
             return fail(400, {
                 username,
@@ -56,7 +57,7 @@ export const actions: Actions = {
             });
         }
 
-        const session = await lucia.createSession(existingUser._id, {});
+        const session = await lucia.createSession(existingUser._id.toString(), {});
         const sessionCookie = lucia.createSessionCookie(session.id);
         event.cookies.set(sessionCookie.name, sessionCookie.value, {
             path: '.',
