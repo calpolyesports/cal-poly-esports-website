@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Club } from "$lib/models";
+    import { type Club } from "$lib/types";
 
     export let items;
     export let adminItem;

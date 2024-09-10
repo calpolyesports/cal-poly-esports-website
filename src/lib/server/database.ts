@@ -1,106 +1,157 @@
-import { MongoClient, ObjectId, ServerApiVersion, type MongoClientOptions } from 'mongodb';
+import { connect, type InferRawDocType } from 'mongoose';
 import { env } from '$env/dynamic/private';
+import { ObjectId } from 'mongodb';
 
-import * as models from '../models';
+import * as models from './models';
 
-const client = new MongoClient(env.DB_CONN_STRING, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    },
-} as MongoClientOptions);
 console.log("Connecting to MongoDB...");
-await client.connect();
-await client.db("admin").command({ ping: 1 });
-console.log("Pinged your deployment. You successfully connected to MongoDB!");
-
-export const Website = client.db('website');
-export const User = Website.collection<models.UserDoc>('users');
-export const Session = Website.collection<models.SessionDoc>('sessions');
-export const Article = Website.collection<models.Article>('articles');
-export const Roster = Website.collection<models.Game>('rosters');
-export const Event = Website.collection<models.EventDoc>('events');
-export const Club = Website.collection<models.Club>('clubs');
-
-export async function getArticles() {
-    const response = await Article.find().toArray();
-    const articles = response.map(article => models.Article.fromMongo(article));
-    return articles.map(article => article.toJSON());
-}
-
-export async function getRosters() {
-    const response = await Roster.find().toArray();
-    const games = response.map(game => models.Game.fromMongo(game));
-    return games.map(game => game.toJSON());
-}
+await connect(env.DB_CONN_STRING!);
+console.log("Connected to MongoDB");
 
 export async function getEvents(adminFor?: string[]) {
-    const response = await Event.find().toArray();
-    const events = response.map(event => models.Event.fromMongo(event._id.toString(), event));
-    const clubs = await Club.find().toArray();
-    events.forEach((event) => {
+    const response = await models.EventModel.find().lean();
+    const clubs = await models.ClubModel.find().lean();
+    return response.map((event) => {
         const club = clubs.find(club => club.urlName === event.club);
-        if (club) {
-            event.backgroundColor = club.color
-        }
-        if (adminFor && adminFor.includes(event.club)) {
-            event.editable = true;
-        }
+        return {
+            ...event,
+            backgroundColor: club?.color ?? '#154734',
+            editable: adminFor?.includes(event.club) ?? false,
+        };
     });
-    return events.map(event => event.toJSON());
 }
 
-export async function addEvent(event: models.EventDoc) {
-    const result = await Event.insertOne(event);
-    return result.insertedId;
-}
-
-export async function getEventById(id: string, adminFor?: string[]) {
-    const eventDoc = await Event.findOne({ _id: new ObjectId(id) });
-    if (!eventDoc) {
-        return null;
-    }
-    const event = models.Event.fromMongo(eventDoc._id.toString(), eventDoc);
-    const club = await Club.findOne({ urlName: event.club });
-    if (club) {
-        event.backgroundColor = club.color;
-        if (adminFor && adminFor.includes(event.club)) {
-            event.editable = true;
-        }
-    }
+export async function getEventById(id: ObjectId, adminFor?: string[]) {
+    const eventDoc = await models.EventModel.findOne({ _id: id }).lean();
+    if (!eventDoc) return null;
+    const clubDoc = await models.ClubModel.findOne({ urlName: eventDoc.club }).lean();
+    const event = {
+        ...eventDoc,
+        backgroundColor: clubDoc ? clubDoc.color : '#154734',
+        editable: adminFor?.includes(eventDoc.club) ?? false,
+    };
     return event;
 }
 
-export async function updateEvent(event: models.Event) {
-    const result = await Event.updateOne({ _id: new ObjectId(event.id) }, { $set: event.toMongo() });
-    return result.matchedCount !== 0;
+export async function addEvent(event: InferRawDocType<typeof models.EventModel>) {
+    const newEvent = new models.EventModel(event);
+    await newEvent.save();
+    return newEvent._id;
 }
 
-export async function deleteEvent(id: string) {
-    const result = await Event.deleteOne({ _id: new ObjectId(id) });
-    return result.deletedCount !== 0;
+export async function updateEvent(id: ObjectId, event: InferRawDocType<typeof models.EventModel>) {
+    await models.EventModel.updateOne({
+        _id: id,
+    }, event);
+}
+
+export async function deleteEvent(id: ObjectId) {
+    await models.EventModel.deleteOne({ _id: id });
+}
+
+export async function getRosterGames() {
+    const allGameDocs = await models.RosterGameModel.find().lean()
+        .populate({
+            path: 'teams',
+            populate: { path: 'members' }
+        });
+    return allGameDocs;
+}
+
+export async function getRosterGameById(id: ObjectId) {
+    const gameDoc = await models.RosterGameModel.findOne({ _id: id }).lean()
+        .populate({
+            path: 'teams',
+            populate: { path: 'members' }
+        });
+    return gameDoc;
+}
+
+export async function getRosterTeams() {
+    const allTeamDocs = await models.RosterTeamModel.find().lean()
+        .populate('members');
+    return allTeamDocs;
+}
+
+export async function getRosterTeamById(id: ObjectId) {
+    const teamDoc = await models.RosterTeamModel.findOne({ _id: id }).lean()
+        .populate('members');
+    return teamDoc;
+}
+
+export async function addRosterTeam(gameId: ObjectId, team: InferRawDocType<typeof models.RosterTeamModel>) {
+    const gameDoc = await models.RosterGameModel.findOne({ _id: gameId });
+    if (!gameDoc) return null;
+    const newTeam = new models.RosterTeamModel(team);
+    await newTeam.save();
+    gameDoc.teams.push(newTeam._id);
+    await gameDoc.save();
+    return newTeam._id;
+}
+
+export async function updateRosterTeam(id: ObjectId, team: InferRawDocType<typeof models.RosterTeamModel>) {
+    await models.RosterTeamModel.updateOne({
+        _id: id,
+    }, team);
+}
+
+export async function deleteRosterTeam(gameId: ObjectId, teamId: ObjectId) {
+    const gameDoc = await models.RosterGameModel.findOne({ _id: gameId });
+    if (!gameDoc) return;
+    const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
+    if (!teamDoc) return;
+    const memberIds = teamDoc.members.map(member => member._id);
+    await models.RosterMemberModel.deleteMany({ _id: { $in: memberIds } });
+    await teamDoc.deleteOne();
+    gameDoc.teams = gameDoc.teams.filter(team => team.toString() !== teamId.toString());
+    await gameDoc.save();
+}
+
+export async function getRosterMembers() {
+    const allMemberDocs = await models.RosterMemberModel.find().lean();
+    return allMemberDocs;
+}
+
+export async function getRosterMemberById(id: ObjectId) {
+    const memberDoc = await models.RosterMemberModel.findOne({ _id: id }).lean();
+    return memberDoc;
+}
+
+export async function addRosterMember(teamId: ObjectId, member: InferRawDocType<typeof models.RosterMemberModel>) {
+    const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
+    if (!teamDoc) return null;
+    const newMember = new models.RosterMemberModel(member);
+    await newMember.save();
+    teamDoc.members.push(newMember._id);
+    await teamDoc.save();
+    return newMember._id;
+}
+
+export async function updateRosterMember(id: ObjectId, member: InferRawDocType<typeof models.RosterMemberModel>) {
+    await models.RosterMemberModel.updateOne({
+        _id: id,
+    }, member);
+}
+
+export async function deleteRosterMember(teamId: ObjectId, memberId: ObjectId) {
+    const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
+    if (!teamDoc) return;
+    await models.RosterMemberModel.deleteOne({ _id: memberId });
+    teamDoc.members = teamDoc.members.filter(member => member.toString() !== memberId.toString());
+    await teamDoc.save();
+}
+
+export async function getArticles() {
+    const response = await models.ArticleModel.find().lean();
+    return response;
 }
 
 export async function getClubByName(urlName: string) {
-    await client.connect();
-    const db = client.db('website');
-    const collection = db.collection('clubs');
-    const club = await collection.findOne({ urlName: urlName });
-
-    if (club) {
-        return {
-            clubName: club.clubName,
-            aboutText: club.aboutText,
-            boardMembers: club.boardMembers,
-            color: club.color,
-        };
-    }
-    return null;
+    const clubDoc = await models.ClubModel.findOne({ urlName }).lean();
+    return clubDoc;
 }
 
 export async function getClubs() {
-    const response = await Club.find().toArray();
-    const clubs = response.map(club => models.Club.fromMongo(club));
-    return clubs.map(club => club.toJSON());
+    const response = await models.ClubModel.find().lean();
+    return response;
 }

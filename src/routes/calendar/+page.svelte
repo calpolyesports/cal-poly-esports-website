@@ -4,8 +4,9 @@
     import TimeGrid from '@event-calendar/time-grid';
     import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
-    import { Event } from '$lib/models.js';
-	import Modal from '$lib/Modal.svelte';
+    import type { Event } from '$lib/types.js';
+	import ModalForm from '$lib/ModalForm.svelte';
+    import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
 
     interface ModalEvent {
         title: string,
@@ -15,63 +16,34 @@
     }
 
     export let data;
-    let events = data.events;
-
-    let modalVisible = false;
-    let modalIsEdit = false;
-    let modalEvent: Event | undefined = undefined;
-    $: modalTitle = modalIsEdit ? 'Edit Event' : 'Add Event';
-
-    let newEventTitle = '';
-    let newEventStart = '';
-    let newEventEnd = '';
-    let newEventClub = '';
+    let events: Event[] = data.events;
+    const clubOptions: [string, string][] = data.adminFor.map((club) => [club.urlName, club.clubName]);
+    if (data.isGeneralAdmin) {
+        clubOptions.unshift(['general', 'General']);
+    }
 
     let ec: Calendar;
 
-    /////////////////////
-    // MODAL FUNCTIONS //
-    /////////////////////
+    let addModal: ModalForm;
+    let addModalVisible = false;
 
-    const setModalFields = (modalEvent?: ModalEvent) => {
-        if (modalEvent) {
-            const adjustedStart = new Date(modalEvent.start.getTime() - modalEvent.start.getTimezoneOffset() * 60000);
-            const adjustedEnd = new Date(modalEvent.end.getTime() - modalEvent.end.getTimezoneOffset() * 60000);
-            newEventTitle = modalEvent.title;
-            newEventStart = adjustedStart.toISOString().slice(0, 16);
-            newEventEnd = adjustedEnd.toISOString().slice(0, 16);
-            newEventClub = modalEvent.club;
-        } else {
-            newEventTitle = '';
-            newEventStart = '';
-            newEventEnd = '';
-            newEventClub = data.adminFor[0].urlName;
-        }
-    };
+    let editModal: ModalForm;
+    let editModalVisible = false;
+    let selectedEvent = undefined as Event | undefined;
 
-    const getModalFields = () => {
-        let startDate = new Date(newEventStart);
-        let endDate = new Date(newEventEnd);
-        if (startDate.getTime() > endDate.getTime()) {
-            const temp = startDate;
-            startDate = endDate;
-            endDate = temp;
-        }
-
-        return {
-            title: newEventTitle,
-            start: startDate,
-            end: endDate,
-            club: newEventClub,
-        };
-    };
+    const modalFields = [
+        { name: 'title', type: 'text' },
+        { name: 'start', type: 'date' },
+        { name: 'end', type: 'date' },
+        { name: 'club', type: 'dropdown', options: clubOptions },
+    ] as ModalFieldDefinition[];
 
     //////////////////////
     // CALENDAR HELPERS //
     //////////////////////
 
     const syncEventTimeInfo = (event: Calendar.Event) => {
-        const targetEvent = events.find((e) => e.id === event.id);
+        const targetEvent = events.find((e) => e._id === event.id);
         if (!targetEvent) {
             return;
         }
@@ -87,15 +59,31 @@
         return data.adminFor.find((club) => club.urlName === event.club);
     };
 
-    const setView = (view: string) => {
-        ec.setOption('view', view);
+    const convertToCalendarEvent = (event: Event): Calendar.EventInput => {
+        return {
+            id: event._id,
+            title: event.title,
+            start: event.start,
+            end: event.end,
+            backgroundColor: event.backgroundColor,
+            editable: event.editable,
+        };
+    };
+
+    const rawModalInfoToModalEvent = (info: FilledModalFields) => {
+        return {
+            title: info.title as string,
+            start: info.start as Date,
+            end: info.end as Date,
+            club: info.club as string,
+        } as ModalEvent;
     };
 
     //////////////////////
     // API INTERACTIONS //
     //////////////////////
 
-    const sendAddEvent = async (event: ModalEvent) => {
+    const sendAddEvent = async (event: ModalEvent): Promise<Event | undefined> => {
         const response = await fetch("/calendar", {
             method: 'POST',
             headers: {
@@ -105,27 +93,15 @@
         });
 
         if (response.ok) {
-            const newEvent = await response.json();
-            if (newEvent.status >= 200 && newEvent.status < 300) {
-                return new Event(
-                    newEvent.event.id,
-                    newEvent.event.title,
-                    new Date(newEvent.event.start),
-                    new Date(newEvent.event.end),
-                    newEvent.event.club,
-                    newEvent.event.backgroundColor,
-                );
-            }
+            const data = await response.json();
+            return data.event;
         }
 
         return undefined;
     };
     
-    const sendUpdateEvent = async (event?: Event) => {
-        if (!event) {
-            return false;
-        }
-        const response = await fetch("/calendar", {
+    const sendUpdateEvent = async (id: string, event: ModalEvent): Promise<Event | undefined> => {
+        const response = await fetch(`/calendar/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -134,96 +110,83 @@
         });
 
         if (response.ok) {
-            const updatedEvent = await response.json();
-            return updatedEvent.status >= 200 && updatedEvent.status < 300;
+            const data = await response.json();
+            return data.event;
         }
 
-        return false;
+        return undefined;
     };
 
-    const sendDeleteEvent = async (event?: Event) => {
-        if (!event) {
-            return false;
-        }
-        const response = await fetch("/calendar", {
+    const sendDeleteEvent = async (id: string): Promise<boolean> => {
+        const response = await fetch(`/calendar/${id}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(event),
         });
 
-        if (response.ok) {
-            const deletedEvent = await response.json();
-            return deletedEvent.status >= 200 && deletedEvent.status < 300;
-        }
-
-        return false;
+        return response.ok;
     };
 
-    //////////////////////
-    // EVENT HANDLERS   //
-    //////////////////////
+    ////////////////////
+    // EVENT HANDLERS //
+    ////////////////////
 
     const onClickAdd = () => {
-        modalIsEdit = false;
-        modalEvent = undefined;
-        setModalFields();
-        modalVisible = true;
+        addModal.clearFields();
+        addModalVisible = true;
     };
 
-    const onSubmitAdd = () => {
-        const newEvent = getModalFields();
-        sendAddEvent(newEvent).then((event) => {
-            if (event) {
-                event.editable = true;
-                events.push(event);
-                ec.addEvent(event);
-            }
-        });
-        setModalFields();
-        modalVisible = false;
+    const onSubmitAdd = async (modalFields: FilledModalFields) => {
+        const newEvent = rawModalInfoToModalEvent(modalFields);
+        const event = await sendAddEvent(newEvent);
+        if (event) {
+            // correct date timezones for calendar
+            event.start = new Date(event.start);
+            event.end = new Date(event.end);
+            events.push(event);
+            ec.addEvent(convertToCalendarEvent(event));
+        }
+        addModal.clearFields();
+        addModalVisible = false;
     };
 
     const onClickEdit = (event: Event) => {
-        setModalFields(event);
-        modalIsEdit = true;
-        modalEvent = event;
-        modalVisible = true;
+        selectedEvent = event;
+        editModal.fillFields({
+            title: event.title,
+            start: event.start,
+            end: event.end,
+            club: event.club,
+        });
+        editModalVisible = true;
     };
 
-    const onSubmitEdit = () => {
-        if (!modalEvent) {
+    const onSubmitEdit = async (modalFields: FilledModalFields) => {
+        if (!selectedEvent) {
             return;
         }
-        const updatedEventInfo = getModalFields();
-        const updatedEvent = new Event(
-            modalEvent.id,
-            updatedEventInfo.title,
-            updatedEventInfo.start,
-            updatedEventInfo.end,
-            updatedEventInfo.club,
-            modalEvent.backgroundColor,
-        );
-        updatedEvent.editable = true;
-        sendUpdateEvent(updatedEvent).then((success) => {
-            if (success) {
-                events = events.map((e) => e.id === updatedEvent.id ? updatedEvent : e);
-                ec.updateEvent(updatedEvent);
-            }
-        });
-        setModalFields();
-        modalVisible = false;
+        const updatedEventInfo = rawModalInfoToModalEvent(modalFields);
+        const updatedEvent = await sendUpdateEvent(selectedEvent._id, updatedEventInfo);
+        if (updatedEvent) {
+            // correct date timezones for calendar
+            updatedEvent.start = new Date(updatedEvent.start);
+            updatedEvent.end = new Date(updatedEvent.end);
+            events = events.map((e) => e._id === updatedEvent._id ? updatedEvent : e);
+            ec.updateEvent(convertToCalendarEvent(updatedEvent));
+        }
+        editModal.clearFields();
+        editModalVisible = false;
     };
 
-    const onSubmitDelete = () => {
-        sendDeleteEvent(modalEvent).then((success) => {
-            if (success && modalEvent) {
-                ec.removeEventById(modalEvent.id);
-            }
-        });
-        setModalFields();
-        modalVisible = false;
+    const onSubmitDelete = async (values: FilledModalFields) => {
+        if (!selectedEvent) {
+            return;
+        }
+        const clickedEvent = selectedEvent;
+        const success = await sendDeleteEvent(clickedEvent._id);
+        if (success) {
+            ec.removeEventById(clickedEvent._id);
+        }
+        editModal.clearFields();
+        editModalVisible = false;
     };
     
     //////////////////////
@@ -238,7 +201,7 @@
         eventDurationEditable: false,
         eventStartEditable: false,
         nowIndicator: true,
-        events: events,
+        events: events.map(convertToCalendarEvent),
         display: 'auto',
         height: '50rem',
         slotMinTime: '08:00:00',
@@ -247,19 +210,19 @@
         allDaySlot: false,
         eventDrop: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
-            if (!await sendUpdateEvent(editedEvent)) {
+            if (editedEvent && !await sendUpdateEvent(editedEvent._id, editedEvent)) {
                 event.revert();
             }
         },
         eventResize: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
-            if (!await sendUpdateEvent(editedEvent)) {
+            if (editedEvent && !await sendUpdateEvent(editedEvent._id, editedEvent)) {
                 event.revert();
             }
         },
         eventClick: async (event) => {
             const clickedEvent = event.event;
-            const eventInfo = events.find((e) => e.id === clickedEvent.id);
+            const eventInfo = events.find((e) => e._id === clickedEvent.id);
             if (!eventInfo || !hasPermissions(eventInfo)) {
                 return;
             }
@@ -281,77 +244,24 @@
 
 <Calendar bind:this={ec} {plugins} {options} />
 
-<Modal bind:show={modalVisible} title={modalTitle}>
-    <div class="form">
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title" bind:value={newEventTitle} required>
-    
-        <label for="start">Start</label>
-        <input type="datetime-local" id="start" name="start" step="300" bind:value={newEventStart} required>
-    
-        <label for="end">End</label>
-        <input type="datetime-local" id="end" name="end" step="300" bind:value={newEventEnd} required>
-    
-        <label for="club">Club</label>
-        <select id="club" name="club" bind:value={newEventClub} required>
-            {#if data.isGeneralAdmin}
-                <option value="general">General</option>
-            {/if}
-            {#each data.adminFor as club}
-                <option value={club.urlName}>{club.clubName}</option>
-            {/each}
-        </select>
-    
-        <button on:click={modalIsEdit ? onSubmitEdit : onSubmitAdd}>Confirm</button>
+<ModalForm
+    bind:this={addModal}
+    bind:show={addModalVisible}
+    title="Add Event"
+    fields={modalFields}
+    actions={[
+        { name: 'Submit', callback: onSubmitAdd },
+    ]} />
 
-        {#if modalIsEdit}
-            <button on:click={onSubmitDelete}>Delete</button>
-        {/if}
-    </div>
-</Modal>
+<ModalForm
+    bind:this={editModal}
+    bind:show={editModalVisible}
+    title="Edit Event"
+    fields={modalFields}
+    actions={[
+        { name: 'Submit', callback: onSubmitEdit },
+        { name: 'Delete', callback: onSubmitDelete },
+    ]} />
 
 <style>
-    h1 {
-        font-size: 3rem;
-        font-weight: bold;
-        margin: 1rem 0;
-    }
-
-    div.form {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 30rem;
-        margin: 1rem auto;
-    }
-
-    label {
-        font-size: 1rem;
-        margin-top: 1rem;
-        font-weight: bold;
-    }
-
-    input {
-        font-size: 1.25rem;
-        padding: 0.5rem;
-        width: 100%;
-    }
-
-    select {
-        font-size: 1.25rem;
-        padding: 0.5rem;
-        width: 100%;
-    }
-
-    button {
-        font-size: 1.25rem;
-        padding: 0.5rem 1rem;
-        margin-top: 1rem;
-        background-color: var(--cal-poly-secondary);
-        color: white;
-        border: none;
-        border-radius: 0.5rem;
-        cursor: pointer;
-    }
 </style>
