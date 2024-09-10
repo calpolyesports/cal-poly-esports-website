@@ -6,6 +6,7 @@
     export let game: types.RosterGame;
     export let team: types.RosterTeam;
     export let player: types.RosterMember;
+    export let onRemove: (id: string) => void;
 
     interface ModalMember {
         name: string;
@@ -23,8 +24,6 @@
         { name: 'role', type: 'text' },
         { name: 'picture', type: 'text' },
     ] as ModalFieldDefinition[];
-
-    let nodeRef: HTMLDivElement;
     
     //////////////////////
     // API INTERACTIONS //
@@ -55,9 +54,9 @@
         return response.ok;
     };
 
-    //////////////////////
-    // EVENT HANDLERS   //
-    //////////////////////
+    ////////////////////
+    // EVENT HANDLERS //
+    ////////////////////
     
     const onClick = () => {
         editMemberModal.fillFields({
@@ -88,7 +87,7 @@
     const onSubmitDelete = async (values: FilledModalFields) => {
         const deleted = await sendDeleteMember(player._id);
         if (deleted) {
-            nodeRef.parentNode?.removeChild(nodeRef);
+            onRemove(player._id);
         }
 
         editMemberModalVisible = false;
@@ -96,7 +95,7 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-<div bind:this={nodeRef} class="player-card" on:click={onClick}>
+<div class="player-card" on:click={onClick}>
     {#if player.picture}
     <div class="picture-container">
         <img src={player.picture} alt={player.username} />

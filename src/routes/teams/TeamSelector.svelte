@@ -5,9 +5,26 @@
 
 	import * as types from "$lib/types";
 	import MemberGrid from "./MemberGrid.svelte";
+	import ModalForm from '$lib/ModalForm.svelte';
+    import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+
+	interface ModalTeam {
+		name: string;
+	}
 
 	export let games: types.RosterGame[] = [];
 	let activeGameId = games.length > 0 ? games[0]._id : '';
+
+	let addTeamModal: ModalForm;
+	let addTeamModalVisible = false;
+
+	const teamModalFields = [
+		{ name: 'name', type: 'text' },
+	] as ModalFieldDefinition[];
+
+	////////////////////
+	// SWITCHER STUFF //
+	////////////////////
 
 	function moveUnderline(instant: boolean) {
 		let element = document.getElementById(activeGameId.toString());
@@ -47,13 +64,68 @@
 			window.removeEventListener('resize', () => moveUnderline(true));
 		}
 	});
+
+	//////////////////////
+	// API INTERACTIONS //
+	//////////////////////
+
+	const sendAddTeam = async (newTeam: ModalTeam): Promise<types.RosterTeam | undefined> => {
+		const response = await fetch(`/teams/${activeGameId}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(newTeam),
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+			return data.team;
+		}
+
+		return undefined;
+	};
+
+	////////////////////
+	// EVENT HANDLERS //
+	////////////////////
+
+	const onClickAddTeam = () => {
+		addTeamModal.clearFields();
+		addTeamModalVisible = true;
+	};
+
+	const onSubmitAddTeam = async (values: FilledModalFields) => {
+		const newTeam = {
+			name: values.name as string,
+		};
+		const team = await sendAddTeam(newTeam);
+		if (team) {
+			games = games.map(game => {
+				if (game._id === activeGameId) {
+					game.teams.push(team);
+				}
+				return game;
+			});
+		}
+		addTeamModalVisible = false;
+	};
+
+	const onTeamRemove = (teamId: string) => {
+		games = games.map(game => {
+			if (game._id === activeGameId) {
+				game.teams = game.teams.filter(team => team._id !== teamId);
+			}
+			return game;
+		});
+	};
 </script>
 
 <div class="content">
 	<ul>
 		{#each games as game}
 			<li class={activeGameId === game._id ? 'active' : ''} id="{game._id.toString()}">
-				<button on:click={handleClick(game._id)}>
+				<button class="icon" on:click={handleClick(game._id)}>
 					<img src={game.icon} alt={game.name} />
 				</button>
 			</li>
@@ -65,15 +137,22 @@
 	{#each games as game}
 		{#if activeGameId == game._id}
 			<h1>{game.name}</h1>
+			<button on:click={onClickAddTeam}>Add Team</button>
 			{#each game.teams as team}
-				<h2>{team.name}</h2>
-				<div class="box">
-					<MemberGrid game={game} team={team} />
-				</div>
+				<MemberGrid game={game} team={team} onRemove={onTeamRemove} />
 			{/each}
 		{/if}
 	{/each}
 </div>
+
+<ModalForm
+	bind:this={addTeamModal}
+	bind:show={addTeamModalVisible}
+	title="Add Team"
+	fields={teamModalFields}
+	actions={[
+		{ name: 'Submit', callback: onSubmitAddTeam },
+	]} />
 
 <style>
 	.content {
@@ -86,11 +165,6 @@
 		visibility: hidden;
 	}
 
-	div.box {
-		margin: 1rem 0;
-		width: 100%;
-	}
-
 	ul {
 		display: flex;
 		flex-wrap: wrap;
@@ -99,7 +173,7 @@
 		list-style: none;
 	}
 
-	button {
+	button.icon {
 		padding: 0.5rem 2rem;
 		border: none;
 		cursor: pointer;
@@ -131,11 +205,5 @@
 		font-weight: bold;
 		margin-top: 3rem;
 		margin-bottom: 0;
-	}
-
-	h2 {
-		font-size: 2rem;
-		font-weight: bold;
-		margin-top: 2rem;
 	}
 </style>

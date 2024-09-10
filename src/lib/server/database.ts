@@ -67,22 +67,6 @@ export async function getRosterGameById(id: ObjectId) {
     return gameDoc;
 }
 
-export async function addRosterGame(game: InferRawDocType<typeof models.RosterGameModel>) {
-    const newGame = new models.RosterGameModel(game);
-    await newGame.save();
-    return newGame._id;
-}
-
-export async function updateRosterGame(id: ObjectId, game: InferRawDocType<typeof models.RosterGameModel>) {
-    await models.RosterGameModel.updateOne({
-        _id: id,
-    }, game);
-}
-
-export async function deleteRosterGame(id: ObjectId) {
-    await models.RosterGameModel.deleteOne({ _id: id });
-}
-
 export async function getRosterTeams() {
     const allTeamDocs = await models.RosterTeamModel.find().lean()
         .populate('members');
@@ -114,7 +98,11 @@ export async function updateRosterTeam(id: ObjectId, team: InferRawDocType<typeo
 export async function deleteRosterTeam(gameId: ObjectId, teamId: ObjectId) {
     const gameDoc = await models.RosterGameModel.findOne({ _id: gameId });
     if (!gameDoc) return;
-    await models.RosterTeamModel.deleteOne({ _id: teamId });
+    const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
+    if (!teamDoc) return;
+    const memberIds = teamDoc.members.map(member => member._id);
+    await models.RosterMemberModel.deleteMany({ _id: { $in: memberIds } });
+    await teamDoc.deleteOne();
     gameDoc.teams = gameDoc.teams.filter(team => team.toString() !== teamId.toString());
     await gameDoc.save();
 }

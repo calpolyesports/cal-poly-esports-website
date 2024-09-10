@@ -86,7 +86,7 @@ export const PUT: RequestHandler = async (event) => {
 
     await db.updateRosterTeam(new ObjectId(teamId), newDoc);
 
-    const newTeam = await db.getRosterTeamById(new ObjectId(gameId));
+    const newTeam = await db.getRosterTeamById(new ObjectId(teamId));
 
     return json({
         team: newTeam

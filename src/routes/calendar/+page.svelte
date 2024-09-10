@@ -122,16 +122,12 @@
             method: 'DELETE',
         });
 
-        if (response.ok) {
-            return true;
-        }
-
-        return false;
+        return response.ok;
     };
 
-    //////////////////////
-    // EVENT HANDLERS   //
-    //////////////////////
+    ////////////////////
+    // EVENT HANDLERS //
+    ////////////////////
 
     const onClickAdd = () => {
         addModal.clearFields();
