@@ -9,8 +9,9 @@
         role: string;
         picture: string;
     }
-
-    export let members: types.RosterMember[];
+    
+    export let game: types.RosterGame;
+    export let team: types.RosterTeam;
 
     let selectedPlayer: types.RosterMember;
 
@@ -76,8 +77,8 @@
 </script>
 
 <div class="member-grid">
-    {#each members as member}
-        <PlayerCard player={member} onClick={() => onPlayerCardClick(member)} />
+    {#each team.members as member}
+        <PlayerCard game={game} team={team} player={member} />
     {/each}
 </div>
 

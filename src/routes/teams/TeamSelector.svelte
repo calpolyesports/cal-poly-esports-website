@@ -68,7 +68,7 @@
 			{#each game.teams as team}
 				<h2>{team.name}</h2>
 				<div class="box">
-					<MemberGrid members={team.members} />
+					<MemberGrid game={game} team={team} />
 				</div>
 			{/each}
 		{/if}
