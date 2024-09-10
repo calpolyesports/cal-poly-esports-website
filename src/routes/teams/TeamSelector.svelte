@@ -13,6 +13,7 @@
 	}
 
 	export let games: types.RosterGame[] = [];
+	export let adminFor: string[];
 	let activeGameId = games.length > 0 ? games[0]._id : '';
 
 	let addTeamModal: ModalForm;
@@ -137,9 +138,15 @@
 	{#each games as game}
 		{#if activeGameId == game._id}
 			<h1>{game.name}</h1>
-			<button on:click={onClickAddTeam}>Add Team</button>
+			{#if adminFor.includes(game.adminRole)}
+				<button class="button-small" on:click={onClickAddTeam}>Add Team</button>
+			{/if}
 			{#each game.teams as team}
-				<MemberGrid game={game} team={team} onRemove={onTeamRemove} />
+				<MemberGrid
+					game={game}
+					team={team}
+					isAdmin={adminFor.includes(game.adminRole)}
+					onRemove={onTeamRemove} />
 			{/each}
 		{/if}
 	{/each}

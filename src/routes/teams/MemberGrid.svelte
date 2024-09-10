@@ -17,6 +17,7 @@
     
     export let game: types.RosterGame;
     export let team: types.RosterTeam;
+    export let isAdmin: boolean;
     export let onRemove: (id: string) => void;
     
     let addMemberModal: ModalForm;
@@ -139,35 +140,44 @@
 
 <div class="box">
     <h2>{team.name}</h2>
-    <div class="buttons">
-        <button on:click={onClickAddMember}>Add Member</button>
-        <button on:click={onClickEditTeam}>Edit Team</button>
-    </div>
+    {#if isAdmin}
+        <div class="buttons">
+            <button class="button-small" on:click={onClickAddMember}>Add Member</button>
+            <button class="button-small" on:click={onClickEditTeam}>Edit Team</button>
+        </div>
+    {/if}
     <div class="member-grid">
         {#each team.members as member}
-            <PlayerCard game={game} team={team} player={member} onRemove={onMemberRemove} />
+            <PlayerCard
+                game={game}
+                team={team}
+                player={member}
+                {isAdmin}
+                onRemove={onMemberRemove} />
         {/each}
     </div>
 </div>
 
-<ModalForm
-    bind:this={addMemberModal}
-    bind:show={addMemberModalVisible}
-    title="Add Member"
-    fields={memberModalFields}
-    actions={[
-        { name: 'Submit', callback: onSubmitAddMember },
-    ]} />
+{#if isAdmin}
+    <ModalForm
+        bind:this={addMemberModal}
+        bind:show={addMemberModalVisible}
+        title="Add Member"
+        fields={memberModalFields}
+        actions={[
+            { name: 'Submit', callback: onSubmitAddMember },
+        ]} />
 
-<ModalForm
-    bind:this={editTeamModal}
-    bind:show={editTeamModalVisible}
-    title="Edit Team"
-    fields={teamModalFields}
-    actions={[
-        { name: 'Submit', callback: onSubmitEditTeam },
-        { name: 'Delete', callback: onSubmitDeleteTeam },
-    ]} />
+    <ModalForm
+        bind:this={editTeamModal}
+        bind:show={editTeamModalVisible}
+        title="Edit Team"
+        fields={teamModalFields}
+        actions={[
+            { name: 'Submit', callback: onSubmitEditTeam },
+            { name: 'Delete', callback: onSubmitDeleteTeam },
+        ]} />
+{/if}
 
 <style>
 	div.box {

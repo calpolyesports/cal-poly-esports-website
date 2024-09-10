@@ -6,6 +6,7 @@
     export let game: types.RosterGame;
     export let team: types.RosterTeam;
     export let player: types.RosterMember;
+    export let isAdmin: boolean;
     export let onRemove: (id: string) => void;
 
     interface ModalMember {
@@ -59,6 +60,7 @@
     ////////////////////
     
     const onClick = () => {
+        if (!isAdmin) return;
         editMemberModal.fillFields({
             name: player.name,
             username: player.username,
@@ -109,15 +111,17 @@
     </div>
 </div>
 
-<ModalForm
-    bind:this={editMemberModal}
-    bind:show={editMemberModalVisible}
-    title="Edit Member"
-    fields={modalFields}
-    actions={[
-        { name: 'Submit', callback: onSubmitEdit },
-        { name: 'Delete', callback: onSubmitDelete },
-    ]} />
+{#if isAdmin}
+    <ModalForm
+        bind:this={editMemberModal}
+        bind:show={editMemberModalVisible}
+        title="Edit Member"
+        fields={modalFields}
+        actions={[
+            { name: 'Submit', callback: onSubmitEdit },
+            { name: 'Delete', callback: onSubmitDelete },
+        ]} />
+{/if}
 
 <style>
     div.player-card {
