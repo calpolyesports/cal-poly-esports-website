@@ -4,7 +4,7 @@
     import TimeGrid from '@event-calendar/time-grid';
     import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
-    import type { Event } from '$lib/types.js';
+    import type { WithStringId, Event } from '$lib/types.js';
 	import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
 
@@ -16,7 +16,7 @@
     }
 
     export let data;
-    let events: Event[] = data.events;
+    let events: WithStringId<Event>[] = data.events;
     const clubOptions: [string, string][] = data.adminFor.map((club) => [club.urlName, club.clubName]);
     if (data.isGeneralAdmin) {
         clubOptions.unshift(['general', 'General']);
@@ -29,7 +29,7 @@
 
     let editModal: ModalForm;
     let editModalVisible = false;
-    let selectedEvent = undefined as Event | undefined;
+    let selectedEvent = undefined as WithStringId<Event> | undefined;
 
     const modalFields = [
         { name: 'title', type: 'text' },
@@ -59,7 +59,7 @@
         return data.adminFor.find((club) => club.urlName === event.club);
     };
 
-    const convertToCalendarEvent = (event: Event): Calendar.EventInput => {
+    const convertToCalendarEvent = (event: WithStringId<Event>): Calendar.EventInput => {
         return {
             id: event._id,
             title: event.title,
@@ -83,7 +83,7 @@
     // API INTERACTIONS //
     //////////////////////
 
-    const sendAddEvent = async (event: ModalEvent): Promise<Event | undefined> => {
+    const sendAddEvent = async (event: ModalEvent): Promise<WithStringId<Event> | undefined> => {
         const response = await fetch("/calendar", {
             method: 'POST',
             headers: {
@@ -100,7 +100,7 @@
         return undefined;
     };
     
-    const sendUpdateEvent = async (id: string, event: ModalEvent): Promise<Event | undefined> => {
+    const sendUpdateEvent = async (id: string, event: ModalEvent): Promise<WithStringId<Event> | undefined> => {
         const response = await fetch(`/calendar/${id}`, {
             method: 'PUT',
             headers: {
@@ -148,7 +148,7 @@
         addModalVisible = false;
     };
 
-    const onClickEdit = (event: Event) => {
+    const onClickEdit = (event: WithStringId<Event>) => {
         selectedEvent = event;
         editModal.fillFields({
             title: event.title,
@@ -239,7 +239,7 @@
 <h1>Calendar</h1>
 
 {#if data.adminFor.length > 0}
-    <button on:click={onClickAdd}>Add Event</button>
+    <button class="button-medium" on:click={onClickAdd}>Add Event</button>
 {/if}
 
 <Calendar bind:this={ec} {plugins} {options} />

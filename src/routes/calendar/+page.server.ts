@@ -1,5 +1,5 @@
 import * as db from '$lib/server/database';
-import type { Event } from '$lib/types';
+import type { WithStringId, Event } from '$lib/types';
 
 import type { ServerLoad } from '@sveltejs/kit';
 
@@ -9,7 +9,7 @@ export const load: ServerLoad = async (event) => {
             ...event,
             _id: event._id.toString(),
         };
-    }) as Event[];
+    }) as WithStringId<Event>[];
     return {
         events,
     }

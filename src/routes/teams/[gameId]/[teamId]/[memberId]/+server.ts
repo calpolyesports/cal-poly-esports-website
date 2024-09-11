@@ -2,7 +2,7 @@ import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import * as db from "$lib/server/database";
 import * as models from "$lib/server/models";
-import type { InferRawDocType } from "mongoose";
+import type { RosterMember } from "$lib/types";
 import { ObjectId } from "mongodb";
 
 export const PUT: RequestHandler = async (event) => {
@@ -43,7 +43,7 @@ export const PUT: RequestHandler = async (event) => {
         username,
         role,
         picture
-    } as InferRawDocType<typeof models.RosterMemberModel>;
+    } as RosterMember;
 
     await db.updateRosterMember(new ObjectId(memberId), newDoc);
 
