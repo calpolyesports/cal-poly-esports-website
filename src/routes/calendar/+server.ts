@@ -1,8 +1,7 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import { json } from "@sveltejs/kit";
 import * as db from "$lib/server/database";
-import * as models from "$lib/server/models";
-import { type InferRawDocType } from 'mongoose';
+import type { Event } from "$lib/types";
 
 export const POST: RequestHandler = async (event) => {
     const body = await event.request.json();
@@ -22,7 +21,7 @@ export const POST: RequestHandler = async (event) => {
         start: new Date(start),
         end: new Date(end),
         club
-    } as InferRawDocType<typeof models.EventModel>;
+    } as Event;
 
     const newId = await db.addEvent(newDoc);
 

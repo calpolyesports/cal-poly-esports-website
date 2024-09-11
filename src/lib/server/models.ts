@@ -74,6 +74,7 @@ export const ArticleModel = model('Article', articleSchema);
 const clubSchema = new Schema({
     clubName: { type: String, required: true },
     aboutText: { type: String, required: true },
+    aboutHtml: { type: String, required: true },
     boardMembers: [
         { name: String, position: String, profileImage: String }
     ],

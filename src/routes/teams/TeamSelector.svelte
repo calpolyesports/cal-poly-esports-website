@@ -3,7 +3,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
 
-	import * as types from "$lib/types";
+	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from "$lib/types";
 	import MemberGrid from "./MemberGrid.svelte";
 	import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
@@ -12,7 +12,7 @@
 		name: string;
 	}
 
-	export let games: types.RosterGame[] = [];
+	export let games: WithStringId<RosterGame>[] = [];
 	export let adminFor: string[];
 	let activeGameId = games.length > 0 ? games[0]._id : '';
 
@@ -70,7 +70,7 @@
 	// API INTERACTIONS //
 	//////////////////////
 
-	const sendAddTeam = async (newTeam: ModalTeam): Promise<types.RosterTeam | undefined> => {
+	const sendAddTeam = async (newTeam: ModalTeam): Promise<WithStringId<RosterTeam> | undefined> => {
 		const response = await fetch(`/teams/${activeGameId}`, {
 			method: 'POST',
 			headers: {

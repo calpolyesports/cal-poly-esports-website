@@ -1,3 +1,5 @@
+export type WithStringId<T> = T & { _id: string };
+
 export interface User {
     _id: string;
     username: string;
@@ -12,7 +14,6 @@ export interface Session {
 }
 
 export interface Event {
-    _id: string;
     title: string;
     start: Date;
     end: Date;
@@ -22,21 +23,18 @@ export interface Event {
 }
 
 export interface RosterGame {
-    _id: string;
     name: string;
     icon: string;
-    teams: RosterTeam[];
+    teams: WithStringId<RosterTeam>[];
     adminRole: string;
 }
 
 export interface RosterTeam {
-    _id: string;
     name: string;
-    members: RosterMember[];
+    members: WithStringId<RosterMember>[];
 }
 
 export interface RosterMember {
-    _id: string;
     name: string;
     username: string;
     role: string;
@@ -44,7 +42,6 @@ export interface RosterMember {
 }
 
 export interface Article {
-    _id: string;
     title: string;
     summary?: string;
     link: string;
@@ -52,16 +49,15 @@ export interface Article {
 }
 
 export interface Club {
-    _id: string;
     clubName: string;
     aboutText: string;
+    aboutHtml: string;
     boardMembers: BoardMember[];
     urlName: string;
     color: string;
 }
 
 export interface BoardMember {
-    _id: string;
     name: string;
     position: string;
     profileImage: string;

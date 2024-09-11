@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { getClubByName } from '$lib/server/database';
+import type { WithStringId, Club } from '$lib/types';
 
 export const load: PageServerLoad = async ({ params }) => {
     const club = await getClubByName(params.slug);
@@ -15,6 +16,6 @@ export const load: PageServerLoad = async ({ params }) => {
         club: {
             ...club,
             _id: club._id.toString(),
-        },
+        } as WithStringId<Club>,
     };
 };

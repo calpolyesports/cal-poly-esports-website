@@ -1,11 +1,11 @@
 <script lang="ts">
-    import * as types from '$lib/types';
+    import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
 
-    export let game: types.RosterGame;
-    export let team: types.RosterTeam;
-    export let player: types.RosterMember;
+    export let game: WithStringId<RosterGame>;
+    export let team: WithStringId<RosterTeam>;
+    export let player: WithStringId<RosterMember>;
     export let isAdmin: boolean;
     export let onRemove: (id: string) => void;
 
@@ -30,7 +30,7 @@
     // API INTERACTIONS //
     //////////////////////
 
-    const sendUpdateMember = async (id: string, member: ModalMember): Promise<types.RosterMember | undefined> => {
+    const sendUpdateMember = async (id: string, member: ModalMember): Promise<WithStringId<RosterMember> | undefined> => {
         const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
             method: 'PUT',
             headers: {
