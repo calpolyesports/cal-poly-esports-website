@@ -5,7 +5,10 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	build: {
 		rollupOptions: {
-			external: ['@node-rs/argon2']
+			external: [
+				'@node-rs/argon2',
+				'marked'
+			]
 		}
 	}
 });
