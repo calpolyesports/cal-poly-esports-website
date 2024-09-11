@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"@node-rs/argon2": "^1.8.3",
+		"isomorphic-dompurify": "^2.15.0",
 		"marked": "^14.1.2"
 	},
 	"devDependencies": {
@@ -38,7 +39,6 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
 		"globals": "^15.0.0",
-		"isomorphic-dompurify": "^2.15.0",
 		"lucia": "^3.2.0",
 		"mongodb": "^6.8.0",
 		"mongoose": "^8.6.1",
