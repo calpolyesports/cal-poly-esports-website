@@ -42,18 +42,15 @@
     // API INTERACTIONS //
     //////////////////////
 
-    const sendAddMember = async (newMember: ModalMember): Promise<WithStringId<RosterMember> | undefined> => {
+    const sendAddMember = async (formData: any): Promise<WithStringId<RosterMember> | undefined> => {
         const response = await fetch(`/teams/${game._id}/${team._id}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newMember),
+            body: formData,
         });
 
         if (response.ok) {
             const data = await response.json();
-            return data.member;
+            team.members = [...team.members, data.member];
         }
 
         return undefined;
@@ -93,24 +90,16 @@
         addMemberModalVisible = true;
     };
 
-    const onSubmitAddMember = async (values) => {
+    const onSubmitAddMember = async (modalFields: FilledModalFields) => {
         const formData = new FormData();
-        formData.append('name', values.name);
-        formData.append('username', values.username);
-        formData.append('role', values.role);
+        formData.append('name', modalFields.name);
+        formData.append('username', modalFields.username);
+        formData.append('role', modalFields.role);
         if (selectedFile) {
             formData.append('picture', selectedFile);
         }
 
-        const response = await fetch(`/teams/${game._id}/${team._id}`, {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            team.members = [...team.members, data.member];
-        }
+        sendAddMember(formData);
 
         addMemberModalVisible = false;
         selectedFile = null;

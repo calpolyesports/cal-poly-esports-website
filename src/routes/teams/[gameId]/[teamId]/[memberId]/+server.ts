@@ -10,11 +10,11 @@ export const PUT: RequestHandler = async (event) => {
     const teamId = event.params.teamId;
     const memberId = event.params.memberId;
 
-    const body = await event.request.json();
-    const name = body.name;
-    const username = body.username;
-    const role = body.role;
-    const picture = body.picture;
+    const formData = await event.request.formData();
+    const name = formData.get('name') as string;
+    const username = formData.get('username') as string;
+    const role = formData.get('role') as string;
+    const pictureData = formData.get('picture') as File | null;
 
     const game = await db.getRosterGameById(new ObjectId(gameId));
 
@@ -38,12 +38,18 @@ export const PUT: RequestHandler = async (event) => {
         }, { status: 403 });
     }
 
+    let picture = null;
+
+    if (pictureData) {
+        picture = await db.uploadFileToBlob(pictureData);
+    }
+
     const newDoc = {
         name,
         username,
         role,
         picture
-    } as RosterMember;
+    } as unknown as RosterMember;
 
     await db.updateRosterMember(new ObjectId(memberId), newDoc);
 
