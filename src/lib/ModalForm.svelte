@@ -1,30 +1,38 @@
 <script lang="ts" context="module">
-    export type ModalFieldDefinition = { name: string, type: 'date' | 'text' | 'dropdown', options?: [string, string][] };
-    export type FilledModalFields = { [key: string]: string | Date };
+    export type ModalFieldDefinition = { 
+        name: string, 
+        type: 'date' | 'text' | 'dropdown' | 'file', 
+        options?: [string, string][],
+        accept?: string
+    };
+    export type FilledModalFields = { [key: string]: string | Date | File | null };
     export type ModalAction = { name: string, callback: (values: FilledModalFields) => Promise<void> };
 </script>
 
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
+
     export let show = false;
     export let title = '';
     export let fields: ModalFieldDefinition[];
     export let actions: ModalAction[];
 
     const bindings = fields.reduce((acc, field) => {
-        acc[field.name] = '';
+        acc[field.name] = field.type === 'file' ? null : '';
         return acc;
-    }, {} as { [key: string]: string });
+    }, {} as { [key: string]: string | File | null });
+
+    const dispatch = createEventDispatcher();
 
     export const fillFields = (values: FilledModalFields) => {
         fields.forEach(field => {
-            const element = document.getElementById(field.name) as HTMLInputElement | HTMLSelectElement;
             const value = values[field.name];
             if (!value) return;
             if (field.type === 'date') {
-                const originalTime = new Date(value);
+                const originalTime = new Date(value as string);
                 const adjustedTime = new Date(originalTime.getTime() - originalTime.getTimezoneOffset() * 60000);
                 bindings[field.name] = adjustedTime.toISOString().slice(0, 16);
-            } else {
+            } else if (field.type !== 'file') {
                 bindings[field.name] = value.toString();
             }
         });
@@ -32,8 +40,7 @@
 
     export const clearFields = () => {
         fields.forEach(field => {
-            const element = document.getElementById(field.name) as HTMLInputElement | HTMLSelectElement;
-            bindings[field.name] = '';
+            bindings[field.name] = field.type === 'file' ? null : '';
         });
     };
 
@@ -41,10 +48,21 @@
         const formData: FilledModalFields = {};
         fields.forEach(field => {
             const value = bindings[field.name];
-            formData[field.name] = field.type === 'date' ? new Date(value) : value;
+            formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
         });
         await callback(formData);
         show = false;
+    }
+
+    function handleFileChange(event: Event, field: ModalFieldDefinition) {
+        const input = event.target as HTMLInputElement;
+
+        if (input && input.files && input.files.length > 0) {
+            bindings[field.name] = input.files[0];
+            dispatch('fileChange', { field, file: input.files[0] });
+        } else {
+            console.error("File input or file selection is invalid");
+        }
     }
 </script>
 
@@ -65,6 +83,13 @@
                             <option value={option[0]}>{option[1]}</option>
                         {/each}
                     </select>
+                {:else if field.type === 'file'}
+                    <input
+                        id={field.name}
+                        type="file"
+                        accept={field.accept}
+                        on:change={(event) => handleFileChange(event, field)}
+                    />
                 {/if}
             {/each}
             <br>

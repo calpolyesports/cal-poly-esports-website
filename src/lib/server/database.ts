@@ -1,8 +1,9 @@
-import { connect, Types } from 'mongoose';
+import { connect } from 'mongoose';
 import { env } from '$env/dynamic/private';
 import { ObjectId } from 'mongodb';
 import DOMPurify from 'isomorphic-dompurify';
 import { marked } from 'marked';
+import { BlobServiceClient } from '@azure/storage-blob';
 
 import * as models from './models';
 import * as types from '../types';
@@ -10,6 +11,9 @@ import * as types from '../types';
 console.log("Connecting to MongoDB...");
 await connect(env.DB_CONN_STRING!);
 console.log("Connected to MongoDB");
+
+const sasUrl = env.PLAYER_PORTRAIT_BLOB!;
+const containerName = 'players';
 
 export async function getEvents(adminFor?: string[]) {
     const response = await models.EventModel.find().lean();
@@ -165,3 +169,22 @@ export async function updateClub(id: ObjectId, club: types.Club) {
         _id: id,
     }, club);
 }
+
+export const uploadFileToBlob = async (file: File): Promise<string> => {
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const blobServiceClient = new BlobServiceClient(sasUrl);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobName = `${Date.now()}-${file.name}`;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    await blockBlobClient.uploadData(buffer, {
+        blobHTTPHeaders: {
+            blobContentType: file.type,
+        },
+    });
+
+    return `${sasUrl.split('?')[0]}/${containerName}/${blobName}`;
+};
