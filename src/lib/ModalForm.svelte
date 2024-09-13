@@ -17,6 +17,9 @@
     export let fields: ModalFieldDefinition[];
     export let actions: ModalAction[];
 
+    let fileError = '';
+    let isFileValid = true;
+
     const bindings = fields.reduce((acc, field) => {
         acc[field.name] = field.type === 'file' ? null : '';
         return acc;
@@ -58,8 +61,20 @@
         const input = event.target as HTMLInputElement;
 
         if (input && input.files && input.files.length > 0) {
-            bindings[field.name] = input.files[0];
-            dispatch('fileChange', { field, file: input.files[0] });
+            const file = input.files[0];
+            const validExtensions = field.accept ? field.accept.split(',').map(ext => ext.trim()) : [];
+
+            const fileExtension = file.name.split('.').pop()?.toLowerCase();
+            if (validExtensions.length > 0 && !validExtensions.includes(`.${fileExtension}`)) {
+                fileError = `File must be of type: ${validExtensions.join(', ')}`;
+                isFileValid = false;
+            } else {
+                fileError = '';
+                isFileValid = true;
+                bindings[field.name] = file;
+            }
+
+            dispatch('fileChange', { field, file });
         } else {
             console.error("File input or file selection is invalid");
         }
@@ -90,11 +105,14 @@
                         accept={field.accept}
                         on:change={(event) => handleFileChange(event, field)}
                     />
+                    {#if fileError}
+                        <p class="error-message">{fileError}</p>
+                    {/if}
                 {/if}
             {/each}
             <br>
             {#each actions as action}
-                <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)}>{action.name}</button>
+                <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)} disabled={!isFileValid}>{action.name}</button>
             {/each}
         </div>
     </div>
@@ -170,5 +188,16 @@
         font-size: 1.25rem;
         padding: 0.5rem;
         width: 100%;
+    }
+
+    .button-medium:disabled {
+        background-color: gray;
+        cursor: not-allowed;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
     }
 </style>
