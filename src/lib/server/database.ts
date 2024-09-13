@@ -165,3 +165,30 @@ export async function updateClub(id: ObjectId, club: types.Club) {
         _id: id,
     }, club);
 }
+
+export async function addBoardMember(clubId: ObjectId, boardMember: types.BoardMember) {
+    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
+    if (!clubDoc) return null;
+    clubDoc.boardMembers.push(boardMember);
+    await clubDoc.save();
+    return boardMember;
+}
+
+export async function updateBoardMember(clubId: ObjectId, boardMemberIndex: number, boardMember: types.BoardMember) {
+    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
+    if (!clubDoc) return;
+    const boardMembers = clubDoc.boardMembers.toObject();
+    boardMembers[boardMemberIndex] = boardMember;
+    clubDoc.boardMembers = boardMembers
+    await clubDoc.save();
+    return boardMember;
+}
+
+export async function deleteBoardMember(clubId: ObjectId, boardMemberIndex: number) {
+    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
+    if (!clubDoc) return;
+    const boardMembers = clubDoc.boardMembers.toObject();
+    boardMembers.splice(boardMemberIndex, 1);
+    clubDoc.boardMembers = boardMembers;
+    await clubDoc.save();
+}
