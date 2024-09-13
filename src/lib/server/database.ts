@@ -143,8 +143,19 @@ export async function updateRosterMember(id: ObjectId, member: types.RosterMembe
 export async function deleteRosterMember(teamId: ObjectId, memberId: ObjectId) {
     const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
     if (!teamDoc) return;
+
+    const memberDoc = await models.RosterMemberModel.findOne({ _id: memberId });
+    if (!memberDoc) return;
+
+    if (memberDoc.picture) {
+        try {
+            await deleteFileFromAzure(memberDoc.picture);
+        } catch (error) {
+            console.error('Error deleting picture from Azure:', error);
+        }
+    }
+
     await models.RosterMemberModel.deleteOne({ _id: memberId });
-    teamDoc.members = teamDoc.members.filter(member => member.toString() !== memberId.toString());
     await teamDoc.save();
 }
 
@@ -188,3 +199,21 @@ export const uploadFileToBlob = async (file: File): Promise<string> => {
 
     return `${sasUrl.split('?')[0]}/${containerName}/${blobName}`;
 };
+
+export async function deleteFileFromAzure(pictureUrl: string): Promise<void> {
+    if (!pictureUrl) {
+        throw new Error('Invalid picture URL provided');
+    }
+
+    const blobServiceClient = new BlobServiceClient(sasUrl);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobName = pictureUrl.split('/').pop();
+
+    if (!blobName) {
+        throw new Error('Invalid blob name extracted from the URL');
+    }
+
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    await blockBlobClient.delete();
+}

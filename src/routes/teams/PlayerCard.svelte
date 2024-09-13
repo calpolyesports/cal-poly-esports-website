@@ -91,7 +91,7 @@
         if (deleted) {
             onRemove(player._id);
         }
-
+        selectedFile = null;
         editMemberModalVisible = false;
     };
 

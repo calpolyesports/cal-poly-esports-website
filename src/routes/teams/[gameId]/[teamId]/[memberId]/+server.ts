@@ -32,15 +32,33 @@ export const PUT: RequestHandler = async (event) => {
         }, { status: 404 });
     }
 
+    const member = await db.getRosterMemberById(new ObjectId(memberId));
+    if (!member) {
+        return json({
+            message: "Member not found"
+        }, { status: 404 });
+    }
+
     if (!event.locals.user?.admin_for.includes(game.adminRole)) {
         return json({
             message: "You do not have permission to update members for this game"
         }, { status: 403 });
     }
 
-    let picture = null;
+    let picture = member.picture;
 
     if (pictureData) {
+        if (member.picture) {
+            try {
+                await db.deleteFileFromAzure(member.picture);
+            } catch (error) {
+                console.error('Error deleting old picture from Azure:', error);
+                return json({
+                    message: "Error deleting old picture"
+                }, { status: 500 });
+            }
+        }
+
         picture = await db.uploadFileToBlob(pictureData);
     }
 
