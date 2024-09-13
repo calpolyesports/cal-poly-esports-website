@@ -80,8 +80,9 @@
         const updated = await sendUpdateMember(player._id, formData);
         if (updated) {
             player = updated;
+            team.members = team.members.map(m => m._id === player._id ? player : m);
         }
-
+        selectedFile = null;
         editMemberModalVisible = false;
     };
 
@@ -109,7 +110,7 @@
 <div class="player-card" on:click={onClick}>
     {#if player.picture}
     <div class="picture-container">
-        <img src={player.picture} alt={player.username} />
+        <img src="{player.picture}?t={Date.now()}" alt="{player.username}" />
     </div>
     {/if}
     <div class="bottom-shadow"></div>
