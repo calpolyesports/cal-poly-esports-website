@@ -71,6 +71,7 @@
 
     ul li {
         margin-right: 3rem;
+        height: 100%;
     }
 
     ul li a {
@@ -78,6 +79,9 @@
         color: var(--neutral-bright);
         font-size: 2rem;
         text-decoration: none;
+        padding-bottom: 20px;
+        padding-top: 20px;
+        height: auto;
     }
 
     .dropdown {
@@ -89,18 +93,23 @@
         display: none;
         position: absolute;
         background-color: white;
-        min-width: 12rem;
+        width: 200px;
         box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
         z-index: 1;
         flex-direction: column;
+        box-sizing: border-box;
+        top: 50px;
     }
 
     .dropdown-content a {
         color: black;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem;
         text-decoration: none;
         display: block;
         border: 1px solid gray;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
     }
 
     .dropdown-content a:hover {
