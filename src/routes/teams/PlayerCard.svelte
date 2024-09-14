@@ -13,30 +13,28 @@
         name: string;
         username: string;
         role: string;
-        picture: string;
+        picture: File;
     }
 
     let editMemberModal: ModalForm;
     let editMemberModalVisible = false;
+    let selectedFile: File | null = null;
 
     const modalFields = [
         { name: 'name', type: 'text' },
         { name: 'username', type: 'text' },
         { name: 'role', type: 'text' },
-        { name: 'picture', type: 'text' },
+        { name: 'picture', type: 'file', accept:".jpg, .jpeg, .png, .webp", onFileChange: true },
     ] as ModalFieldDefinition[];
     
     //////////////////////
     // API INTERACTIONS //
     //////////////////////
 
-    const sendUpdateMember = async (id: string, member: ModalMember): Promise<WithStringId<RosterMember> | undefined> => {
+    const sendUpdateMember = async (id: string, formData: any): Promise<WithStringId<RosterMember> | undefined> => {
         const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(member),
+            body: formData,
         });
 
         if (response.ok) {
@@ -71,18 +69,20 @@
     };
 
     const onSubmitEdit = async (modalFields: FilledModalFields) => {
-        const updatedMember = {
-            name: modalFields.name as string,
-            username: modalFields.username as string,
-            role: modalFields.role as string,
-            picture: modalFields.picture as string,
-        };
-
-        const updated = await sendUpdateMember(player._id, updatedMember);
-        if (updated) {
-            player = updated;
+        const formData = new FormData();
+        formData.append('name', modalFields.name);
+        formData.append('username', modalFields.username);
+        formData.append('role', modalFields.role);
+        if (selectedFile) {
+            formData.append('picture', selectedFile);
         }
 
+        const updated = await sendUpdateMember(player._id, formData);
+        if (updated) {
+            player = updated;
+            team.members = team.members.map(m => m._id === player._id ? player : m);
+        }
+        selectedFile = null;
         editMemberModalVisible = false;
     };
 
@@ -91,8 +91,18 @@
         if (deleted) {
             onRemove(player._id);
         }
-
+        selectedFile = null;
         editMemberModalVisible = false;
+    };
+
+    const onFileChange = (event: CustomEvent) => {
+        const { file } = event.detail;
+
+        if (file) {
+            selectedFile = file;
+        } else {
+            console.error("File selection is invalid in MEMBERGRID");
+        }
     };
 </script>
 
@@ -100,7 +110,7 @@
 <div class="player-card" on:click={onClick}>
     {#if player.picture}
     <div class="picture-container">
-        <img src={player.picture} alt={player.username} />
+        <img src="{player.picture}?t={Date.now()}" alt="{player.username}" />
     </div>
     {/if}
     <div class="bottom-shadow"></div>
@@ -120,7 +130,9 @@
         actions={[
             { name: 'Submit', callback: onSubmitEdit },
             { name: 'Delete', callback: onSubmitDelete },
-        ]} />
+        ]} 
+        on:fileChange={onFileChange}
+    />
 {/if}
 
 <style>

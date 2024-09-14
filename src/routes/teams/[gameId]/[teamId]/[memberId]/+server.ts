@@ -10,11 +10,11 @@ export const PUT: RequestHandler = async (event) => {
     const teamId = event.params.teamId;
     const memberId = event.params.memberId;
 
-    const body = await event.request.json();
-    const name = body.name;
-    const username = body.username;
-    const role = body.role;
-    const picture = body.picture;
+    const formData = await event.request.formData();
+    const name = formData.get('name') as string;
+    const username = formData.get('username') as string;
+    const role = formData.get('role') as string;
+    const pictureData = formData.get('picture') as File | null;
 
     const game = await db.getRosterGameById(new ObjectId(gameId));
 
@@ -32,10 +32,34 @@ export const PUT: RequestHandler = async (event) => {
         }, { status: 404 });
     }
 
+    const member = await db.getRosterMemberById(new ObjectId(memberId));
+    if (!member) {
+        return json({
+            message: "Member not found"
+        }, { status: 404 });
+    }
+
     if (!event.locals.user?.admin_for.includes(game.adminRole)) {
         return json({
             message: "You do not have permission to update members for this game"
         }, { status: 403 });
+    }
+
+    let picture = member.picture;
+
+    if (pictureData) {
+        if (member.picture) {
+            try {
+                await db.deleteFileFromAzure(member.picture);
+            } catch (error) {
+                console.error('Error deleting old picture from Azure:', error);
+                return json({
+                    message: "Error deleting old picture"
+                }, { status: 500 });
+            }
+        }
+
+        picture = await db.uploadFileToBlob(pictureData);
     }
 
     const newDoc = {
@@ -43,7 +67,7 @@ export const PUT: RequestHandler = async (event) => {
         username,
         role,
         picture
-    } as RosterMember;
+    } as unknown as RosterMember;
 
     await db.updateRosterMember(new ObjectId(memberId), newDoc);
 
