@@ -16,6 +16,7 @@
     }, {} as { [key: string]: string });
 
     export const fillFields = (values: FilledModalFields) => {
+        clearFields();
         fields.forEach(field => {
             const element = document.getElementById(field.name) as HTMLInputElement | HTMLSelectElement;
             const value = values[field.name];
