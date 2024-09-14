@@ -28,6 +28,7 @@
     const dispatch = createEventDispatcher();
 
     export const fillFields = (values: FilledModalFields) => {
+        clearFields();
         fields.forEach(field => {
             const value = values[field.name];
             if (!value) return;
