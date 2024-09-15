@@ -6,23 +6,20 @@ import type { BoardMember } from "$lib/types";
 export const PUT: RequestHandler = async (event) => {
     const slug = event.params.slug;
     const index = Number(event.params.index);
-
     if (!slug) {
         return json({
             message: "Club not found"
         }, { status: 404 });
     }
-
-    if (!index) {
+    if (index === null) {
         return json({
             message: "Board member not found"
         }, { status: 404 });
     }
-    
-    const body = await event.request.json();
-    const name = body.name;
-    const position = body.position;
-    const profileImage = body.profileImage;
+    const formData = await event.request.formData();
+    const name = formData.get('name') as string;
+    const position = formData.get('position') as string;
+    const profileImageData = formData.get('profileImage') as File | null;
 
     const club = await db.getClubByName(slug);
 
@@ -36,6 +33,23 @@ export const PUT: RequestHandler = async (event) => {
         return json({
             message: "You do not have permission to update members for this club"
         }, { status: 403 });
+    }
+
+    let profileImage = club.boardMembers[index].profileImage;
+
+    if (profileImageData) {
+        if(profileImage != 'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg') {
+            try {
+                await db.deleteFileFromAzure(profileImage, 'boards');
+            } catch (error) {
+                console.error('Error deleting old picture from Azure:', error);
+                return json({
+                    message: "Error deleting old picture"
+                }, { status: 500 });
+            }
+        }
+
+        profileImage = await db.uploadFileToBlob(profileImageData, 'boards');
     }
 
     const newDoc = {

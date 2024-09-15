@@ -50,7 +50,7 @@ export const PUT: RequestHandler = async (event) => {
     if (pictureData) {
         if (member.picture) {
             try {
-                await db.deleteFileFromAzure(member.picture);
+                await db.deleteFileFromAzure(member.picture, 'players');
             } catch (error) {
                 console.error('Error deleting old picture from Azure:', error);
                 return json({
@@ -59,7 +59,7 @@ export const PUT: RequestHandler = async (event) => {
             }
         }
 
-        picture = await db.uploadFileToBlob(pictureData);
+        picture = await db.uploadFileToBlob(pictureData, 'players');
     }
 
     const newDoc = {

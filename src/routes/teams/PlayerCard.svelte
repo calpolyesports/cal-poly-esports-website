@@ -27,7 +27,7 @@
         { name: 'picture', type: 'file', accept:".jpg, .jpeg, .png, .webp", onFileChange: true },
     ] as ModalFieldDefinition[];
     
-    //////////////////////
+    //////////////////////-
     // API INTERACTIONS //
     //////////////////////
 
