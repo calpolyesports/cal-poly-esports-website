@@ -31,16 +31,16 @@ export const POST: RequestHandler = async (event) => {
         }, { status: 404 });
     }
 
-    let picture = null;
-
-    if (pictureData) {
-        picture = await db.uploadFileToBlob(pictureData);
-    }
-
     if (!event.locals.user?.admin_for.includes(game.adminRole)) {
         return json({
             message: "You do not have permission to add members for this game"
         }, { status: 403 });
+    }
+
+    let picture = null;
+
+    if (pictureData) {
+        picture = await db.uploadFileToBlob(pictureData, 'players');
     }
 
     const newDoc = {

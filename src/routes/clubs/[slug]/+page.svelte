@@ -27,10 +27,12 @@
     let editMemberModalVisible = false;
     let selectedMemberIndex: number | undefined;
 
+    let selectedFile: File | null = null;
+
     const memberModalFields = [
         { name: 'name', type: 'text' },
         { name: 'position', type: 'text' },
-        { name: 'profileImage', type: 'text' },
+        { name: 'profileImage', type: 'file', accept:".jpg, .jpeg, .png, .webp" },
     ] as ModalFieldDefinition[];
 
     //////////////////////
@@ -53,13 +55,10 @@
         }
     };
 
-    const sendAddMember = async (club: Club, member: BoardMember) => {
+    const sendAddMember = async (club: Club, formData: any) => {
         const response = await fetch(`/clubs/${club.urlName}/board`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(member),
+            body: formData
         });
 
         if (response.ok) {
@@ -68,13 +67,10 @@
         }
     };
 
-    const sendUpdateMember = async (club: Club, memberIndex: number, member: BoardMember) => {
+    const sendUpdateMember = async (club: Club, memberIndex: number, formData: any) => {
         const response = await fetch(`/clubs/${club.urlName}/board/${memberIndex}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(member),
+            body: formData
         });
 
         if (response.ok) {
@@ -116,17 +112,21 @@
 
     const onSubmitAddMember = async (fields: FilledModalFields) => {
         if (club) {
-            const newMember = {
-                name: fields.name as string,
-                position: fields.position as string,
-                profileImage: fields.profileImage as string,
-            };
-            const member = await sendAddMember(club, newMember);
+            const formData = new FormData
+            formData.append('name', fields.name);
+            formData.append('position', fields.position);
+            if (selectedFile) {
+                formData.append('profileImage', selectedFile);
+            }
+
+            const member = await sendAddMember(club, formData);
             if (member) {
                 club.boardMembers = [...club.boardMembers, member];
                 addMemberModalVisible = false;
             }
         }
+
+        selectedFile = null;
     };
 
     const onClickEditMember = (index: number) => {
@@ -137,7 +137,6 @@
             editMemberModal.fillFields({
                 name: member.name,
                 position: member.position,
-                profileImage: member.profileImage,
             });
             editMemberModalVisible = true;
         }
@@ -145,17 +144,20 @@
 
     const onSubmitEditMember = async (fields: FilledModalFields) => {
         if (club && selectedMemberIndex !== undefined) {
-            const updatedMember = {
-                name: fields.name as string,
-                position: fields.position as string,
-                profileImage: fields.profileImage as string,
-            };
-            const member = await sendUpdateMember(club, selectedMemberIndex, updatedMember);
+            const formData = new FormData();
+            formData.append('name', fields.name);
+            formData.append('position', fields.position);
+            if (selectedFile) {
+                formData.append('profileImage', selectedFile);
+            }
+            const member = await sendUpdateMember(club, selectedMemberIndex, formData);
             if (member) {
                 club.boardMembers = club.boardMembers.map((m, i) => i === selectedMemberIndex ? member : m);
                 editMemberModalVisible = false;
             }
         }
+
+        selectedFile = null;
     };
 
     const onSubmitDeleteMember = async () => {
@@ -165,6 +167,18 @@
                 club.boardMembers = club.boardMembers.filter((_, i) => i !== selectedMemberIndex);
                 editMemberModalVisible = false;
             }
+        }
+
+        selectedFile = null;
+    };
+
+    const onFileChange = (event: CustomEvent) => {
+        const { file } = event.detail;
+
+        if (file) {
+            selectedFile = file;
+        } else {
+            console.error("File selection is invalid");
         }
     };
 </script>
@@ -209,7 +223,9 @@
             fields={memberModalFields}
             actions={[
                 { name: 'Submit', callback: onSubmitAddMember },
-            ]} />
+            ]} 
+            on:fileChange={onFileChange}
+        />
 
         <ModalForm
             bind:this={editMemberModal}
@@ -219,7 +235,9 @@
             actions={[
                 { name: 'Submit', callback: onSubmitEditMember },
                 { name: 'Delete', callback: onSubmitDeleteMember },
-            ]} />
+            ]} 
+            on:fileChange={onFileChange}
+        />
     {/if}
 {:else}
     <h1>404</h1>

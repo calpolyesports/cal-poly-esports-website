@@ -13,7 +13,6 @@ await connect(env.DB_CONN_STRING!);
 console.log("Connected to MongoDB");
 
 const sasUrl = env.PLAYER_PORTRAIT_BLOB!;
-const containerName = 'players';
 
 export async function getEvents(adminFor?: string[]) {
     const response = await models.EventModel.find().lean();
@@ -149,7 +148,7 @@ export async function deleteRosterMember(teamId: ObjectId, memberId: ObjectId) {
 
     if (memberDoc.picture) {
         try {
-            await deleteFileFromAzure(memberDoc.picture);
+            await deleteFileFromAzure(memberDoc.picture, 'players');
         } catch (error) {
             console.error('Error deleting picture from Azure:', error);
         }
@@ -203,12 +202,23 @@ export async function deleteBoardMember(clubId: ObjectId, boardMemberIndex: numb
     const clubDoc = await models.ClubModel.findOne({ _id: clubId });
     if (!clubDoc) return;
     const boardMembers = clubDoc.boardMembers.toObject();
+
+    const member = boardMembers[boardMemberIndex];
+
+    if (member.picture != 'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg') {
+        try {
+            await deleteFileFromAzure(member.profileImage, 'boards');
+        } catch (error) {
+            console.error('Error deleting picture from Azure:', error);
+        }
+    }
+
     boardMembers.splice(boardMemberIndex, 1);
     clubDoc.boardMembers = boardMembers;
     await clubDoc.save();
 }
 
-export const uploadFileToBlob = async (file: File): Promise<string> => {
+export const uploadFileToBlob = async (file: File, containerName: string): Promise<string> => {
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -227,7 +237,7 @@ export const uploadFileToBlob = async (file: File): Promise<string> => {
     return `${sasUrl.split('?')[0]}/${containerName}/${blobName}`;
 };
 
-export async function deleteFileFromAzure(pictureUrl: string): Promise<void> {
+export async function deleteFileFromAzure(pictureUrl: string, containerName: string): Promise<void> {
     if (!pictureUrl) {
         throw new Error('Invalid picture URL provided');
     }

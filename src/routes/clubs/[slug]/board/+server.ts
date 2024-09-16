@@ -12,10 +12,10 @@ export const POST: RequestHandler = async (event) => {
         }, { status: 404 });
     }
     
-    const body = await event.request.json();
-    const name = body.name;
-    const position = body.position;
-    const profileImage = body.profileImage;
+    const formData = await event.request.formData();
+    const name = formData.get('name') as string;
+    const position = formData.get('position') as string;
+    const profileImageData = formData.get('profileImage') as File | null;
 
     const club = await db.getClubByName(slug);
 
@@ -29,6 +29,12 @@ export const POST: RequestHandler = async (event) => {
         return json({
             message: "You do not have permission to add members for this club"
         }, { status: 403 });
+    }
+
+    let profileImage = 'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg';
+
+    if (profileImageData) {
+        profileImage = await db.uploadFileToBlob(profileImageData, 'boards');
     }
 
     const newDoc = {
