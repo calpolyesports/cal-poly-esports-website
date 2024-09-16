@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from '$app/stores';
     import { type Club } from "$lib/types";
 
     export let items;
@@ -6,6 +7,9 @@
     export let isAdmin;
     export let icon;
     export let clubs: Club[];
+
+    let currentPath: string;
+    $: $page.url.pathname && (currentPath = $page.url.pathname);
 </script>
 
 <nav>
@@ -17,7 +21,7 @@
             <li>
                 {#if item.name === "Clubs"}
                     <div class="dropdown">
-                        <a href={item.link}>{item.name}</a>
+                        <a href={item.link} class:selected={currentPath.startsWith('/clubs')}>{item.name}</a>
                         <div class="dropdown-content">
                             {#each clubs as club}
                                 <a href={`/clubs/${club.urlName}`}>{club.clubName}</a>
@@ -25,13 +29,13 @@
                         </div>
                     </div>
                 {:else}
-                    <a href={item.link}>{item.name}</a>
+                    <a href={item.link} class:selected={currentPath === item.link}>{item.name}</a>
                 {/if}
             </li>
         {/each}
         {#if isAdmin}
             <li>
-                <a href={adminItem.link}>{adminItem.name}</a>
+                <a href={adminItem.link} class:selected={currentPath === adminItem.link}>{adminItem.name}</a>
             </li>
         {/if}
     </ul>
@@ -84,6 +88,21 @@
         height: auto;
     }
 
+    ul li a.selected {
+        position: relative;
+    }
+
+    ul li a.selected::after {
+        content: '';
+        position: absolute;
+        left: -10px;
+        right: -10px;
+        bottom: 5.5px;
+        height: 4px;
+        background-color: var(--cal-poly-secondary);
+        width: calc(100% + 20px);
+    }
+
     .dropdown {
         position: relative;
         display: inline-block;
@@ -98,7 +117,7 @@
         z-index: 1;
         flex-direction: column;
         box-sizing: border-box;
-        top: 50px;
+        top: 50.5px;
         border-left: 8px solid var(--cal-poly-primary);
     }
 
@@ -109,7 +128,7 @@
         display: block;
         border-top: 1px solid var(--cal-poly-primary);
         border-bottom: 1px solid var(--cal-poly-primary);
-        width: calc(100% - 8px);
+        width: 100%;
         box-sizing: border-box;
         text-align: center;
     }
