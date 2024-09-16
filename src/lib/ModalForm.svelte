@@ -1,30 +1,42 @@
 <script lang="ts" context="module">
-    export type ModalFieldDefinition = { name: string, type: 'date' | 'text' | 'dropdown', options?: [string, string][] };
-    export type FilledModalFields = { [key: string]: string | Date };
+    export type ModalFieldDefinition = { 
+        name: string, 
+        type: 'date' | 'text' | 'dropdown' | 'file', 
+        options?: [string, string][],
+        accept?: string
+    };
+    export type FilledModalFields = { [key: string]: string | Date | File | null };
     export type ModalAction = { name: string, callback: (values: FilledModalFields) => Promise<void> };
 </script>
 
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
+
     export let show = false;
     export let title = '';
     export let fields: ModalFieldDefinition[];
     export let actions: ModalAction[];
 
+    let fileError = '';
+    let isFileValid = true;
+
     const bindings = fields.reduce((acc, field) => {
-        acc[field.name] = '';
+        acc[field.name] = field.type === 'file' ? null : '';
         return acc;
-    }, {} as { [key: string]: string });
+    }, {} as { [key: string]: string | File | null });
+
+    const dispatch = createEventDispatcher();
 
     export const fillFields = (values: FilledModalFields) => {
+        clearFields();
         fields.forEach(field => {
-            const element = document.getElementById(field.name) as HTMLInputElement | HTMLSelectElement;
             const value = values[field.name];
             if (!value) return;
             if (field.type === 'date') {
-                const originalTime = new Date(value);
+                const originalTime = new Date(value as string);
                 const adjustedTime = new Date(originalTime.getTime() - originalTime.getTimezoneOffset() * 60000);
                 bindings[field.name] = adjustedTime.toISOString().slice(0, 16);
-            } else {
+            } else if (field.type !== 'file') {
                 bindings[field.name] = value.toString();
             }
         });
@@ -32,8 +44,7 @@
 
     export const clearFields = () => {
         fields.forEach(field => {
-            const element = document.getElementById(field.name) as HTMLInputElement | HTMLSelectElement;
-            bindings[field.name] = '';
+            bindings[field.name] = field.type === 'file' ? null : '';
         });
     };
 
@@ -41,10 +52,33 @@
         const formData: FilledModalFields = {};
         fields.forEach(field => {
             const value = bindings[field.name];
-            formData[field.name] = field.type === 'date' ? new Date(value) : value;
+            formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
         });
         await callback(formData);
         show = false;
+    }
+
+    function handleFileChange(event: Event, field: ModalFieldDefinition) {
+        const input = event.target as HTMLInputElement;
+
+        if (input && input.files && input.files.length > 0) {
+            const file = input.files[0];
+            const validExtensions = field.accept ? field.accept.split(',').map(ext => ext.trim()) : [];
+
+            const fileExtension = file.name.split('.').pop()?.toLowerCase();
+            if (validExtensions.length > 0 && !validExtensions.includes(`.${fileExtension}`)) {
+                fileError = `File must be of type: ${validExtensions.join(', ')}`;
+                isFileValid = false;
+            } else {
+                fileError = '';
+                isFileValid = true;
+                bindings[field.name] = file;
+            }
+
+            dispatch('fileChange', { field, file });
+        } else {
+            console.error("File input or file selection is invalid");
+        }
     }
 </script>
 
@@ -65,11 +99,21 @@
                             <option value={option[0]}>{option[1]}</option>
                         {/each}
                     </select>
+                {:else if field.type === 'file'}
+                    <input
+                        id={field.name}
+                        type="file"
+                        accept={field.accept}
+                        on:change={(event) => handleFileChange(event, field)}
+                    />
+                    {#if fileError}
+                        <p class="error-message">{fileError}</p>
+                    {/if}
                 {/if}
             {/each}
             <br>
             {#each actions as action}
-                <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)}>{action.name}</button>
+                <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)} disabled={!isFileValid}>{action.name}</button>
             {/each}
         </div>
     </div>
@@ -145,5 +189,16 @@
         font-size: 1.25rem;
         padding: 0.5rem;
         width: 100%;
+    }
+
+    .button-medium:disabled {
+        background-color: gray;
+        cursor: not-allowed;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
     }
 </style>

@@ -1,8 +1,9 @@
-import { connect, Types } from 'mongoose';
+import { connect } from 'mongoose';
 import { env } from '$env/dynamic/private';
 import { ObjectId } from 'mongodb';
 import DOMPurify from 'isomorphic-dompurify';
 import { marked } from 'marked';
+import { BlobServiceClient } from '@azure/storage-blob';
 
 import * as models from './models';
 import * as types from '../types';
@@ -10,6 +11,8 @@ import * as types from '../types';
 console.log("Connecting to MongoDB...");
 await connect(env.DB_CONN_STRING!);
 console.log("Connected to MongoDB");
+
+const sasUrl = env.PLAYER_PORTRAIT_BLOB!;
 
 export async function getEvents(adminFor?: string[]) {
     const response = await models.EventModel.find().lean();
@@ -139,8 +142,19 @@ export async function updateRosterMember(id: ObjectId, member: types.RosterMembe
 export async function deleteRosterMember(teamId: ObjectId, memberId: ObjectId) {
     const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
     if (!teamDoc) return;
+
+    const memberDoc = await models.RosterMemberModel.findOne({ _id: memberId });
+    if (!memberDoc) return;
+
+    if (memberDoc.picture) {
+        try {
+            await deleteFileFromAzure(memberDoc.picture, 'players');
+        } catch (error) {
+            console.error('Error deleting picture from Azure:', error);
+        }
+    }
+
     await models.RosterMemberModel.deleteOne({ _id: memberId });
-    teamDoc.members = teamDoc.members.filter(member => member.toString() !== memberId.toString());
     await teamDoc.save();
 }
 
@@ -164,4 +178,79 @@ export async function updateClub(id: ObjectId, club: types.Club) {
     await models.ClubModel.updateOne({
         _id: id,
     }, club);
+}
+
+export async function addBoardMember(clubId: ObjectId, boardMember: types.BoardMember) {
+    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
+    if (!clubDoc) return null;
+    clubDoc.boardMembers.push(boardMember);
+    await clubDoc.save();
+    return boardMember;
+}
+
+export async function updateBoardMember(clubId: ObjectId, boardMemberIndex: number, boardMember: types.BoardMember) {
+    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
+    if (!clubDoc) return;
+    const boardMembers = clubDoc.boardMembers.toObject();
+    boardMembers[boardMemberIndex] = boardMember;
+    clubDoc.boardMembers = boardMembers
+    await clubDoc.save();
+    return boardMember;
+}
+
+export async function deleteBoardMember(clubId: ObjectId, boardMemberIndex: number) {
+    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
+    if (!clubDoc) return;
+    const boardMembers = clubDoc.boardMembers.toObject();
+
+    const member = boardMembers[boardMemberIndex];
+
+    if (member.picture != 'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg') {
+        try {
+            await deleteFileFromAzure(member.profileImage, 'boards');
+        } catch (error) {
+            console.error('Error deleting picture from Azure:', error);
+        }
+    }
+
+    boardMembers.splice(boardMemberIndex, 1);
+    clubDoc.boardMembers = boardMembers;
+    await clubDoc.save();
+}
+
+export const uploadFileToBlob = async (file: File, containerName: string): Promise<string> => {
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const blobServiceClient = new BlobServiceClient(sasUrl);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobName = `${Date.now()}-${file.name}`;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    await blockBlobClient.uploadData(buffer, {
+        blobHTTPHeaders: {
+            blobContentType: file.type,
+        },
+    });
+
+    return `${sasUrl.split('?')[0]}/${containerName}/${blobName}`;
+};
+
+export async function deleteFileFromAzure(pictureUrl: string, containerName: string): Promise<void> {
+    if (!pictureUrl) {
+        throw new Error('Invalid picture URL provided');
+    }
+
+    const blobServiceClient = new BlobServiceClient(sasUrl);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobName = pictureUrl.split('/').pop();
+
+    if (!blobName) {
+        throw new Error('Invalid blob name extracted from the URL');
+    }
+
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    await blockBlobClient.delete();
 }

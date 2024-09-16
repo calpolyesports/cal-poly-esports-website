@@ -70,14 +70,17 @@ const articleSchema = new Schema({
 });
 export const ArticleModel = model('Article', articleSchema);
 
+const boardMemberSchema = new Schema({
+    name: { type: String, required: true },
+    position: { type: String, required: true },
+    profileImage: String,
+}, { _id: false });
 
 const clubSchema = new Schema({
     clubName: { type: String, required: true },
     aboutText: { type: String, required: true },
     aboutHtml: { type: String, required: true },
-    boardMembers: [
-        { name: String, position: String, profileImage: String }
-    ],
+    boardMembers: [boardMemberSchema],
     urlName: { type: String, required: true },
     color: { type: String, required: true },
 });
