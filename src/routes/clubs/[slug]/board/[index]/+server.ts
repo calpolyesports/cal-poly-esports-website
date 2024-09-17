@@ -75,7 +75,7 @@ export const DELETE: RequestHandler = async (event) => {
         }, { status: 404 });
     }
 
-    if (!index) {
+    if (index === null) {
         return json({
             message: "Board member not found"
         }, { status: 404 });
