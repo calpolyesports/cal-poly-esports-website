@@ -6,6 +6,9 @@ export const load: ServerLoad = async (event) => {
 	if (!event.locals.user) {
         redirect(302, "/login");
     }
+    return {
+        subtitle: 'Admin',
+    };
 };
 
 export const actions: Actions = {

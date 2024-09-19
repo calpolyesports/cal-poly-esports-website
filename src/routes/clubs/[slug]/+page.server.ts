@@ -13,6 +13,7 @@ export const load: PageServerLoad = async ({ params }) => {
     }
 
     return {
+        subtitle: club.clubName,
         club: {
             ...club,
             _id: club._id.toString(),
