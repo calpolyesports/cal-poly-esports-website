@@ -11,6 +11,7 @@ export const load: ServerLoad = async (event) => {
         };
     }) as WithStringId<Event>[];
     return {
+        subtitle: 'Calendar',
         events,
     }
 }

@@ -23,6 +23,7 @@ export async function load() {
         };
     }) as WithStringId<RosterGame>[];
     return {
+        subtitle: 'Teams',
         games,
     }
 }

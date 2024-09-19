@@ -1,5 +1,12 @@
 <script>
     import TopNav from "./TopNav.svelte";
+    import { page } from '$app/stores';
+    
+    let head = {
+        title: "Cal Poly Esports",
+        description: "Welcome to Cal Poly Esports, the largest gaming community at Cal Poly SLO!",
+        image: "/favicon.png",
+    };
 
     let topNavItems = [
         { name: "Home", link: "/" },
@@ -10,9 +17,22 @@
     ];
 
     export let data;
+
+    $: head.title = $page.data.subtitle ? `${$page.data.subtitle} - Cal Poly Esports` : "Cal Poly Esports";
 </script>
 
 <svelte:head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content={head.description}>
+
+    <title>{head.title}</title>
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={head.title} />
+    <meta property="og:description" content={head.description} />
+    <meta property="og:image" content={head.image} />
+
 	<link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="https://use.typekit.net/yij1veh.css">
 </svelte:head>
