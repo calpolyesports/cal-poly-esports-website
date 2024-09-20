@@ -277,9 +277,13 @@
 <Modal
     bind:this={displayModal}
     title={selectedEvent?.title}>
-    <p>{selectedEvent?.description}</p>
+    {#if selectedEvent?.description}
+        <p>{selectedEvent?.description}</p>
+    {/if}
     <div class="event-info">
-        <p><em>Location: {selectedEvent?.location}</em></p>
+        {#if selectedEvent?.location}
+            <p><em>Location: {selectedEvent?.location}</em></p>
+        {/if}
         <p><em>Club: {selectedEvent?.club}</em></p>
         <p><em>Start: {selectedEvent?.start.toLocaleString()}</em></p>
         <p><em>End: {selectedEvent?.start.toLocaleString()}</em></p>
