@@ -17,7 +17,6 @@
 	let activeGameId = games.length > 0 ? games[0]._id : '';
 
 	let addTeamModal: ModalForm;
-	let addTeamModalVisible = false;
 
 	const teamModalFields = [
 		{ name: 'name', type: 'text' },
@@ -93,7 +92,7 @@
 
 	const onClickAddTeam = () => {
 		addTeamModal.clearFields();
-		addTeamModalVisible = true;
+		addTeamModal.showModal();
 	};
 
 	const onSubmitAddTeam = async (values: FilledModalFields) => {
@@ -109,7 +108,7 @@
 				return game;
 			});
 		}
-		addTeamModalVisible = false;
+		addTeamModal.hideModal();
 	};
 
 	const onTeamRemove = (teamId: string) => {
@@ -154,7 +153,6 @@
 
 <ModalForm
 	bind:this={addTeamModal}
-	bind:show={addTeamModalVisible}
 	title="Add Team"
 	fields={teamModalFields}
 	actions={[

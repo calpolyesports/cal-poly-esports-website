@@ -5,6 +5,7 @@
     import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
     import type { WithStringId, Event } from '$lib/types.js';
+    import Modal from '$lib/Modal.svelte';
 	import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
 
@@ -13,6 +14,8 @@
         start: Date,
         end: Date,
         club: string,
+        location?: string,
+        description?: string,
     }
 
     export let data;
@@ -24,11 +27,11 @@
 
     let ec: Calendar;
 
+    let displayModal: Modal;
+
     let addModal: ModalForm;
-    let addModalVisible = false;
 
     let editModal: ModalForm;
-    let editModalVisible = false;
     let selectedEvent = undefined as WithStringId<Event> | undefined;
 
     const modalFields = [
@@ -36,6 +39,8 @@
         { name: 'start', type: 'date' },
         { name: 'end', type: 'date' },
         { name: 'club', type: 'dropdown', options: clubOptions },
+        { name: 'location', type: 'text' },
+        { name: 'description', type: 'text' },
     ] as ModalFieldDefinition[];
 
     //////////////////////
@@ -76,6 +81,8 @@
             start: info.start as Date,
             end: info.end as Date,
             club: info.club as string,
+            location: info.location === '' ? undefined : info.location as string,
+            description: info.description === '' ? undefined : info.description as string,
         } as ModalEvent;
     };
 
@@ -131,7 +138,7 @@
 
     const onClickAdd = () => {
         addModal.clearFields();
-        addModalVisible = true;
+        addModal.showModal();
     };
 
     const onSubmitAdd = async (modalFields: FilledModalFields) => {
@@ -145,7 +152,7 @@
             ec.addEvent(convertToCalendarEvent(event));
         }
         addModal.clearFields();
-        addModalVisible = false;
+        addModal.hideModal();
     };
 
     const onClickEdit = (event: WithStringId<Event>) => {
@@ -155,8 +162,10 @@
             start: event.start,
             end: event.end,
             club: event.club,
+            location: event.location ?? '',
+            description: event.description ?? '',
         });
-        editModalVisible = true;
+        editModal.showModal();
     };
 
     const onSubmitEdit = async (modalFields: FilledModalFields) => {
@@ -173,7 +182,7 @@
             ec.updateEvent(convertToCalendarEvent(updatedEvent));
         }
         editModal.clearFields();
-        editModalVisible = false;
+        editModal.hideModal();
     };
 
     const onSubmitDelete = async (values: FilledModalFields) => {
@@ -186,7 +195,7 @@
             ec.removeEventById(clickedEvent._id);
         }
         editModal.clearFields();
-        editModalVisible = false;
+        editModal.hideModal();
     };
     
     //////////////////////
@@ -223,10 +232,14 @@
         eventClick: async (event) => {
             const clickedEvent = event.event;
             const eventInfo = events.find((e) => e._id === clickedEvent.id);
-            if (!eventInfo || !hasPermissions(eventInfo)) {
-                return;
+            if (eventInfo) {
+                if (hasPermissions(eventInfo)) {
+                    onClickEdit(eventInfo);
+                } else {
+                    selectedEvent = eventInfo;
+                    displayModal.showModal();
+                }
             }
-            onClickEdit(eventInfo);
         },
         headerToolbar: {
             start: 'title prev,next today',
@@ -246,7 +259,6 @@
 
 <ModalForm
     bind:this={addModal}
-    bind:show={addModalVisible}
     title="Add Event"
     fields={modalFields}
     actions={[
@@ -255,13 +267,31 @@
 
 <ModalForm
     bind:this={editModal}
-    bind:show={editModalVisible}
     title="Edit Event"
     fields={modalFields}
     actions={[
         { name: 'Submit', callback: onSubmitEdit },
         { name: 'Delete', callback: onSubmitDelete },
-    ]} />
+    ]} />  
 
+<Modal
+    bind:this={displayModal}
+    title={selectedEvent?.title}>
+    <p>{selectedEvent?.description}</p>
+    <div class="event-info">
+        <p><em>Location: {selectedEvent?.location}</em></p>
+        <p><em>Club: {selectedEvent?.club}</em></p>
+        <p><em>Start: {selectedEvent?.start.toLocaleString()}</em></p>
+        <p><em>End: {selectedEvent?.start.toLocaleString()}</em></p>
+    </div>
+</Modal>
 <style>
+    p {
+        margin: 0.5rem 0;
+        font-size: 1.25rem;
+    }
+
+    .event-info {
+        margin-top: 1rem;
+    }
 </style>

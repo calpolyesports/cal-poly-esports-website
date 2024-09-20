@@ -9,6 +9,8 @@ export const POST: RequestHandler = async (event) => {
     const start = body.start;
     const end = body.end;
     const club = body.club;
+    const location = body.location;
+    const description = body.description;
 
     if (!event.locals.user?.admin_for.includes(club)) {
         return json({
@@ -20,7 +22,9 @@ export const POST: RequestHandler = async (event) => {
         title,
         start: new Date(start),
         end: new Date(end),
-        club
+        club,
+        location,
+        description,
     } as Event;
 
     const newId = await db.addEvent(newDoc);

@@ -36,6 +36,8 @@ const eventSchema = new Schema({
     start: { type: Date, required: true },
     end: { type: Date, required: true },
     club: { type: String, required: true },
+    location: String,
+    description: String,
 });
 export const EventModel = model('Event', eventSchema);
 
