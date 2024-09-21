@@ -21,7 +21,6 @@
     export let onRemove: (id: string) => void;
     
     let addMemberModal: ModalForm;
-    let addMemberModalVisible = false;
     let selectedFile: File | null = null;
 
     const memberModalFields = [
@@ -32,7 +31,6 @@
     ] as ModalFieldDefinition[];
 
     let editTeamModal: ModalForm;
-    let editTeamModalVisible = false;
 
     const teamModalFields = [
         { name: 'name', type: 'text' },
@@ -87,7 +85,7 @@
 
     const onClickAddMember = () => {
         addMemberModal.clearFields();
-        addMemberModalVisible = true;
+        addMemberModal.showModal();
     };
 
     const onSubmitAddMember = async (modalFields: FilledModalFields) => {
@@ -101,7 +99,7 @@
 
         sendAddMember(formData);
 
-        addMemberModalVisible = false;
+        addMemberModal.hideModal();
         selectedFile = null;
     };
 
@@ -109,7 +107,7 @@
         editTeamModal.fillFields({
             name: team.name,
         });
-        editTeamModalVisible = true;
+        editTeamModal.showModal();
     };
 
     const onSubmitEditTeam = async (values: FilledModalFields) => {
@@ -121,7 +119,7 @@
             team = responseTeam;
             console.log(team);
         }
-        editTeamModalVisible = false;
+        editTeamModal.hideModal();
     };
 
     const onSubmitDeleteTeam = async (values: FilledModalFields) => {
@@ -129,7 +127,7 @@
         if (deleted) {
             onRemove(team._id);
         }
-        editTeamModalVisible = false;
+        editTeamModal.hideModal();
     };
 
     const onMemberRemove = (id: string) => {
@@ -170,7 +168,6 @@
 {#if isAdmin}
     <ModalForm
         bind:this={addMemberModal}
-        bind:show={addMemberModalVisible}
         title="Add Member"
         fields={memberModalFields}
         actions={[
@@ -181,7 +178,6 @@
 
     <ModalForm
         bind:this={editTeamModal}
-        bind:show={editTeamModalVisible}
         title="Edit Team"
         fields={teamModalFields}
         actions={[

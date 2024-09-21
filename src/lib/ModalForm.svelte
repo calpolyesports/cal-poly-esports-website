@@ -10,9 +10,9 @@
 </script>
 
 <script lang="ts">
+    import Modal from './Modal.svelte';
     import { createEventDispatcher } from 'svelte';
 
-    export let show = false;
     export let title = '';
     export let fields: ModalFieldDefinition[];
     export let actions: ModalAction[];
@@ -26,6 +26,16 @@
     }, {} as { [key: string]: string | File | null });
 
     const dispatch = createEventDispatcher();
+
+    let modal: Modal;
+
+    export const showModal = () => {
+        modal.showModal();
+    };
+
+    export const hideModal = () => {
+        modal.hideModal();
+    };
 
     export const fillFields = (values: FilledModalFields) => {
         clearFields();
@@ -55,7 +65,7 @@
             formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
         });
         await callback(formData);
-        show = false;
+        hideModal();
     }
 
     function handleFileChange(event: Event, field: ModalFieldDefinition) {
@@ -82,10 +92,7 @@
     }
 </script>
 
-<div class="modal" style="display: {show ? 'flex' : 'none'}">
-    <div class="modal-content">
-        <button class="close" on:click={() => show = false}>&times;</button>
-        <h2>{title}</h2>
+<Modal bind:this={modal} bind:title>
         <div class="form">
             {#each fields as field}
                 <label for={field.name}>{field.name}</label>
@@ -116,53 +123,9 @@
                 <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)} disabled={!isFileValid}>{action.name}</button>
             {/each}
         </div>
-    </div>
-</div>
+</Modal>
 
 <style>
-    .modal {
-        display: none;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        z-index: 10000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgb(0,0,0);
-        background-color: rgba(0,0,0,0.4);
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 2rem;
-        border: 1px solid #888;
-        width: 40rem;
-    }
-
-    h2 {
-        text-align: center;
-    }
-
-    button.close {
-        color: #aaa;
-        float: right;
-        font-size: 2.5rem;
-        font-weight: bold;
-        border: none;
-        background-color: transparent;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
     div.form {
         display: flex;
         flex-direction: column;

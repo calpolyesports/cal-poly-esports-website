@@ -11,6 +11,8 @@ export const PUT: RequestHandler = async (event) => {
     const newStart = body.start;
     const newEnd = body.end;
     const newClub = body.club;
+    const newLocation = body.location;
+    const newDescription = body.description
 
     if (!id) {
         return json({
@@ -37,7 +39,9 @@ export const PUT: RequestHandler = async (event) => {
         title: newTitle,
         start: new Date(newStart),
         end: new Date(newEnd),
-        club: newClub
+        club: newClub,
+        location: newLocation ?? null,
+        description: newDescription ?? null,
     } as Event;
 
     await db.updateEvent(new ObjectId(id), newDoc);

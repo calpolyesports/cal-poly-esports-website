@@ -18,6 +18,8 @@ export interface Event {
     start: Date;
     end: Date;
     club: string;
+    location?: string;
+    description?: string;
     backgroundColor: string;
     editable: boolean;
 }
