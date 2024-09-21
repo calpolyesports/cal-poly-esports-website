@@ -21,10 +21,8 @@
     let editingAbout = false;
 
     let addMemberModal: ModalForm;
-    let addMemberModalVisible = false;
 
     let editMemberModal: ModalForm;
-    let editMemberModalVisible = false;
     let selectedMemberIndex: number | undefined;
 
     let selectedFile: File | null = null;
@@ -107,7 +105,7 @@
 
     const onClickAddMember = () => {
         addMemberModal.clearFields();
-        addMemberModalVisible = true;
+        addMemberModal.showModal();
     };
 
     const onSubmitAddMember = async (fields: FilledModalFields) => {
@@ -122,7 +120,7 @@
             const member = await sendAddMember(club, formData);
             if (member) {
                 club.boardMembers = [...club.boardMembers, member];
-                addMemberModalVisible = false;
+                addMemberModal.hideModal();
             }
         }
 
@@ -138,7 +136,7 @@
                 name: member.name,
                 position: member.position,
             });
-            editMemberModalVisible = true;
+            editMemberModal.showModal();
         }
     };
 
@@ -153,7 +151,7 @@
             const member = await sendUpdateMember(club, selectedMemberIndex, formData);
             if (member) {
                 club.boardMembers = club.boardMembers.map((m, i) => i === selectedMemberIndex ? member : m);
-                editMemberModalVisible = false;
+                editMemberModal.hideModal();
             }
         }
 
@@ -165,7 +163,7 @@
             const deleted = await sendDeleteMember(club, selectedMemberIndex);
             if (deleted) {
                 club.boardMembers = club.boardMembers.filter((_, i) => i !== selectedMemberIndex);
-                editMemberModalVisible = false;
+                editMemberModal.hideModal();
             }
         }
 
@@ -218,7 +216,6 @@
     {#if canEdit}
         <ModalForm
             bind:this={addMemberModal}
-            bind:show={addMemberModalVisible}
             title="Add Board Member"
             fields={memberModalFields}
             actions={[
@@ -229,7 +226,6 @@
 
         <ModalForm
             bind:this={editMemberModal}
-            bind:show={editMemberModalVisible}
             title="Edit Board Member"
             fields={memberModalFields}
             actions={[

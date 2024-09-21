@@ -17,7 +17,6 @@
     }
 
     let editMemberModal: ModalForm;
-    let editMemberModalVisible = false;
     let selectedFile: File | null = null;
 
     const modalFields = [
@@ -65,7 +64,7 @@
             role: player.role,
             picture: player.picture,
         });
-        editMemberModalVisible = true;
+        editMemberModal.showModal();
     };
 
     const onSubmitEdit = async (modalFields: FilledModalFields) => {
@@ -83,7 +82,7 @@
             team.members = team.members.map(m => m._id === player._id ? player : m);
         }
         selectedFile = null;
-        editMemberModalVisible = false;
+        editMemberModal.hideModal();
     };
 
     const onSubmitDelete = async (values: FilledModalFields) => {
@@ -92,7 +91,7 @@
             onRemove(player._id);
         }
         selectedFile = null;
-        editMemberModalVisible = false;
+        editMemberModal.hideModal();
     };
 
     const onFileChange = (event: CustomEvent) => {
@@ -124,7 +123,6 @@
 {#if isAdmin}
     <ModalForm
         bind:this={editMemberModal}
-        bind:show={editMemberModalVisible}
         title="Edit Member"
         fields={modalFields}
         actions={[
