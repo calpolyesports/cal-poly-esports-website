@@ -45,6 +45,13 @@
         margin: 0;
     }
 
+    @media (max-width: 768px) {
+        div.news-feed {
+            flex-direction: column;
+            height: auto;
+        }
+    }
+
     a.article {
         position: relative;
         display: flex;
@@ -58,6 +65,15 @@
         width: 60%;
         height: 100%;
         margin-right: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        a.main-article {
+            width: 100%;
+            height: 20rem;
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
     }
     
     a.main-article h2 {
@@ -79,11 +95,24 @@
         height: 100%;
         margin-left: 0.5rem;
     }
+
+    @media (max-width: 768px) {
+        div.side-articles {
+            width: 100%;
+            margin-left: 0;
+        }
+    }
     
     a.side-article {
         width: 100%;
         height: 100%;
         margin: 0.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+        a.side-article {
+            height: 20rem;
+        }
     }
 
     a.side-article:first-child {
