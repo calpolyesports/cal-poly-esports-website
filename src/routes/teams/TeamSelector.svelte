@@ -176,6 +176,7 @@
 		padding-left: 0;
 		margin-bottom: 0;
 		list-style: none;
+		row-gap: 2.5rem;
 	}
 
 	button.icon {
@@ -210,5 +211,6 @@
 		font-weight: bold;
 		margin-top: 3rem;
 		margin-bottom: 0;
+		text-align: center;
 	}
 </style>
