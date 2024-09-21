@@ -172,6 +172,8 @@
 
 	ul {
 		display: flex;
+		justify-content: center;
+		align-items: center;
 		flex-wrap: wrap;
 		padding-left: 0;
 		margin-bottom: 0;

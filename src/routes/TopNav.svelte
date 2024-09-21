@@ -142,7 +142,7 @@
         background-color: white;
         width: 200px;
         box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 1;
+        z-index: 1000;
         flex-direction: column;
         box-sizing: border-box;
         top: 50.5px;

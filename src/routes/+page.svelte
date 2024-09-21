@@ -135,6 +135,7 @@
         display: flex;
         justify-content: space-around;
         flex-wrap: wrap;
+        row-gap: 2rem;
         width: 100%;
         margin: 4rem 0;
     }
@@ -177,6 +178,13 @@
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 3rem;
+            text-underline-offset: 1rem;
+        }
     }
 
     p {
