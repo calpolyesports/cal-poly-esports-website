@@ -15,6 +15,7 @@
     .about :global(p) {
         font-size: 1.2rem;
         margin: 0.2rem 0;
+        text-align: center;
     }
 
     .about :global(h1) {
@@ -24,6 +25,7 @@
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 1.5rem;
+        text-align: center;
     }
 
     .about :global(h2) {
@@ -33,6 +35,7 @@
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 1rem;
+        text-align: center;
     }
 
     .about :global(h3) {
@@ -42,6 +45,7 @@
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 0.5rem;
+        text-align: center;
     }
 
     .about :global(ul), :global(ol) {

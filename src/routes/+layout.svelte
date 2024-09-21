@@ -94,11 +94,23 @@
         height: 100%;
     }
 
+    @media (max-width: 768px) {
+        div.everything {
+            position: relative;
+        }
+    }
+
     div.main-body {
         width: 100%;
         height: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
+    }
+
+    @media (max-width: 768px) {
+        div.main-body {
+            height: auto;
+        }
     }
 
     div.container {
@@ -113,6 +125,7 @@
     div.footer {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         justify-content: center;
         margin-top: 5rem;
         width: 100%;
