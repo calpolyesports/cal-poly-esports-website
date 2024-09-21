@@ -199,6 +199,7 @@
         font-size: 2rem;
         font-weight: bold;
         margin-top: 2rem;
+        text-align: center;
     }
 
     div.member-grid {
