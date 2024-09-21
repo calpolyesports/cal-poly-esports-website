@@ -74,16 +74,38 @@
         height: 25rem;
     }
 
+    @media (max-width: 768px) {
+        div.embeds {
+            flex-direction: column;
+            height: auto;
+            width: 100%;
+        }
+    }
+
     div.livestream {
         width: 54%;
         height: 100%;
+    }
+
+    @media (max-width: 768px) {
+        div.livestream {
+            width: 100%;
+            height: 50%;
+        }
     }
     
     div.text-box {
         width: 44%;
         height: 100%;
         outline: 3px solid var(--cal-poly-primary);
-        overflow: hidden; /* Temporary fix; make responsive later */
+        overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+        div.text-box {
+            width: 100%;
+            height: 50%;
+        }
     }
 
     div.text-box h1 {
@@ -99,9 +121,10 @@
     div.games {
         width: 100%;
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-around;
         margin: 5rem 0;
-        height: 10rem;
+        height: 10vw;
     }
 
     div.games img {
@@ -111,6 +134,7 @@
     div.links {
         display: flex;
         justify-content: space-around;
+        flex-wrap: wrap;
         width: 100%;
         margin: 4rem 0;
     }
@@ -124,7 +148,7 @@
     }
 
     a.link img {
-        height: 10rem;
+        height: 12vw;
         transition: transform 0.2s;
     }
 

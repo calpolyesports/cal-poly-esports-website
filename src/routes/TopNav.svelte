@@ -51,6 +51,13 @@
         height: 4rem;
     }
 
+    @media (max-width: 768px) {
+        nav {
+            height: auto;
+            flex-direction: column;
+        }
+    }
+
     div.icon-container {
         display: flex;
         justify-content: center;
@@ -58,6 +65,12 @@
         height: 100%;
         margin-right: auto;
         margin-left: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        div.icon-container {
+            margin: 1rem auto;
+        }
     }
 
     div.icon-container img {
@@ -73,9 +86,24 @@
         padding-inline-start: 0;
     }
 
+    @media (max-width: 768px) {
+        ul {
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1rem;
+        }
+    }
+
     ul li {
         margin-right: 3rem;
         height: 100%;
+    }
+
+    @media (max-width: 768px) {
+        ul li {
+            margin-right: 0;
+        }
     }
 
     ul li a {
