@@ -122,6 +122,12 @@
         margin: 1rem auto;
     }
 
+    @media (max-width: 768px) {
+        div.container {
+            width: 90%;
+        }
+    }
+
     div.footer {
         display: flex;
         flex-direction: row;

@@ -80,6 +80,7 @@ const boardMemberSchema = new Schema({
 
 const clubSchema = new Schema({
     clubName: { type: String, required: true },
+    fullName: { type: String, required: true },
     aboutText: { type: String, required: true },
     aboutHtml: { type: String, required: true },
     boardMembers: [boardMemberSchema],
