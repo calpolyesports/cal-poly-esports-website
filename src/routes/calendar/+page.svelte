@@ -284,7 +284,7 @@
         {#if selectedEvent?.location}
             <p><em>Location: {selectedEvent?.location}</em></p>
         {/if}
-        <p><em>Club: {selectedEvent?.club}</em></p>
+        <p><em>Club: {data.clubs.find((club) => club.urlName === selectedEvent?.club)?.fullName ?? 'General'}</em></p>
         <p><em>Start: {selectedEvent?.start.toLocaleString()}</em></p>
         <p><em>End: {selectedEvent?.start.toLocaleString()}</em></p>
     </div>

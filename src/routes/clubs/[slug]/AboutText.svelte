@@ -20,7 +20,7 @@
 
     .about :global(h1) {
         font-size: 2.5rem;
-        margin: 0.5rem 0;
+        margin: 1rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
@@ -30,7 +30,7 @@
 
     .about :global(h2) {
         font-size: 2rem;
-        margin: 0.5rem 0;
+        margin: 1rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
@@ -40,7 +40,7 @@
 
     .about :global(h3) {
         font-size: 1.5rem;
-        margin: 0.5rem 0;
+        margin: 1rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
