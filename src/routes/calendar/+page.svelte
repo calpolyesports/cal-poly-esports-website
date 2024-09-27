@@ -4,10 +4,13 @@
     import TimeGrid from '@event-calendar/time-grid';
     import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
-    import type { WithStringId, Event } from '$lib/types.js';
+    import type { WithStringId, Event, Club } from '$lib/types.js';
     import Modal from '$lib/Modal.svelte';
 	import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+	import { onMount } from 'svelte';
+    import { slide } from 'svelte/transition';
+	import { now } from 'mongoose';
 
     interface ModalEvent {
         title: string,
@@ -21,18 +24,20 @@
     export let data;
     let events: WithStringId<Event>[] = data.events;
     const clubOptions: [string, string][] = data.adminFor.map((club) => [club.urlName, club.clubName]);
-    if (data.isGeneralAdmin) {
-        clubOptions.unshift(['general', 'General']);
-    }
 
     let ec: Calendar;
 
-    let displayModal: Modal;
+    let visibleClubs = data.clubs.map((club) => club.urlName);
+    let showFilters = false;
 
+    let displayModal: Modal;
     let addModal: ModalForm;
 
     let editModal: ModalForm;
     let selectedEvent = undefined as WithStringId<Event> | undefined;
+    $: selectedEventClub = selectedEvent ? data.clubs.find((club) => club.urlName === selectedEvent!.club) : undefined;
+
+    let mounted = false;
 
     const modalFields = [
         { name: 'title', type: 'text' },
@@ -40,6 +45,7 @@
         { name: 'end', type: 'date' },
         { name: 'club', type: 'dropdown', options: clubOptions },
         { name: 'location', type: 'text' },
+        { name: 'locationLink', type: 'text' },
         { name: 'description', type: 'text' },
     ] as ModalFieldDefinition[];
 
@@ -58,9 +64,6 @@
     };
 
     const hasPermissions = (event: Event) => {
-        if (event.club === 'general') {
-            return data.isGeneralAdmin;
-        }
         return data.adminFor.find((club) => club.urlName === event.club);
     };
 
@@ -82,9 +85,25 @@
             end: info.end as Date,
             club: info.club as string,
             location: info.location === '' ? undefined : info.location as string,
+            locationLink: info.locationLink === '' ? undefined : info.locationLink as string,
             description: info.description === '' ? undefined : info.description as string,
         } as ModalEvent;
     };
+
+    const syncCalendarWithEvents = () => {
+        ec.setOption('events', events.filter((event) => visibleClubs.includes(event.club)).map(convertToCalendarEvent));
+    }
+
+    function formatDate(date: Date = new Date()): string {
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        });
+    }
 
     //////////////////////
     // API INTERACTIONS //
@@ -137,7 +156,15 @@
     ////////////////////
 
     const onClickAdd = () => {
-        addModal.clearFields();
+        const nowWithoutMinutes = new Date();
+        nowWithoutMinutes.setMinutes(0);
+        nowWithoutMinutes.setSeconds(0);
+        const plusOneHour = new Date(nowWithoutMinutes.getTime() + 60 * 60 * 1000);
+        addModal.fillFields({
+            start: nowWithoutMinutes,
+            end: plusOneHour,
+            club: clubOptions[0][0],
+        });
         addModal.showModal();
     };
 
@@ -149,7 +176,7 @@
             event.start = new Date(event.start);
             event.end = new Date(event.end);
             events.push(event);
-            ec.addEvent(convertToCalendarEvent(event));
+            syncCalendarWithEvents();
         }
         addModal.clearFields();
         addModal.hideModal();
@@ -163,6 +190,7 @@
             end: event.end,
             club: event.club,
             location: event.location ?? '',
+            locationLink: event.locationLink ?? '',
             description: event.description ?? '',
         });
         editModal.showModal();
@@ -179,7 +207,7 @@
             updatedEvent.start = new Date(updatedEvent.start);
             updatedEvent.end = new Date(updatedEvent.end);
             events = events.map((e) => e._id === updatedEvent._id ? updatedEvent : e);
-            ec.updateEvent(convertToCalendarEvent(updatedEvent));
+            syncCalendarWithEvents();
         }
         editModal.clearFields();
         editModal.hideModal();
@@ -192,7 +220,8 @@
         const clickedEvent = selectedEvent;
         const success = await sendDeleteEvent(clickedEvent._id);
         if (success) {
-            ec.removeEventById(clickedEvent._id);
+            events = events.filter((e) => e._id !== clickedEvent._id);
+            syncCalendarWithEvents();
         }
         editModal.clearFields();
         editModal.hideModal();
@@ -210,7 +239,7 @@
         eventDurationEditable: false,
         eventStartEditable: false,
         nowIndicator: true,
-        events: events.map(convertToCalendarEvent),
+        events: [],
         display: 'auto',
         height: '50rem',
         slotMinTime: '08:00:00',
@@ -247,12 +276,49 @@
             end: 'dayGridMonth,timeGridWeek,listMonth',
         }
     } as Calendar.Options;
+
+    onMount(() => {
+        mounted = true;
+    });
+
+    // sync events with calendar on mount and when visible clubs change
+    $: if (mounted && visibleClubs.length >= 0) {
+        syncCalendarWithEvents();
+    }
 </script>
 
 <h1>Calendar</h1>
 
 {#if data.adminFor.length > 0}
     <button class="button-medium" on:click={onClickAdd}>Add Event</button>
+{/if}
+
+<button class="button-medium filter-visibility-button" on:click={() => showFilters = !showFilters}>{showFilters ? 'Hide' : 'Show'} Filters</button>
+
+{#if showFilters}
+    <div class="filter-container" transition:slide>
+        <div class="filter-checkboxes">
+            {#each data.clubs as club}
+                <label style="
+                    border-color: {club.color};
+                    background-color: {visibleClubs.find((urlName) => club.urlName === urlName) ? club.color : 'transparent'};
+                    color: {visibleClubs.find((urlName) => club.urlName === urlName) ? 'white' : club.color}">
+                    <input
+                        type="checkbox"
+                        name="visibleClubs"
+                        value={club.urlName}
+                        bind:group={visibleClubs}
+                        checked
+                    />
+                    {club.clubName}
+                </label>
+            {/each}
+        </div>
+        <div class="filter-buttons">
+            <button on:click={() => visibleClubs = data.clubs.map((club) => club.urlName)}>Show All</button>
+            <button on:click={() => visibleClubs = []}>Hide All</button>
+        </div>
+    </div>
 {/if}
 
 <Calendar bind:this={ec} {plugins} {options} />
@@ -282,13 +348,18 @@
     {/if}
     <div class="event-info">
         {#if selectedEvent?.location}
-            <p><em>Location: {selectedEvent?.location}</em></p>
+            {#if selectedEvent?.locationLink}
+                <p><em>Location: <a href={selectedEvent?.locationLink} target="_blank">{selectedEvent?.location}</a></em></p>
+            {:else}
+                <p><em>Location: {selectedEvent?.location}</em></p>
+            {/if}
         {/if}
-        <p><em>Club: {data.clubs.find((club) => club.urlName === selectedEvent?.club)?.fullName ?? 'General'}</em></p>
-        <p><em>Start: {selectedEvent?.start.toLocaleString()}</em></p>
-        <p><em>End: {selectedEvent?.start.toLocaleString()}</em></p>
+        <p><em>Club: <a href="/clubs/{selectedEventClub?.urlName}">{selectedEventClub?.clubName ?? 'unknown'}</a></em></p>
+        <p><em>Start: {formatDate(selectedEvent?.start)}</em></p>
+        <p><em>End: {formatDate(selectedEvent?.end)}</em></p>
     </div>
 </Modal>
+
 <style>
     p {
         margin: 0.5rem 0;
@@ -297,5 +368,67 @@
 
     .event-info {
         margin-top: 1rem;
+    }
+
+    a {
+        color: var(--cal-poly-secondary);
+    }
+
+    div.filter-container {
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        border: 3px solid #777;
+        border-radius: 1rem;
+        padding: 1rem;
+    }
+
+    div.filter-checkboxes {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    div.filter-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    div.filter-buttons button {
+        margin-top: 1rem;
+        background-color: transparent;
+        border: 3px solid #777;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    div.filter-buttons button:hover {
+        background-color: #777;
+        color: white;
+    }
+
+    label {
+        padding: 0.3rem 0.6rem;
+        border-radius: 0.5rem;
+        border-width: 3px;
+        border-style: solid;
+        cursor: pointer;
+    }
+
+    input {
+        display: none;
+    }
+    
+    .filter-visibility-button {
+        margin-bottom: 2rem;
     }
 </style>

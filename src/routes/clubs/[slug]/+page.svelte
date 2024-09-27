@@ -111,8 +111,8 @@
     const onSubmitAddMember = async (fields: FilledModalFields) => {
         if (club) {
             const formData = new FormData
-            formData.append('name', fields.name);
-            formData.append('position', fields.position);
+            formData.append('name', fields.name as string);
+            formData.append('position', fields.position as string);
             if (selectedFile) {
                 formData.append('profileImage', selectedFile);
             }
@@ -143,8 +143,8 @@
     const onSubmitEditMember = async (fields: FilledModalFields) => {
         if (club && selectedMemberIndex !== undefined) {
             const formData = new FormData();
-            formData.append('name', fields.name);
-            formData.append('position', fields.position);
+            formData.append('name', fields.name as string);
+            formData.append('position', fields.position as string);
             if (selectedFile) {
                 formData.append('profileImage', selectedFile);
             }
@@ -195,24 +195,26 @@
         <AboutText html={club.aboutHtml} />
     {/if}
 
-    <h2>Board Members</h2>
-    {#if canEdit}
-        <button class="button-medium" on:click={onClickAddMember}>Add Board Member</button>
+    {#if club.boardMembers.length > 0 || canEdit}
+        <h2>Board Members</h2>
+        {#if canEdit}
+            <button class="button-medium" on:click={onClickAddMember}>Add Board Member</button>
+        {/if}
+        <ul class="board-members">
+            {#each club.boardMembers as member, i}
+                <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+                <div on:click={() => onClickEditMember(i)}>
+                    <li>
+                        {#if member.profileImage}
+                            <img src={member.profileImage} alt={member.name} />
+                        {/if}
+                        <p>{member.name}</p>
+                        <p>{member.position}</p>
+                    </li>
+                </div>
+            {/each}
+        </ul>
     {/if}
-    <ul class="board-members">
-        {#each club.boardMembers as member, i}
-            <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-            <div on:click={() => onClickEditMember(i)}>
-                <li>
-                    {#if member.profileImage}
-                        <img src={member.profileImage} alt={member.name} />
-                    {/if}
-                    <p>{member.name}</p>
-                    <p>{member.position}</p>
-                </li>
-            </div>
-        {/each}
-    </ul>
 
     {#if canEdit}
         <ModalForm

@@ -1,0 +1,540 @@
+[{
+  "_id": {
+    "$oid": "66e00ff06735a8de8a5fbf38"
+  },
+  "title": "thursday",
+  "start": {
+    "$date": "2024-09-12T21:22:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-10T22:22:00.000Z"
+  },
+  "club": "overwatch",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e08c6b56ac4f611c55455b"
+  },
+  "title": "asadfjo",
+  "start": {
+    "$date": "2024-09-13T18:13:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-13T08:13:00.000Z"
+  },
+  "club": "general",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e08e1956ac4f611c5545f9"
+  },
+  "title": "Esports General Meeting",
+  "start": {
+    "$date": "2024-09-28T01:10:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-28T02:30:00.000Z"
+  },
+  "club": "general",
+  "__v": 0,
+  "description": "Win prizes and check out what all the gaming clubs will be up to this year!",
+  "location": "Baker Science Center 180-101"
+},
+{
+  "_id": {
+    "$oid": "66e08f2256ac4f611c554600"
+  },
+  "title": "Club Showcase",
+  "start": {
+    "$date": "2024-09-22T17:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-22T20:00:00.000Z"
+  },
+  "club": "general",
+  "__v": 0,
+  "description": "Check out our booth in the second row!",
+  "location": "H-16"
+},
+{
+  "_id": {
+    "$oid": "66e1e24b3f64a6f9ef606802"
+  },
+  "title": "Overwatch Gold Collegiate Matches Rounds 1 & 2",
+  "start": {
+    "$date": "2024-09-28T18:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-28T21:00:00.000Z"
+  },
+  "club": "overwatch",
+  "__v": 0,
+  "description": "Rounds 1 and 2 of Overwatch Collegiate Homecoming",
+  "location": "twitch.tv/calpoly_esports"
+},
+{
+  "_id": {
+    "$oid": "66e1e3d73f64a6f9ef606807"
+  },
+  "title": "Overwatch Team Tryouts Day 1",
+  "start": {
+    "$date": "2024-09-29T00:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-29T02:00:00.000Z"
+  },
+  "club": "overwatch",
+  "__v": 0,
+  "description": "First day of tryouts for our Overwatch teams",
+  "location": "SLOverwatch Discord"
+},
+{
+  "_id": {
+    "$oid": "66e1e3f83f64a6f9ef60680c"
+  },
+  "title": "Overwatch Team Tryouts Day 2",
+  "start": {
+    "$date": "2024-09-30T00:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-30T02:00:00.000Z"
+  },
+  "club": "overwatch",
+  "__v": 0,
+  "description": "Second day of tryouts for our Overwatch teams",
+  "location": "SLOverwatch Discord"
+},
+{
+  "_id": {
+    "$oid": "66ee43cfc35217007f955e4d"
+  },
+  "title": "LOL General Meeting",
+  "start": {
+    "$date": "2024-10-04T01:10:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-04T02:30:00.000Z"
+  },
+  "club": "league-of-legends",
+  "__v": 0,
+  "description": "Cal Poly League of Legend's first General Meeting of the Quarter! Scouting Grounds Information and Back to School Bash!",
+  "location": "Baker 112"
+},
+{
+  "_id": {
+    "$oid": "66ee44e2c35217007f955e76"
+  },
+  "title": "LOL Scouting Grounds",
+  "start": {
+    "$date": "2024-10-05T19:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-05T22:00:00.000Z"
+  },
+  "club": "league-of-legends",
+  "__v": 0,
+  "description": "Day 1 of Tryouts! Those interested in playing for Cal Poly's League of Legends Team will be competing against one another to show off their skills!",
+  "location": "Cal Poly League of Legends Discord"
+},
+{
+  "_id": {
+    "$oid": "66ee4537c35217007f955e7d"
+  },
+  "title": "LOL Scouting Grounds",
+  "start": {
+    "$date": "2024-10-06T19:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-06T22:00:00.000Z"
+  },
+  "club": "league-of-legends",
+  "__v": 0,
+  "description": "Day 1 of Tryouts! Those interested in playing for Cal Poly's League of Legends Team will be competing against one another to show off their skills!",
+  "location": "Cal Poly League of Legends Discord"
+},
+{
+  "_id": {
+    "$oid": "66f3129742328cac3ca9e067"
+  },
+  "title": "Overwatch Gold Collegiate Matches Rounds 3 & 4",
+  "start": {
+    "$date": "2024-10-05T18:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-05T21:00:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "description": "Rounds 3 and 4 of Overwatch Collegiate Homecoming",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f314d142328cac3ca9e07f"
+  },
+  "title": "Overwatch Collegiate Rounds 5 & 6",
+  "start": {
+    "$date": "2024-10-12T18:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-12T21:00:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "description": "Rounds 5 & 6 of Overwatch Collegiate Homecoming",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4b49342328cac3ca9e482"
+  },
+  "title": "Counter Strike - Collegiate Match 2",
+  "start": {
+    "$date": "2024-09-28T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-28T04:00:00.000Z"
+  },
+  "club": "counter-strike",
+  "location": "https://www.twitch.tv/calpoly_esports ",
+  "description": "Cal Poly SLO vs Colorado School of Mines",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4b58542328cac3ca9e48f"
+  },
+  "title": "Counter Strike - Collegiate Match 3",
+  "start": {
+    "$date": "2024-10-05T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-05T04:00:00.000Z"
+  },
+  "club": "counter-strike",
+  "location": "https://www.twitch.tv/calpoly_esports",
+  "description": "Cal Poly SLO vs California State University Fullerton",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4b64c42328cac3ca9e49a"
+  },
+  "title": "Counter Strike - Collegiate Match",
+  "start": {
+    "$date": "2024-10-12T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-09-26T04:00:00.000Z"
+  },
+  "club": "counter-strike",
+  "location": "https://www.twitch.tv/calpoly_esports",
+  "description": "Cal Poly SLO vs University of Hawaii - Manoa",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4b6a142328cac3ca9e49f"
+  },
+  "title": "Counter Strike - Collegiate Match 5",
+  "start": {
+    "$date": "2024-10-19T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-19T04:00:00.000Z"
+  },
+  "club": "counter-strike",
+  "location": "https://www.twitch.tv/calpoly_esports",
+  "description": "Cal Poly SLO vs University of Washington",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4b6cd42328cac3ca9e4a4"
+  },
+  "title": "Counter Strike - Collegiate Match 6",
+  "start": {
+    "$date": "2024-10-26T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-26T04:00:00.000Z"
+  },
+  "club": "counter-strike",
+  "location": "https://www.twitch.tv/calpoly_esports",
+  "description": "Cal Poly SLO vs University of Idaho",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4b6fc42328cac3ca9e4a9"
+  },
+  "title": "Counter Strike - Collegiate Match 7",
+  "start": {
+    "$date": "2024-11-02T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-11-02T04:00:00.000Z"
+  },
+  "club": "counter-strike",
+  "location": "https://www.twitch.tv/calpoly_esports",
+  "description": "Cal Poly SLO vs University of New Mexico",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4b75042328cac3ca9e4c0"
+  },
+  "title": "Counter Strike - Collegiate Match 4",
+  "start": {
+    "$date": "2024-10-12T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-12T04:00:00.000Z"
+  },
+  "club": "counter-strike",
+  "location": "https://www.twitch.tv/calpoly_esports",
+  "description": "Cal Poly SLO vs University of Hawaii - Manoa",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4da9542328cac3ca9e52d"
+  },
+  "title": "OWCS NA Finals Watch Party",
+  "start": {
+    "$date": "2024-10-13T17:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-13T21:00:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "TBD",
+  "description": "Meet the other members of the club in-person for some foods and arts and crafts! We will also be watching the OWCS NA Finals!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4dad242328cac3ca9e534"
+  },
+  "title": "Overwatch Collegiate Rounds 7 & 8",
+  "start": {
+    "$date": "2024-10-19T18:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-19T21:00:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "__v": 0,
+  "description": "Rounds 7 & 8 of Overwatch Collegiate Homecoming"
+},
+{
+  "_id": {
+    "$oid": "66f4f1d742328cac3ca9e5d9"
+  },
+  "title": "Open Lab Hours",
+  "start": {
+    "$date": "2024-10-01T21:10:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-01T23:00:00.000Z"
+  },
+  "club": "general",
+  "location": "Engineering West 021-0233",
+  "description": "Open lab hours for all Cal Poly students!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f4f1f842328cac3ca9e5de"
+  },
+  "title": "Open Lab Hours",
+  "start": {
+    "$date": "2024-10-03T21:10:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-03T23:00:00.000Z"
+  },
+  "club": "general",
+  "location": "Engineering West 021-0233",
+  "description": "Open lab hours for all Cal Poly students!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5201f42328cac3ca9e66e"
+  },
+  "title": "Open Lab Hours",
+  "start": {
+    "$date": "2024-10-08T21:10:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-08T23:00:00.000Z"
+  },
+  "club": "general",
+  "location": "Engineering West 021-0233",
+  "description": "Open lab hours for all Cal Poly students!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5204142328cac3ca9e673"
+  },
+  "title": "Open Lab Hours",
+  "start": {
+    "$date": "2024-10-10T21:10:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-10T23:00:00.000Z"
+  },
+  "club": "general",
+  "location": "Engineering West 021-0233",
+  "description": "Open lab hours for all Cal Poly students!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5210142328cac3ca9e680"
+  },
+  "title": "SLOverwatch League Week 1",
+  "start": {
+    "$date": "2024-10-14T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-14T03:30:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "description": "SLOverwatch League Group Stage Week 1!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5214b42328cac3ca9e685"
+  },
+  "title": "SLOverwatch League Week 2",
+  "start": {
+    "$date": "2024-10-21T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-21T03:30:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "description": "SLOverwatch League Group Stage Week 2!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5217a42328cac3ca9e690"
+  },
+  "title": "SLOverwatch League Week 3",
+  "start": {
+    "$date": "2024-10-28T02:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-28T03:30:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "description": "SLOverwatch League Group Stage Week 3!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f521a842328cac3ca9e6a1"
+  },
+  "title": "SLOverwatch League Week 4",
+  "start": {
+    "$date": "2024-11-04T03:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-11-04T04:30:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "description": "SLOverwatch League Group Stage Week 4!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f521da42328cac3ca9e6a6"
+  },
+  "title": "SLOverwatch League Quarterfinals",
+  "start": {
+    "$date": "2024-11-10T03:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-11-10T04:00:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "description": "Quarterfinals of the SLOverwatch League!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5220942328cac3ca9e6ab"
+  },
+  "title": "SLOverwatch League Semifinals",
+  "start": {
+    "$date": "2024-11-11T03:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-11-11T04:30:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "twitch.tv/calpoly_esports",
+  "description": "Semifinals of the SLOverwatch League!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5223b42328cac3ca9e6b2"
+  },
+  "title": "SLOverwatch League Grand Finals",
+  "start": {
+    "$date": "2024-11-17T00:00:00.000Z"
+  },
+  "end": {
+    "$date": "2024-11-17T03:00:00.000Z"
+  },
+  "club": "overwatch",
+  "location": "Baker Science Center 180-0112",
+  "description": "Grand Finals of the SLOverwatch League!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5228842328cac3ca9e6d5"
+  },
+  "title": "Open Lab Hours",
+  "start": {
+    "$date": "2024-10-15T21:10:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-15T23:00:00.000Z"
+  },
+  "club": "general",
+  "location": "Engineering West 021-0233",
+  "description": "Open lab hours for all Cal Poly students!",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f5229e42328cac3ca9e6da"
+  },
+  "title": "Open Lab Hours",
+  "start": {
+    "$date": "2024-10-17T21:10:00.000Z"
+  },
+  "end": {
+    "$date": "2024-10-17T23:00:00.000Z"
+  },
+  "club": "general",
+  "location": "Engineering West 021-0233",
+  "description": "Open lab hours for all Cal Poly students!",
+  "__v": 0
+}]

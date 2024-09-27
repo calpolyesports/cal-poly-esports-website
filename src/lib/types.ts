@@ -19,6 +19,7 @@ export interface Event {
     end: Date;
     club: string;
     location?: string;
+    locationLink?: string;
     description?: string;
     backgroundColor: string;
     editable: boolean;
@@ -58,6 +59,7 @@ export interface Club {
     boardMembers: BoardMember[];
     urlName: string;
     color: string;
+    display: boolean;
 }
 
 export interface BoardMember {

@@ -42,6 +42,7 @@
         padding: 2rem;
         border: 1px solid #888;
         width: 40rem;
+        border-radius: 1rem;
     }
 
     h2 {
