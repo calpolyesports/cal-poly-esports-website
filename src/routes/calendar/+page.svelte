@@ -9,6 +9,7 @@
 	import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
 	import { onMount } from 'svelte';
+    import { slide } from 'svelte/transition';
 
     interface ModalEvent {
         title: string,
@@ -26,6 +27,7 @@
     let ec: Calendar;
 
     let visibleClubs = data.clubs.map((club) => club.urlName);
+    let showFilters = false;
 
     let displayModal: Modal;
     let addModal: ModalForm;
@@ -282,20 +284,33 @@
     <button class="button-medium" on:click={onClickAdd}>Add Event</button>
 {/if}
 
-<div class="club-filter">
-    {#each data.clubs as club}
-        <label>
-            <input
-                type="checkbox"
-                name="visibleClubs"
-                value={club.urlName}
-                bind:group={visibleClubs}
-                checked
-            />
-            {club.clubName}
-        </label>
-    {/each}
-</div>
+<button class="button-medium filter-visibility-button" on:click={() => showFilters = !showFilters}>{showFilters ? 'Hide' : 'Show'} Filters</button>
+
+{#if showFilters}
+    <div class="filter-container" transition:slide>
+        <div class="filter-checkboxes">
+            {#each data.clubs as club}
+                <label style="
+                    border-color: {club.color};
+                    background-color: {visibleClubs.find((urlName) => club.urlName === urlName) ? club.color : 'transparent'};
+                    color: {visibleClubs.find((urlName) => club.urlName === urlName) ? 'white' : club.color}">
+                    <input
+                        type="checkbox"
+                        name="visibleClubs"
+                        value={club.urlName}
+                        bind:group={visibleClubs}
+                        checked
+                    />
+                    {club.clubName}
+                </label>
+            {/each}
+        </div>
+        <div class="filter-buttons">
+            <button on:click={() => visibleClubs = data.clubs.map((club) => club.urlName)}>Show All</button>
+            <button on:click={() => visibleClubs = []}>Hide All</button>
+        </div>
+    </div>
+{/if}
 
 <Calendar bind:this={ec} {plugins} {options} />
 
@@ -346,12 +361,61 @@
         color: var(--cal-poly-secondary);
     }
 
-    div.club-filter {
+    div.filter-container {
         width: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        border: 3px solid #777;
+        border-radius: 1rem;
+        padding: 1rem;
+    }
+
+    div.filter-checkboxes {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: 1rem;
-        margin-bottom: 1rem;
+    }
+
+    div.filter-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    div.filter-buttons button {
+        margin-top: 1rem;
+        background-color: transparent;
+        border: 3px solid #777;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    div.filter-buttons button:hover {
+        background-color: #777;
+        color: white;
+    }
+
+    label {
+        padding: 0.3rem 0.6rem;
+        border-radius: 0.5rem;
+        border-width: 3px;
+        border-style: solid;
+        cursor: pointer;
+    }
+
+    input {
+        display: none;
+    }
+    
+    .filter-visibility-button {
+        margin-bottom: 2rem;
     }
 </style>
