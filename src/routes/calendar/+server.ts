@@ -10,6 +10,7 @@ export const POST: RequestHandler = async (event) => {
     const end = body.end;
     const club = body.club;
     const location = body.location;
+    const locationLink = body.locationLink;
     const description = body.description;
 
     if (!event.locals.user?.admin_for.includes(club)) {
@@ -24,6 +25,7 @@ export const POST: RequestHandler = async (event) => {
         end: new Date(end),
         club,
         location,
+        locationLink,
         description,
     } as Event;
 

@@ -10,6 +10,7 @@
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
 	import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
+	import { now } from 'mongoose';
 
     interface ModalEvent {
         title: string,
@@ -44,6 +45,7 @@
         { name: 'end', type: 'date' },
         { name: 'club', type: 'dropdown', options: clubOptions },
         { name: 'location', type: 'text' },
+        { name: 'locationLink', type: 'text' },
         { name: 'description', type: 'text' },
     ] as ModalFieldDefinition[];
 
@@ -83,15 +85,13 @@
             end: info.end as Date,
             club: info.club as string,
             location: info.location === '' ? undefined : info.location as string,
+            locationLink: info.locationLink === '' ? undefined : info.locationLink as string,
             description: info.description === '' ? undefined : info.description as string,
         } as ModalEvent;
     };
 
     const syncCalendarWithEvents = () => {
-        const oldEventIds = ec.getEvents().map((event) => event.id);
-        oldEventIds.forEach((id) => ec.removeEventById(id));
-        const newEventList = data.events.filter((event) => visibleClubs.includes(event.club));
-        newEventList.forEach((event) => ec.addEvent(convertToCalendarEvent(event)));
+        ec.setOption('events', events.filter((event) => visibleClubs.includes(event.club)).map(convertToCalendarEvent));
     }
 
     function formatDate(date: Date = new Date()): string {
@@ -156,7 +156,15 @@
     ////////////////////
 
     const onClickAdd = () => {
-        addModal.clearFields();
+        const nowWithoutMinutes = new Date();
+        nowWithoutMinutes.setMinutes(0);
+        nowWithoutMinutes.setSeconds(0);
+        const plusOneHour = new Date(nowWithoutMinutes.getTime() + 60 * 60 * 1000);
+        addModal.fillFields({
+            start: nowWithoutMinutes,
+            end: plusOneHour,
+            club: clubOptions[0][0],
+        });
         addModal.showModal();
     };
 
@@ -182,6 +190,7 @@
             end: event.end,
             club: event.club,
             location: event.location ?? '',
+            locationLink: event.locationLink ?? '',
             description: event.description ?? '',
         });
         editModal.showModal();
@@ -339,7 +348,11 @@
     {/if}
     <div class="event-info">
         {#if selectedEvent?.location}
-            <p><em>Location: {selectedEvent?.location}</em></p>
+            {#if selectedEvent?.locationLink}
+                <p><em>Location: <a href={selectedEvent?.locationLink} target="_blank">{selectedEvent?.location}</a></em></p>
+            {:else}
+                <p><em>Location: {selectedEvent?.location}</em></p>
+            {/if}
         {/if}
         <p><em>Club: <a href="/clubs/{selectedEventClub?.urlName}">{selectedEventClub?.clubName ?? 'unknown'}</a></em></p>
         <p><em>Start: {formatDate(selectedEvent?.start)}</em></p>
