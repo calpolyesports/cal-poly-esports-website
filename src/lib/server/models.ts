@@ -37,6 +37,7 @@ const eventSchema = new Schema({
     end: { type: Date, required: true },
     club: { type: String, required: true },
     location: String,
+    locationLink: String,
     description: String,
 });
 export const EventModel = model('Event', eventSchema);
@@ -86,5 +87,6 @@ const clubSchema = new Schema({
     boardMembers: [boardMemberSchema],
     urlName: { type: String, required: true },
     color: { type: String, required: true },
+    display: { type: Boolean, default: true },
 });
 export const ClubModel = model('Club', clubSchema);

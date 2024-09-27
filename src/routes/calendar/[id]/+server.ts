@@ -12,6 +12,7 @@ export const PUT: RequestHandler = async (event) => {
     const newEnd = body.end;
     const newClub = body.club;
     const newLocation = body.location;
+    const newLocationLink = body.locationLink;
     const newDescription = body.description
 
     if (!id) {
@@ -41,6 +42,7 @@ export const PUT: RequestHandler = async (event) => {
         end: new Date(newEnd),
         club: newClub,
         location: newLocation ?? null,
+        locationLink: newLocationLink ?? null,
         description: newDescription ?? null,
     } as Event;
 

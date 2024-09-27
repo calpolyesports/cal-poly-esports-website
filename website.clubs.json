@@ -1,0 +1,246 @@
+[{
+  "_id": {
+    "$oid": "66ce59da5888432433b4c62f"
+  },
+  "clubName": "Counter-Strike",
+  "urlName": "counter-strike",
+  "color": "#E48716",
+  "boardMembers": [
+    {
+      "name": "Cameron",
+      "position": "President - IGL",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1726804041874-yer.jpg"
+    }
+  ],
+  "aboutText": "CPCS is Cal Poly's hub for all things Counter-Strike. We provide a community for all players, both casual and competitive! \n\nJoin our discord for more info! https://discord.gg/PkPnZWmWAA\n\nContact me directly: clhafer@calpoly.edu",
+  "aboutHtml": "<p>CPCS is Cal Poly's hub for all things Counter-Strike. We provide a community for all players, both casual and competitive! </p>\n<p>Join our discord for more info! <a href=\"https://discord.gg/PkPnZWmWAA\">https://discord.gg/PkPnZWmWAA</a></p>\n<p>Contact me directly: <a href=\"mailto:clhafer@calpoly.edu\">clhafer@calpoly.edu</a></p>\n",
+  "__v": 5,
+  "fullName": "Counter-Strike Club"
+},
+{
+  "_id": {
+    "$oid": "66ce5bc65888432433b4c630"
+  },
+  "clubName": "Fighting Game",
+  "urlName": "fighting-game",
+  "color": "#4E6F8F",
+  "boardMembers": [],
+  "aboutText": "About Fighting Game Community",
+  "aboutHtml": "<p>About Fighting Game Community</p>",
+  "fullName": "Fighting Game Community"
+},
+{
+  "_id": {
+    "$oid": "66ce5c0f5888432433b4c631"
+  },
+  "clubName": "Gender-Inclusive Gaming",
+  "urlName": "gender-inclusive-gaming",
+  "color": "#E24DBB",
+  "boardMembers": [
+    {
+      "name": "Wafiqa Farhana",
+      "position": "President",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727061902855-image_2024-09-22_202500145.png"
+    },
+    {
+      "name": "Bowie Cowan",
+      "position": "Treasurer",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727061936405-image_2024-09-22_202527372.png"
+    },
+    {
+      "name": " Lyra Feinstein",
+      "position": "Secretary",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727061595528-image_2024-09-22_201953673.png"
+    },
+    {
+      "name": "April Grow",
+      "position": "Advisor",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1726989192638-image_2024-09-22_001310841.png"
+    }
+  ],
+  "aboutText": "<center><p>Gender-Inclusive Gaming is a community that supports minorities who are interested in gaming as a leisure activity! We have a community of people in our <a href=\"https://discord.gg/EsrMVeCQj8\">club Discord</a>. Our club is a hybrid entity that boasts both Discord and in person meetings!</p>\n\n<br>\n\nGIG has two Discords: a larger one that works to create a safe space to connect gamers across campus, and a smaller one with activity restrictions that aims to foster social connection. We host Game Nights and PowerPoint Nights in meetings where we allow individuals to share their personal interests! We welcome all identities, including neurodivergent, non-cis and queer individuals. Our only requirement is to abide by the club conduct found in our Discord(s)!</center>\n",
+  "aboutHtml": "<center><p>Gender-Inclusive Gaming is a community that supports minorities who are interested in gaming as a leisure activity! We have a community of people in our <a href=\"https://discord.gg/EsrMVeCQj8\">club Discord</a>. Our club is a hybrid entity that boasts both Discord and in person meetings!</p>\n\n<br>\n\n<p>GIG has two Discords: a larger one that works to create a safe space to connect gamers across campus, and a smaller one with activity restrictions that aims to foster social connection. We host Game Nights and PowerPoint Nights in meetings where we allow individuals to share their personal interests! We welcome all identities, including neurodivergent, non-cis and queer individuals. Our only requirement is to abide by the club conduct found in our Discord(s)!</p></center><p></p>\n",
+  "__v": 9,
+  "fullName": "Gender-Inclusive Gaming Club"
+},
+{
+  "_id": {
+    "$oid": "66e0978a8cc293a2d404b8a0"
+  },
+  "clubName": "League of Legends",
+  "aboutText": "## We're **SLOLERS**!\nAs Cal Poly's League of Legends club, we host a wide variety of events from casual pick-up games to fierce collegiate esports matches. Whether you're just getting into the vast world of Runeterra or want to claw your way to the LCS, there's something for you!\n\nWe have __**two**__ tiers of competitive teams, D1 and D2, to accommodate players of all skill levels looking to get started in esports! Looking for fame a little more local? Our annual intramural tournament, __**SLOLCS**__, runs every Winter Quarter! Enter solo or with a duo, get matched onto teams, and battle to prove who's the best Summoner in San Luis Obispo!\n\n[Get connected with us on Discord!](https://discord.gg/VBSaTxu)",
+  "boardMembers": [
+    {
+      "name": "Adi Gottumukkala",
+      "position": "President",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Connie Xian",
+      "position": "Vice President",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Tarsa Yuen",
+      "position": "Media Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Evelyn Tay",
+      "position": "Esports Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Valeria Iniguez",
+      "position": "Esports Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Anson Chen",
+      "position": "Esports Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Austin Koonvirarak",
+      "position": "TFT Events Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    }
+  ],
+  "urlName": "league-of-legends",
+  "color": "#00556C",
+  "aboutHtml": "<h2>We're <strong>SLOLERS</strong>!</h2>\n<p>As Cal Poly's League of Legends club, we host a wide variety of events from casual pick-up games to fierce collegiate esports matches. Whether you're just getting into the vast world of Runeterra or want to claw your way to the LCS, there's something for you!</p>\n<p>We have <strong><strong>two</strong></strong> tiers of competitive teams, D1 and D2, to accommodate players of all skill levels looking to get started in esports! Looking for fame a little more local? Our annual intramural tournament, <strong><strong>SLOLCS</strong></strong>, runs every Winter Quarter! Enter solo or with a duo, get matched onto teams, and battle to prove who's the best Summoner in San Luis Obispo!</p>\n<p><a href=\"https://discord.gg/VBSaTxu\">Get connected with us on Discord!</a></p>\n",
+  "__v": 10,
+  "fullName": "League of Legends Club"
+},
+{
+  "_id": {
+    "$oid": "66e6064b96ec771ed061a139"
+  },
+  "clubName": "SLOverwatch",
+  "aboutText": "Welcome to the Cal Poly SLOverwatch Club! We are dedicated to both casual and competitive gaming for Overwatch 2. For those that are competitively inclined, we have collegiate teams that compete year-round and various in-house matches and tournaments. For those that enjoy more casual gaming, we host weekly play-days, and just having a fun time in voice chat!\n\n## Getting Involved\n\nWe offer multiple ways for members to get involved. If you would like to help with planning and running events, feel free to reach out to anyone on board! We always welcome others input and ideas. If you are more interested in joining our competitive teams, we host tryouts quarterly and recruit year-round, so keep an eye out for those announcements! You can find our current competitive teams [here](/teams).\n\n## Links\n\nYou can join our Discord server [here](https://discord.gg/nrBXphM3), and you can join our organization at our [Cal Poly NOW](https://now.calpoly.edu/actioncenter/organization/cpsloverwatch/) page.",
+  "boardMembers": [
+    {
+      "name": "Aiden Smith",
+      "position": "President",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727323677749-aidenpfp.png"
+    },
+    {
+      "name": "Rebekah Lee",
+      "position": "Vice President",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Jordan Twitty",
+      "position": "Treasurer",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727324048577-jordanpfp.png"
+    },
+    {
+      "name": "Jordyn Tamani",
+      "position": "Event Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727323818603-jordynpfp.png"
+    },
+    {
+      "name": "Tarsa Yuen",
+      "position": "Esports Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727323925635-tarsapfp.png"
+    },
+    {
+      "name": "Jacob Kelleran",
+      "position": "Media Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727323726265-jacobpfp.png"
+    },
+    {
+      "name": "Stephen Beard",
+      "position": "Faculty Advisor",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/1727323972737-stephenpfp.png"
+    }
+  ],
+  "urlName": "overwatch",
+  "color": "#F16414",
+  "aboutHtml": "<p>Welcome to the Cal Poly SLOverwatch Club! We are dedicated to both casual and competitive gaming for Overwatch 2. For those that are competitively inclined, we have collegiate teams that compete year-round and various in-house matches and tournaments. For those that enjoy more casual gaming, we host weekly play-days, and just having a fun time in voice chat!</p>\n<h2>Getting Involved</h2>\n<p>We offer multiple ways for members to get involved. If you would like to help with planning and running events, feel free to reach out to anyone on board! We always welcome others input and ideas. If you are more interested in joining our competitive teams, we host tryouts quarterly and recruit year-round, so keep an eye out for those announcements! You can find our current competitive teams <a href=\"/teams\">here</a>.</p>\n<h2>Links</h2>\n<p>You can join our Discord server <a href=\"https://discord.gg/nrBXphM3\">here</a>, and you can join our organization at our <a href=\"https://now.calpoly.edu/actioncenter/organization/cpsloverwatch/\">Cal Poly NOW</a> page.</p>\n",
+  "__v": 16,
+  "fullName": "SLOverwatch Club"
+},
+{
+  "_id": {
+    "$oid": "66e6072996ec771ed061a13a"
+  },
+  "clubName": "Smash",
+  "urlName": "smash",
+  "color": "#D0430B",
+  "boardMembers": [],
+  "aboutText": "About Smash Community",
+  "aboutHtml": "<p>About Smash Community</p>",
+  "fullName": "Smash Community"
+},
+{
+  "_id": {
+    "$oid": "66e6078c96ec771ed061a13b"
+  },
+  "clubName": "Team Fortress 2",
+  "urlName": "team-fortress-2",
+  "color": "#BB8640",
+  "boardMembers": [],
+  "aboutText": "About TF2 Club",
+  "aboutHtml": "<p>About TF2 Club</p>",
+  "fullName": "Team Fortress 2 Club"
+},
+{
+  "_id": {
+    "$oid": "66e608af96ec771ed061a13c"
+  },
+  "clubName": "Valorant",
+  "aboutText": "This is the Valorant club dedicated to competitive Valorant gaming at Cal Poly.",
+  "boardMembers": [
+    {
+      "name": "Adi Gottumukkala",
+      "position": "President",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Dane Dodge",
+      "position": "Vice President",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Evan Tran",
+      "position": "Support",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Jenny Huang",
+      "position": "Support",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Ethan Hess ",
+      "position": "Events Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Connie Xian",
+      "position": "Events Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Jimmy Cromeenes",
+      "position": "Esports Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Austin Koonvirarak",
+      "position": "Esports Coordinator",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    },
+    {
+      "name": "Brandon Collier",
+      "position": "Treasurer",
+      "profileImage": "https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg"
+    }
+  ],
+  "urlName": "valorant",
+  "color": "#FF4555",
+  "aboutHtml": "<p>This is the Valorant club dedicated to competitive Valorant gaming at Cal Poly.</p>\n",
+  "__v": 15,
+  "fullName": "Valorant Club"
+}]
