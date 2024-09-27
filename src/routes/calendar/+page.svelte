@@ -4,10 +4,11 @@
     import TimeGrid from '@event-calendar/time-grid';
     import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
-    import type { WithStringId, Event } from '$lib/types.js';
+    import type { WithStringId, Event, Club } from '$lib/types.js';
     import Modal from '$lib/Modal.svelte';
 	import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+	import { onMount } from 'svelte';
 
     interface ModalEvent {
         title: string,
@@ -21,11 +22,10 @@
     export let data;
     let events: WithStringId<Event>[] = data.events;
     const clubOptions: [string, string][] = data.adminFor.map((club) => [club.urlName, club.clubName]);
-    if (data.isGeneralAdmin) {
-        clubOptions.unshift(['general', 'General']);
-    }
 
     let ec: Calendar;
+
+    let visibleClubs = data.clubs.map((club) => club.urlName);
 
     let displayModal: Modal;
 
@@ -33,6 +33,7 @@
 
     let editModal: ModalForm;
     let selectedEvent = undefined as WithStringId<Event> | undefined;
+    $: selectedEventClub = selectedEvent ? data.clubs.find((club) => club.urlName === selectedEvent!.club) : undefined;
 
     const modalFields = [
         { name: 'title', type: 'text' },
@@ -58,9 +59,6 @@
     };
 
     const hasPermissions = (event: Event) => {
-        if (event.club === 'general') {
-            return data.isGeneralAdmin;
-        }
         return data.adminFor.find((club) => club.urlName === event.club);
     };
 
@@ -85,6 +83,24 @@
             description: info.description === '' ? undefined : info.description as string,
         } as ModalEvent;
     };
+
+    const syncCalendarWithEvents = () => {
+        const oldEventIds = ec.getEvents().map((event) => event.id);
+        oldEventIds.forEach((id) => ec.removeEventById(id));
+        const newEventList = data.events.filter((event) => visibleClubs.includes(event.club));
+        newEventList.forEach((event) => ec.addEvent(convertToCalendarEvent(event)));
+    }
+
+    function formatDate(date: Date = new Date()): string {
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        });
+    }
 
     //////////////////////
     // API INTERACTIONS //
@@ -149,7 +165,7 @@
             event.start = new Date(event.start);
             event.end = new Date(event.end);
             events.push(event);
-            ec.addEvent(convertToCalendarEvent(event));
+            syncCalendarWithEvents();
         }
         addModal.clearFields();
         addModal.hideModal();
@@ -179,7 +195,7 @@
             updatedEvent.start = new Date(updatedEvent.start);
             updatedEvent.end = new Date(updatedEvent.end);
             events = events.map((e) => e._id === updatedEvent._id ? updatedEvent : e);
-            ec.updateEvent(convertToCalendarEvent(updatedEvent));
+            syncCalendarWithEvents();
         }
         editModal.clearFields();
         editModal.hideModal();
@@ -192,7 +208,8 @@
         const clickedEvent = selectedEvent;
         const success = await sendDeleteEvent(clickedEvent._id);
         if (success) {
-            ec.removeEventById(clickedEvent._id);
+            events = events.filter((e) => e._id !== clickedEvent._id);
+            syncCalendarWithEvents();
         }
         editModal.clearFields();
         editModal.hideModal();
@@ -210,7 +227,7 @@
         eventDurationEditable: false,
         eventStartEditable: false,
         nowIndicator: true,
-        events: events.map(convertToCalendarEvent),
+        events: [],
         display: 'auto',
         height: '50rem',
         slotMinTime: '08:00:00',
@@ -247,6 +264,10 @@
             end: 'dayGridMonth,timeGridWeek,listMonth',
         }
     } as Calendar.Options;
+
+    onMount(() => {
+        syncCalendarWithEvents();
+    });
 </script>
 
 <h1>Calendar</h1>
@@ -284,11 +305,12 @@
         {#if selectedEvent?.location}
             <p><em>Location: {selectedEvent?.location}</em></p>
         {/if}
-        <p><em>Club: {selectedEvent?.club}</em></p>
-        <p><em>Start: {selectedEvent?.start.toLocaleString()}</em></p>
-        <p><em>End: {selectedEvent?.start.toLocaleString()}</em></p>
+        <p><em>Club: <a href="/clubs/{selectedEventClub?.urlName}">{selectedEventClub?.clubName ?? 'unknown'}</a></em></p>
+        <p><em>Start: {formatDate(selectedEvent?.start)}</em></p>
+        <p><em>End: {formatDate(selectedEvent?.end)}</em></p>
     </div>
 </Modal>
+
 <style>
     p {
         margin: 0.5rem 0;
@@ -297,5 +319,9 @@
 
     .event-info {
         margin-top: 1rem;
+    }
+
+    a {
+        color: var(--cal-poly-secondary);
     }
 </style>

@@ -85,5 +85,6 @@ const clubSchema = new Schema({
     boardMembers: [boardMemberSchema],
     urlName: { type: String, required: true },
     color: { type: String, required: true },
+    display: { type: Boolean, default: true },
 });
 export const ClubModel = model('Club', clubSchema);

@@ -57,6 +57,7 @@ export interface Club {
     boardMembers: BoardMember[];
     urlName: string;
     color: string;
+    display: boolean;
 }
 
 export interface BoardMember {

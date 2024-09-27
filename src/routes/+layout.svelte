@@ -19,6 +19,8 @@
     export let data;
 
     $: head.title = $page.data.subtitle ? `${$page.data.subtitle} - Cal Poly Esports` : "Cal Poly Esports";
+
+    const displayClubs = data.clubs.filter((club) => club.display);
 </script>
 
 <svelte:head>
@@ -44,7 +46,7 @@
             adminItem={{ name: "Admin", link: "/admin" }}
             isAdmin={data.username !== undefined}
             icon="/images/Main Logo/White Logo.png"
-            clubs={data.clubs}
+            clubs={displayClubs}
         />
     </header>
     
@@ -75,7 +77,7 @@
             </div>
             <div class="column">
                 <h3>Clubs</h3>
-                {#each data.clubs as club}
+                {#each displayClubs as club}
                     <a href="/clubs/{club.urlName}">{club.clubName}</a>
                 {/each}
             </div>
