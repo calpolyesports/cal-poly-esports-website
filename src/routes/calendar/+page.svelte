@@ -28,12 +28,13 @@
     let visibleClubs = data.clubs.map((club) => club.urlName);
 
     let displayModal: Modal;
-
     let addModal: ModalForm;
 
     let editModal: ModalForm;
     let selectedEvent = undefined as WithStringId<Event> | undefined;
     $: selectedEventClub = selectedEvent ? data.clubs.find((club) => club.urlName === selectedEvent!.club) : undefined;
+
+    let mounted = false;
 
     const modalFields = [
         { name: 'title', type: 'text' },
@@ -266,8 +267,13 @@
     } as Calendar.Options;
 
     onMount(() => {
-        syncCalendarWithEvents();
+        mounted = true;
     });
+
+    // sync events with calendar on mount and when visible clubs change
+    $: if (mounted && visibleClubs.length >= 0) {
+        syncCalendarWithEvents();
+    }
 </script>
 
 <h1>Calendar</h1>
@@ -275,6 +281,21 @@
 {#if data.adminFor.length > 0}
     <button class="button-medium" on:click={onClickAdd}>Add Event</button>
 {/if}
+
+<div class="club-filter">
+    {#each data.clubs as club}
+        <label>
+            <input
+                type="checkbox"
+                name="visibleClubs"
+                value={club.urlName}
+                bind:group={visibleClubs}
+                checked
+            />
+            {club.clubName}
+        </label>
+    {/each}
+</div>
 
 <Calendar bind:this={ec} {plugins} {options} />
 
@@ -323,5 +344,14 @@
 
     a {
         color: var(--cal-poly-secondary);
+    }
+
+    div.club-filter {
+        width: 80%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
     }
 </style>
