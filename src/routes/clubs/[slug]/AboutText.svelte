@@ -15,33 +15,37 @@
     .about :global(p) {
         font-size: 1.2rem;
         margin: 0.2rem 0;
+        text-align: center;
     }
 
     .about :global(h1) {
         font-size: 2.5rem;
-        margin: 0.5rem 0;
+        margin: 1rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 1.5rem;
+        text-align: center;
     }
 
     .about :global(h2) {
         font-size: 2rem;
-        margin: 0.5rem 0;
+        margin: 1rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 1rem;
+        text-align: center;
     }
 
     .about :global(h3) {
         font-size: 1.5rem;
-        margin: 0.5rem 0;
+        margin: 1rem 0;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 0.5rem;
+        text-align: center;
     }
 
     .about :global(ul), :global(ol) {

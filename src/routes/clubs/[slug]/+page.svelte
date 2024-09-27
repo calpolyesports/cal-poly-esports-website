@@ -182,8 +182,9 @@
 </script>
 
 {#if club}
-    <h1>{club.clubName} Club</h1>
+    <h1>{club.fullName}</h1>
     {#if canEdit && editingAbout}
+        <p><strong>This text supports markdown!</strong> Learn more about it <a href='https://www.markdownguide.org/basic-syntax/'>here</a>.</p>
         <textarea bind:value={club.aboutText}></textarea>
         <button class="button-medium" on:click={onSubmitEditAbout}>Save</button>
     {:else}
@@ -244,12 +245,19 @@
 
 <style>
     h1 {
+        text-align: center;
         font-size: 2.5rem;
         margin-bottom: 1rem;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.2rem;
         text-underline-offset: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            text-underline-offset: 1rem;
+        }
     }
 
     p {
@@ -261,6 +269,7 @@
         list-style: none;
         padding: 0;
         display: flex;
+        justify-content: center;
         flex-wrap: wrap;
         gap: 2rem;
     }

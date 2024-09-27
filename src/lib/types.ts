@@ -53,6 +53,7 @@ export interface Article {
 
 export interface Club {
     clubName: string;
+    fullName: string;
     aboutText: string;
     aboutHtml: string;
     boardMembers: BoardMember[];
