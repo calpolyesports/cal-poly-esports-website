@@ -69,9 +69,9 @@
 
     const onSubmitEdit = async (modalFields: FilledModalFields) => {
         const formData = new FormData();
-        formData.append('name', modalFields.name);
-        formData.append('username', modalFields.username);
-        formData.append('role', modalFields.role);
+        formData.append('name', modalFields.name as string);
+        formData.append('username', modalFields.username as string);
+        formData.append('role', modalFields.role as string);
         if (selectedFile) {
             formData.append('picture', selectedFile);
         }
@@ -148,6 +148,13 @@
         margin: 1rem;
         color: var(--neutral-bright);
         box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        div.player-card {
+            height: 8rem;
+            width: 6rem;
+        }
     }
 
     div.picture-container {
