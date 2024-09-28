@@ -163,6 +163,16 @@
         margin-top: 1rem;
     }
 
+    @media (max-width: 768px) {
+        a.link img {
+            height: 15vw;
+        }
+
+        a.link p {
+            font-size: 1.8rem;
+        }
+    }
+
     img.banner {
         width: 100%;
     }
