@@ -23,6 +23,8 @@ export interface Event {
     description?: string;
     backgroundColor: string;
     editable: boolean;
+    usesLab: boolean;
+    showPublic: boolean;
 }
 
 export interface RosterGame {

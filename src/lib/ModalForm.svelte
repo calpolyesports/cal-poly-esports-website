@@ -1,11 +1,11 @@
 <script lang="ts" context="module">
     export type ModalFieldDefinition = { 
         name: string, 
-        type: 'date' | 'text' | 'dropdown' | 'file', 
+        type: 'date' | 'text' | 'dropdown' | 'file' | 'boolean', 
         options?: [string, string][],
         accept?: string
     };
-    export type FilledModalFields = { [key: string]: string | Date | File | null };
+    export type FilledModalFields = { [key: string]: string | Date | File | boolean | null };
     export type ModalAction = { name: string, callback: (values: FilledModalFields) => Promise<void> };
 </script>
 
@@ -16,6 +16,7 @@
     export let title = '';
     export let fields: ModalFieldDefinition[];
     export let actions: ModalAction[];
+    export let showPublicCheckbox = false; // New prop to indicate whether to show the "public" checkbox
 
     let fileError = '';
     let isFileValid = true;
@@ -23,7 +24,11 @@
     const bindings = fields.reduce((acc, field) => {
         acc[field.name] = field.type === 'file' ? null : '';
         return acc;
-    }, {} as { [key: string]: string | File | null });
+    }, {} as { [key: string]: string | File | boolean | null });
+
+    if (showPublicCheckbox) {
+        bindings['showPublic'] = false; // Default value for the public checkbox
+    }
 
     const dispatch = createEventDispatcher();
 
@@ -50,12 +55,20 @@
                 bindings[field.name] = value.toString();
             }
         });
+
+        if (showPublicCheckbox && 'showPublic' in values) {
+            bindings['showPublic'] = values['showPublic'] as boolean;
+        }
     };
 
     export const clearFields = () => {
         fields.forEach(field => {
             bindings[field.name] = field.type === 'file' ? null : '';
         });
+
+        if (showPublicCheckbox) {
+            bindings['showPublic'] = false;
+        }
     };
 
     async function runCallbackWithFormData(callback: (values: FilledModalFields) => Promise<void>) {
@@ -64,6 +77,11 @@
             const value = bindings[field.name];
             formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
         });
+
+        if (showPublicCheckbox) {
+            formData['showPublic'] = bindings['showPublic'] as boolean;
+        }
+
         await callback(formData);
         hideModal();
     }
@@ -93,36 +111,43 @@
 </script>
 
 <Modal bind:this={modal} bind:title>
-        <div class="form">
-            {#each fields as field}
-                <label for={field.name}>{field.name}</label>
-                {#if field.type === 'date'}
-                    <input type="datetime-local" id={field.name} name={field.name} bind:value={bindings[field.name]} />
-                {:else if field.type === 'text'}
-                    <input type="text" id={field.name} name={field.name} bind:value={bindings[field.name]} />
-                {:else if field.type === 'dropdown' && field.options}
-                    <select id={field.name} name={field.name} bind:value={bindings[field.name]}>
-                        {#each field.options as option}
-                            <option value={option[0]}>{option[1]}</option>
-                        {/each}
-                    </select>
-                {:else if field.type === 'file'}
-                    <input
-                        id={field.name}
-                        type="file"
-                        accept={field.accept}
-                        on:change={(event) => handleFileChange(event, field)}
-                    />
-                    {#if fileError}
-                        <p class="error-message">{fileError}</p>
-                    {/if}
+    <div class="form">
+        {#each fields as field}
+            <label for={field.name}>{field.name}</label>
+            {#if field.type === 'date'}
+                <input type="datetime-local" id={field.name} name={field.name} bind:value={bindings[field.name]} />
+            {:else if field.type === 'text'}
+                <input type="text" id={field.name} name={field.name} bind:value={bindings[field.name]} />
+            {:else if field.type === 'dropdown' && field.options}
+                <select id={field.name} name={field.name} bind:value={bindings[field.name]}>
+                    {#each field.options as option}
+                        <option value={option[0]}>{option[1]}</option>
+                    {/each}
+                </select>
+            {:else if field.type === 'file'}
+                <input
+                    id={field.name}
+                    type="file"
+                    accept={field.accept}
+                    on:change={(event) => handleFileChange(event, field)}
+                />
+                {#if fileError}
+                    <p class="error-message">{fileError}</p>
                 {/if}
-            {/each}
-            <br>
-            {#each actions as action}
-                <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)} disabled={!isFileValid}>{action.name}</button>
-            {/each}
-        </div>
+            {/if}
+        {/each}
+
+        <!-- Add public checkbox only if in admin context -->
+        {#if showPublicCheckbox}
+            <label for="showPublic">Show on Public Calendar</label>
+            <input type="checkbox" id="showPublic" name="showPublic" bind:checked={bindings['showPublic']} />
+        {/if}
+
+        <br>
+        {#each actions as action}
+            <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)} disabled={!isFileValid}>{action.name}</button>
+        {/each}
+    </div>
 </Modal>
 
 <style>
