@@ -257,8 +257,8 @@
     let plugins = [DayGrid, TimeGrid, List, Interaction] as Calendar.Plugin[];
     let options = {
         view: 'timeGridWeek',
-        selectable: false,
-        editable: false,
+        selectable: true,
+        editable: true,
         eventDurationEditable: false,
         eventStartEditable: false,
         nowIndicator: true,
@@ -269,6 +269,18 @@
         slotMaxTime: '22:00:00',
         flexibleSlotTimeLimits: true,
         allDaySlot: false,
+        select: async (selectInfo) => {
+            console.log("MADE IT");
+            const start = selectInfo.start;
+            const end = new Date(selectInfo.start.getTime() + 60 * 60 * 1000);
+
+            addModal.fillFields({
+                start: start,
+                end: end,
+                club: clubOptions[0][0],
+            });
+            addModal.showModal();
+        },
         eventDrop: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
             if (editedEvent && !await sendUpdateEvent(editedEvent._id, editedEvent)) {
