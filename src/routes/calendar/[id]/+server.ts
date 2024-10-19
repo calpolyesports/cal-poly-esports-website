@@ -13,7 +13,9 @@ export const PUT: RequestHandler = async (event) => {
     const newClub = body.club;
     const newLocation = body.location;
     const newLocationLink = body.locationLink;
-    const newDescription = body.description
+    const newDescription = body.description;
+    const usesLab = body.usesLab;
+    const showPublic = body.showPublic;
 
     if (!id) {
         return json({
@@ -44,6 +46,8 @@ export const PUT: RequestHandler = async (event) => {
         location: newLocation ?? null,
         locationLink: newLocationLink ?? null,
         description: newDescription ?? null,
+        usesLab: usesLab ?? false,
+        showPublic: showPublic ?? true,
     } as Event;
 
     await db.updateEvent(new ObjectId(id), newDoc);

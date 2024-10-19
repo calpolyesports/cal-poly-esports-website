@@ -10,7 +10,6 @@
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
 	import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
-	import { now } from 'mongoose';
 
     interface ModalEvent {
         title: string,
@@ -19,6 +18,8 @@
         club: string,
         location?: string,
         description?: string,
+        usesLab: boolean;
+        showPublic: boolean;
     }
 
     export let data;
@@ -289,9 +290,9 @@
 
 <h1>Calendar</h1>
 
-{#if data.adminFor.length > 0}
+<!--{#if data.adminFor.length > 0}
     <button class="button-medium" on:click={onClickAdd}>Add Event</button>
-{/if}
+{/if}-->
 
 <button class="button-medium filter-visibility-button" on:click={() => showFilters = !showFilters}>{showFilters ? 'Hide' : 'Show'} Filters</button>
 

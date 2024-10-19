@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
     export type ModalFieldDefinition = { 
         name: string, 
-        type: 'date' | 'text' | 'dropdown' | 'file' | 'boolean', 
+        type: 'date' | 'text' | 'dropdown' | 'file' | 'checkbox', 
         options?: [string, string][],
         accept?: string
     };
@@ -14,21 +14,23 @@
     import { createEventDispatcher } from 'svelte';
 
     export let title = '';
-    export let fields: ModalFieldDefinition[];
-    export let actions: ModalAction[];
-    export let showPublicCheckbox = false; // New prop to indicate whether to show the "public" checkbox
+    export let fields: ModalFieldDefinition[] = [];
+    export let actions: ModalAction[] = [];
 
     let fileError = '';
     let isFileValid = true;
+    let validationError = ''; // For showing validation messages
 
     const bindings = fields.reduce((acc, field) => {
-        acc[field.name] = field.type === 'file' ? null : '';
+        if (field.type === 'file') {
+            acc[field.name] = null;
+        } else if (field.type === 'checkbox') {
+            acc[field.name] = false;
+        } else {
+            acc[field.name] = '';
+        }
         return acc;
     }, {} as { [key: string]: string | File | boolean | null });
-
-    if (showPublicCheckbox) {
-        bindings['showPublic'] = false; // Default value for the public checkbox
-    }
 
     const dispatch = createEventDispatcher();
 
@@ -46,29 +48,29 @@
         clearFields();
         fields.forEach(field => {
             const value = values[field.name];
-            if (!value) return;
             if (field.type === 'date') {
                 const originalTime = new Date(value as string);
                 const adjustedTime = new Date(originalTime.getTime() - originalTime.getTimezoneOffset() * 60000);
                 bindings[field.name] = adjustedTime.toISOString().slice(0, 16);
-            } else if (field.type !== 'file') {
+            } else if (field.type === "checkbox") {
+                bindings[field.name] = value as boolean;
+            } else if (field.type !== 'file' && value) {
                 bindings[field.name] = value.toString();
             }
         });
-
-        if (showPublicCheckbox && 'showPublic' in values) {
-            bindings['showPublic'] = values['showPublic'] as boolean;
-        }
     };
 
     export const clearFields = () => {
         fields.forEach(field => {
-            bindings[field.name] = field.type === 'file' ? null : '';
+            if (field.type === 'file') {
+                bindings[field.name] = null;
+            } else if (field.type === 'checkbox') {
+                bindings[field.name] = false;
+            } else {
+                bindings[field.name] = '';
+            }
         });
-
-        if (showPublicCheckbox) {
-            bindings['showPublic'] = false;
-        }
+        validationError = ''; // Clear validation error when fields are cleared
     };
 
     async function runCallbackWithFormData(callback: (values: FilledModalFields) => Promise<void>) {
@@ -78,8 +80,12 @@
             formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
         });
 
-        if (showPublicCheckbox) {
-            formData['showPublic'] = bindings['showPublic'] as boolean;
+        // Perform validation before submission
+        if (!bindings['showPublic'] && !bindings['usesLab']) {
+            validationError = 'An event must either be public or use the lab!';
+            return; // Do not submit if validation fails
+        } else {
+            validationError = ''; // Clear validation error if the condition passes
         }
 
         await callback(formData);
@@ -134,16 +140,18 @@
                 {#if fileError}
                     <p class="error-message">{fileError}</p>
                 {/if}
+            {:else if field.type === 'checkbox'}
+                <input type="checkbox" id={field.name} name={field.name} bind:checked={bindings[field.name]} />
             {/if}
         {/each}
 
-        <!-- Add public checkbox only if in admin context -->
-        {#if showPublicCheckbox}
-            <label for="showPublic">Show on Public Calendar</label>
-            <input type="checkbox" id="showPublic" name="showPublic" bind:checked={bindings['showPublic']} />
-        {/if}
-
         <br>
+
+        <!-- Validation error message -->
+        {#if validationError}
+            <p class="error-message">{validationError}</p>
+        {/if}
+        
         {#each actions as action}
             <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)} disabled={!isFileValid}>{action.name}</button>
         {/each}

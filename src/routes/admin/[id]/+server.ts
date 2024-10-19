@@ -21,8 +21,8 @@ export const PUT: RequestHandler = async (event) => {
     const newLocationLink = body.locationLink;
     const newDescription = body.description;
     const showPublic = body.showPublic;
+    const usesLab = body.usesLab;
 
-    // Get existing event from database
     const oldEvent = await db.getEventById(new ObjectId(id));
     if (!oldEvent) {
         return json({
@@ -30,7 +30,6 @@ export const PUT: RequestHandler = async (event) => {
         }, { status: 404 });
     }
 
-    // Permission check: Ensure user has permission to update event
     if (!event.locals.user?.admin_for.includes(newClub) ||
         !event.locals.user?.admin_for.includes(oldEvent?.club)) {
         return json({
@@ -38,7 +37,6 @@ export const PUT: RequestHandler = async (event) => {
         }, { status: 403 });
     }
 
-    // Update event document
     const updatedEvent = {
         title: newTitle,
         start: new Date(newStart),
@@ -47,7 +45,7 @@ export const PUT: RequestHandler = async (event) => {
         location: newLocation ?? null,
         locationLink: newLocationLink ?? null,
         description: newDescription ?? null,
-        usesLab: true, // Set usesLab to true since it's in admin
+        usesLab: usesLab ?? false,
         showPublic: showPublic ?? false,
     } as Event;
 
@@ -67,7 +65,6 @@ export const DELETE: RequestHandler = async (event) => {
         }, { status: 400 });
     }
 
-    // Get existing event from database
     const oldEvent = await db.getEventById(new ObjectId(id));
     if (!oldEvent) {
         return json({
@@ -75,7 +72,6 @@ export const DELETE: RequestHandler = async (event) => {
         }, { status: 404 });
     }
 
-    // Permission check: Ensure user has permission to delete event
     if (!event.locals.user?.admin_for.includes(oldEvent.club)) {
         return json({
             status: 403,
