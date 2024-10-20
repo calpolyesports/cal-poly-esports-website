@@ -14,7 +14,7 @@ export const POST: RequestHandler = async (event) => {
     const description = body.description;
     const usesLab = body.usesLab;
     const showPublic = body.showPublic;
-
+    
     if (!event.locals.user?.admin_for.includes(club)) {
         return json({
             message: "You do not have permission to add events for this club"
@@ -29,8 +29,8 @@ export const POST: RequestHandler = async (event) => {
         location,
         locationLink,
         description,
-        usesLab,
-        showPublic,
+        usesLab: usesLab ?? false,
+        showPublic: showPublic ?? false,
     } as Event;
 
     const newId = await db.addEvent(newDoc);
@@ -46,4 +46,4 @@ export const POST: RequestHandler = async (event) => {
     return json({
         event: newEvent
     }, { status: 200 });
-}
+};

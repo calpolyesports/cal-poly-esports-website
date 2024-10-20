@@ -39,6 +39,8 @@ const eventSchema = new Schema({
     location: String,
     locationLink: String,
     description: String,
+    usesLab: Boolean,
+    showPublic: Boolean,
 });
 export const EventModel = model('Event', eventSchema);
 
