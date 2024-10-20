@@ -32,26 +32,8 @@ export async function getEvents(adminFor?: string[], publicOnly: boolean = false
     });
 }
 
-export async function getLabEvents(adminFor?: string[]) {
-    const response = await models.EventModel.find({ usesLab: true }).lean();
-    const clubs = await models.ClubModel.find().lean();
-    return response.map((event) => {
-        const club = clubs.find(club => club.urlName === event.club);
-        return {
-            ...event,
-            backgroundColor: club?.color ?? '#154734',
-            editable: adminFor?.includes(event.club) ?? false,
-        };
-    });
-}
-
-export async function getAdminLabEvents() {
-    const events = await models.EventModel.find({ usesLab: true }).lean();
-    return events;
-}
-
 export async function getEventById(id: ObjectId, adminFor?: string[], usesLabOnly: boolean = false) {
-    const query = { _id: id };
+    const query: any = { _id: id };
     if (usesLabOnly) {
         query.usesLab = true;
     }

@@ -9,7 +9,7 @@ export const load: ServerLoad = async (event) => {
         redirect(302, "/login");
     }
 
-    const events = (await db.getLabEvents(event.locals.user?.admin_for)).map((event) => ({
+    const events = (await db.getEvents(event.locals.user?.admin_for)).map((event) => ({
         ...event,
         _id: event._id.toString(),
     })) as WithStringId<Event>[];

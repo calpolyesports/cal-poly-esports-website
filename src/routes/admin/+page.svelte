@@ -5,9 +5,11 @@
     import List from '@event-calendar/list';
     import Interaction from '@event-calendar/interaction';
     import type { WithStringId, Event } from '$lib/types.js';
+    import Modal from '$lib/Modal.svelte';
     import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
     import { onMount } from 'svelte';
+    import { enhance } from "$app/forms";
 
     interface ModalEvent {
         title: string;
@@ -30,7 +32,9 @@
 
     let addModal: ModalForm;
     let editModal: ModalForm;
+    let displayModal: Modal;
     let selectedEvent = undefined as WithStringId<Event> | undefined;
+    $: selectedEventClub = selectedEvent ? data.clubs.find((club) => club.urlName === selectedEvent!.club) : undefined;
 
     let mounted = false;
 
@@ -91,25 +95,20 @@
 
     const syncCalendarWithEvents = () => {
     let filteredEvents = events.filter(event => {
-        // If either lab events are shown or public events are shown, include the event
-        if (showLabEvents && event.usesLab) return true; // Show lab events if enabled
-        if (showPublicEvents && event.showPublic) return true; // Show public events if enabled
+        if (showLabEvents && event.usesLab) return true;
+        if (showPublicEvents && event.showPublic) return true;
 
-        // If neither are selected, exclude the event
         return false;
     });
 
-    // Update the calendar with the filtered events
     ec.setOption('events', filteredEvents.map(convertToCalendarEvent));
 };
 
-    // Toggle showing lab events
     const toggleLabEvents = () => {
         showLabEvents = !showLabEvents;
         syncCalendarWithEvents();
     };
 
-    // Toggle showing public events
     const togglePublicEvents = () => {
         showPublicEvents = !showPublicEvents;
         syncCalendarWithEvents();
@@ -270,9 +269,8 @@
         flexibleSlotTimeLimits: true,
         allDaySlot: false,
         select: async (selectInfo) => {
-            console.log("MADE IT");
             const start = selectInfo.start;
-            const end = new Date(selectInfo.start.getTime() + 60 * 60 * 1000);
+            const end = selectInfo.end;
 
             addModal.fillFields({
                 start: start,
@@ -299,7 +297,10 @@
             if (eventInfo) {
                 if (hasPermissions(eventInfo)) {
                     onClickEdit(eventInfo);
-                } 
+                } else {
+                    selectedEvent = eventInfo;
+                    displayModal.showModal();
+                }
             }
         },
         headerToolbar: {
@@ -318,20 +319,41 @@
     }
 </script>
 
-<h1>Admin Calendar</h1>
-<button on:click={onClickAdd} class="button-medium">Add Event</button>
+<div>
+    <h1>Admin</h1>
+</div>
 
 <!-- Filter buttons -->
-<div class="filter-buttons">
-    <button class="filter-button" on:click={toggleLabEvents} style="background-color: {showLabEvents ? 'var(--cal-poly-secondary)' : 'gray'}">
-        Lab Events
-    </button>
-    <button class="filter-button" on:click={togglePublicEvents} style="background-color: {showPublicEvents ? 'var(--cal-poly-secondary)' : 'gray'}">
-        Public Events
-    </button>
+<div class="button-container">
+    <button on:click={onClickAdd} class="button-medium">Add Event</button>
+
+    <!-- Filter buttons for Lab and Public events -->
+    <div class="filter-buttons">
+        <button class="filter-button" on:click={toggleLabEvents} style="background-color: {showLabEvents ? 'var(--cal-poly-secondary)' : 'gray'}">
+            Lab Events
+        </button>
+        <button class="filter-button" on:click={togglePublicEvents} style="background-color: {showPublicEvents ? 'var(--cal-poly-secondary)' : 'gray'}">
+            Public Events
+        </button>
+    </div>
 </div>
 
 <Calendar bind:this={ec} {plugins} {options} />
+
+<div>
+    <h2>Logged in as: {data.username}</h2>
+
+	<form method="post" use:enhance>
+		<button>Log out</button>
+	</form>
+</div>
+
+<div>
+    <h3>Clubs</h3>
+    {#each data.adminFor as club}
+        <a href="/clubs/{club.urlName}">{club.clubName}</a>
+    {/each}
+</div>
 
 <ModalForm
     bind:this={addModal}
@@ -350,15 +372,108 @@
         { name: 'Delete', callback: onSubmitDelete },
     ]} />  
 
+<Modal
+    bind:this={displayModal}
+    title={selectedEvent?.title}>
+    {#if selectedEvent?.description}
+        <p>{selectedEvent?.description}</p>
+    {/if}
+    <div class="event-info">
+        {#if selectedEvent?.location}
+            {#if selectedEvent?.locationLink}
+                <p><em>Location: <a href={selectedEvent?.locationLink} target="_blank">{selectedEvent?.location}</a></em></p>
+            {:else}
+                <p><em>Location: {selectedEvent?.location}</em></p>
+            {/if}
+        {/if}
+        <p><em>Club: <a href="/clubs/{selectedEventClub?.urlName}">{selectedEventClub?.clubName ?? 'unknown'}</a></em></p>
+        <p><em>Start: {formatDate(selectedEvent?.start)}</em></p>
+        <p><em>End: {formatDate(selectedEvent?.end)}</em></p>
+    </div>
+</Modal>
+
 <style>
-    /* Filter buttons container */
-    .filter-buttons {
+    div {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin: 1rem auto;
     }
 
-    /* Filter button styles */
+    h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-top: 1rem;
+        text-align: center;
+        text-decoration-line: underline;
+        text-decoration-color: var(--cal-poly-secondary);
+        text-decoration-thickness: 0.2rem;
+        text-underline-offset: 2rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-top: 1rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+        color: var(--cal-poly-secondary);
+    }
+
+    a {
+        font-size: 1.25rem;
+        margin: 0;
+        color: black;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    button {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        padding: 0.5rem 1rem;
+        background-color: var(--cal-poly-secondary);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+    }
+
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .button-medium {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem 1rem;
+        background-color: var(--cal-poly-secondary);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+    }
+
+    .filter-buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
     .filter-button {
         color: rgb(255, 255, 255);
         border: none;

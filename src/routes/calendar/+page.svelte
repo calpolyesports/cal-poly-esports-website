@@ -247,7 +247,7 @@
         slotMaxTime: '22:00:00',
         flexibleSlotTimeLimits: true,
         allDaySlot: false,
-        eventDrop: async (event) => {
+        /* eventDrop: async (event) => {
             const editedEvent = syncEventTimeInfo(event.event);
             if (editedEvent && !await sendUpdateEvent(editedEvent._id, editedEvent)) {
                 event.revert();
@@ -270,6 +270,12 @@
                     displayModal.showModal();
                 }
             }
+        }, */
+        eventClick: async (event) => {
+            const clickedEvent = event.event;
+            const eventInfo = events.find((e) => e._id === clickedEvent.id);
+            selectedEvent = eventInfo;
+            displayModal.showModal();
         },
         headerToolbar: {
             start: 'title prev,next today',

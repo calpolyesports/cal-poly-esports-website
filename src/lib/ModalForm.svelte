@@ -19,7 +19,8 @@
 
     let fileError = '';
     let isFileValid = true;
-    let validationError = ''; // For showing validation messages
+    let validationError = '';
+    let timeError = '';
 
     const bindings = fields.reduce((acc, field) => {
         if (field.type === 'file') {
@@ -70,7 +71,8 @@
                 bindings[field.name] = '';
             }
         });
-        validationError = ''; // Clear validation error when fields are cleared
+        validationError = '';
+        timeError = '';
     };
 
     async function runCallbackWithFormData(callback: (values: FilledModalFields) => Promise<void>) {
@@ -80,13 +82,32 @@
             formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
         });
 
-        // Perform validation before submission
         if (!bindings['showPublic'] && !bindings['usesLab']) {
             validationError = 'An event must either be public or use the lab!';
-            return; // Do not submit if validation fails
+            return;
         } else {
-            validationError = ''; // Clear validation error if the condition passes
+            validationError = '';
         }
+
+        const startTime = new Date(bindings['start'] as string);
+        const endTime = new Date(bindings['end'] as string);
+        
+        if (endTime <= startTime) {
+            timeError = 'End time must be after start time!';
+            return;
+        } else {
+            timeError = '';
+        }
+
+        const requiredFields = ['Title', 'Start', 'End', 'Club', 'Location'];
+        for (const field of requiredFields) {
+            if (!bindings[field.toLowerCase()]) {
+                validationError = `${field} is required!`;
+                return;
+            }
+        }
+
+        validationError = '';
 
         await callback(formData);
         hideModal();
@@ -119,7 +140,12 @@
 <Modal bind:this={modal} bind:title>
     <div class="form">
         {#each fields as field}
-            <label for={field.name}>{field.name}</label>
+            <label for={field.name}>
+                {field.name}
+                {#if ['title', 'start', 'end', 'club', 'location'].includes(field.name)}
+                    <span class="required-asterisk">*</span>
+                {/if}
+            </label>
             {#if field.type === 'date'}
                 <input type="datetime-local" id={field.name} name={field.name} bind:value={bindings[field.name]} />
             {:else if field.type === 'text'}
@@ -147,9 +173,13 @@
 
         <br>
 
-        <!-- Validation error message -->
+        <!-- Validation error messages -->
         {#if validationError}
             <p class="error-message">{validationError}</p>
+        {/if}
+        
+        {#if timeError}
+            <p class="error-message">{timeError}</p>
         {/if}
         
         {#each actions as action}
@@ -196,5 +226,10 @@
         color: red;
         font-size: 0.9rem;
         margin-top: 0.5rem;
+    }
+
+    .required-asterisk {
+        color: red;
+        margin-left: 5px;
     }
 </style>
