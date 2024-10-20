@@ -14,8 +14,13 @@ console.log("Connected to MongoDB");
 
 const sasUrl = env.PLAYER_PORTRAIT_BLOB!;
 
-export async function getEvents(adminFor?: string[]) {
-    const response = await models.EventModel.find().lean();
+export async function getEvents(adminFor?: string[], publicOnly: boolean = false) {
+    const query: any = {};
+    if (publicOnly) {
+        query.showPublic = true;
+    }
+
+    const response = await models.EventModel.find(query).lean();
     const clubs = await models.ClubModel.find().lean();
     return response.map((event) => {
         const club = clubs.find(club => club.urlName === event.club);
@@ -27,9 +32,15 @@ export async function getEvents(adminFor?: string[]) {
     });
 }
 
-export async function getEventById(id: ObjectId, adminFor?: string[]) {
-    const eventDoc = await models.EventModel.findOne({ _id: id }).lean();
+export async function getEventById(id: ObjectId, adminFor?: string[], usesLabOnly: boolean = false) {
+    const query: any = { _id: id };
+    if (usesLabOnly) {
+        query.usesLab = true;
+    }
+
+    const eventDoc = await models.EventModel.findOne(query).lean();
     if (!eventDoc) return null;
+
     const clubDoc = await models.ClubModel.findOne({ urlName: eventDoc.club }).lean();
     const event = {
         ...eventDoc,
@@ -41,6 +52,9 @@ export async function getEventById(id: ObjectId, adminFor?: string[]) {
 
 export async function addEvent(event: types.Event) {
     const newEvent = new models.EventModel(event);
+    if (!event.usesLab) {
+        newEvent.usesLab = false;
+    }
     await newEvent.save();
     return newEvent._id;
 }
