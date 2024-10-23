@@ -82,7 +82,10 @@
             formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
         });
 
-        if (!bindings['showPublic'] && !bindings['usesLab']) {
+        const hasShowPublicField = fields.some(field => field.name === 'showPublic');
+        const hasUsesLabField = fields.some(field => field.name === 'usesLab');
+
+        if (hasShowPublicField && hasUsesLabField && !bindings['showPublic'] && !bindings['usesLab']) {
             validationError = 'An event must either be public or use the lab!';
             return;
         } else {
@@ -101,7 +104,7 @@
 
         const requiredFields = ['Title', 'Start', 'End', 'Club', 'Location'];
         for (const field of requiredFields) {
-            if (!bindings[field.toLowerCase()]) {
+            if (fields.some(f => f.name.toLowerCase() === field.toLowerCase()) && !bindings[field.toLowerCase()]) {
                 validationError = `${field} is required!`;
                 return;
             }
@@ -112,6 +115,7 @@
         await callback(formData);
         hideModal();
     }
+
 
     function handleFileChange(event: Event, field: ModalFieldDefinition) {
         const input = event.target as HTMLInputElement;
