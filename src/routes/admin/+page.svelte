@@ -263,9 +263,9 @@
         nowIndicator: true,
         events: [],
         display: 'auto',
-        height: '50rem',
-        slotMinTime: '08:00:00',
-        slotMaxTime: '22:00:00',
+        height: '60rem',
+        slotMinTime: '07:00:00',
+        slotMaxTime: '24:00:00',
         flexibleSlotTimeLimits: true,
         allDaySlot: false,
         select: async (selectInfo) => {
@@ -339,6 +339,35 @@
 </div>
 
 <Calendar bind:this={ec} {plugins} {options} />
+
+<!-- Ethernet Availability Info in Table -->
+<div class="ethernet-availability">
+    <h3>ETHERNET AVAILABILITY:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>5:30-midnight</td>
+                <td>4:30-midnight</td>
+                <td>5:30-midnight</td>
+                <td>4:30-midnight</td>
+                <td>2:00-midnight</td>
+                <td>All-Day</td>
+                <td>All-Day</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 <div>
     <h2>Logged in as: {data.username}</h2>
@@ -452,12 +481,11 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-bottom: 2rem;
     }
 
     .button-medium {
         font-size: 1.25rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0rem;
         padding: 0.5rem 1rem;
         background-color: var(--cal-poly-secondary);
         color: white;
@@ -485,5 +513,39 @@
 
     .filter-button:hover {
         opacity: 0.8;
+    }
+
+    .ethernet-availability {
+        text-align: center;
+    }
+
+    .ethernet-availability h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--cal-poly-secondary);
+    }
+
+    .ethernet-availability table {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        border-collapse: collapse;
+        font-size: 1.25rem;
+    }
+
+    .ethernet-availability th, .ethernet-availability td {
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+        text-align: center;
+    }
+
+    .ethernet-availability th {
+        background-color: var(--cal-poly-secondary);
+        color: white;
+        font-weight: bold;
+    }
+
+    .ethernet-availability td {
+        background-color: #f9f9f9;
     }
 </style>
