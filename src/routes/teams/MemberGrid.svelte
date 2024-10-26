@@ -79,6 +79,22 @@
         return response.ok;
     };
 
+    const updateTeamOrder = async () => {
+        const response = await fetch(`/teams/${game._id}/${team._id}/reorder`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                members: team.members.map(m => m._id),
+            }),
+        });
+
+        if (!response.ok) {
+            console.error('Failed to update the team order');
+        }
+    };
+
     ////////////////////
     // EVENT HANDLERS //
     ////////////////////
@@ -143,6 +159,29 @@
             console.error("File selection is invalid in MEMBERGRID");
         }
     };
+
+    const moveMember = (oldIndex: number, newIndex: number) => {
+        const members = [...team.members];
+        const [movedMember] = members.splice(oldIndex, 1);
+        members.splice(newIndex, 0, movedMember);
+        team.members = members;
+
+        updateTeamOrder();
+    };
+
+    const onMoveLeft = (id: string) => {
+        const index = team.members.findIndex(m => m._id === id);
+        if (index > 0) {
+            moveMember(index, index - 1);
+        }
+    };
+
+    const onMoveRight = (id: string) => {
+        const index = team.members.findIndex(m => m._id === id);
+        if (index < team.members.length - 1) {
+            moveMember(index, index + 1);
+        }
+    };
 </script>
 
 <div class="box">
@@ -160,7 +199,9 @@
                 team={team}
                 player={member}
                 {isAdmin}
-                onRemove={onMemberRemove} />
+                onRemove={onMemberRemove}
+                onMoveLeft={onMoveLeft}
+                onMoveRight={onMoveRight} />
         {/each}
     </div>
 </div>

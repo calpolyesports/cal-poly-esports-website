@@ -172,6 +172,22 @@ export async function deleteRosterMember(teamId: ObjectId, memberId: ObjectId) {
     await teamDoc.save();
 }
 
+export async function updateTeamMemberOrder(teamId: string, newOrder: string[]) {
+    try {
+        const teamObjectId = new ObjectId(teamId);
+        const memberObjectIds = newOrder.map(id => new ObjectId(id));
+
+        await models.RosterTeamModel.updateOne(
+            { _id: teamObjectId },
+            { $set: { members: memberObjectIds } }
+        );
+        return true;
+    } catch (error) {
+        console.error('Error updating team member order:', error);
+        return false;
+    }
+}
+
 export async function getArticles() {
     const response = await models.ArticleModel.find().lean();
     return response;

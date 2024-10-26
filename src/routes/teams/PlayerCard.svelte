@@ -8,6 +8,8 @@
     export let player: WithStringId<RosterMember>;
     export let isAdmin: boolean;
     export let onRemove: (id: string) => void;
+    export let onMoveLeft: (id: string) => void;
+    export let onMoveRight: (id: string) => void;
 
     interface ModalMember {
         name: string;
@@ -103,6 +105,10 @@
             console.error("File selection is invalid in MEMBERGRID");
         }
     };
+
+    const index = team.members.findIndex(m => m._id === player._id);
+    const isFirst = index === 0;
+    const isLast = index === team.members.length - 1;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
@@ -119,6 +125,13 @@
         <h2>{player.role}</h2>
     </div>
 </div>
+
+{#if isAdmin}
+<div class="arrows">
+    <button on:click={() => onMoveLeft(player._id)} disabled={isFirst}>⬅️</button>
+    <button on:click={() => onMoveRight(player._id)} disabled={isLast}>➡️</button>
+</div>
+{/if}
 
 {#if isAdmin}
     <ModalForm
@@ -187,6 +200,10 @@
         position: relative;
         z-index: 1;
         text-align: center;
+    }
+
+    div.arrows {
+        text-align:center;
     }
 
     h1, h2, p {
