@@ -14,14 +14,14 @@
 <div class="container">
     <div class="embeds">
         <div class="livestream">
-            <TwitchEmbed channel="CalPoly_Esports" parentUrl={PUBLIC_PAGE_URL} />
+            <TwitchEmbed channel="CalPolyEsports" parentUrl={PUBLIC_PAGE_URL} />
         </div>
 
         <div class="text-box">
             <h1>Lab Information</h1>
             <br>
             <p>Come check out our new Esports and Gaming Lab, equipped with <strong>six high-end gaming PCs!</strong></p>
-            <p>The lab is currently located in <a href="https://maps.calpoly.edu/place/bldg-021-0">Building 21</a>, Room 233. You can find <a href="/calendar">open hours for free usage here.</a></p>
+            <p>The lab is currently located in <a href="https://maps.calpoly.edu/place/bldg-014-0">Building 14</a>, Room 233. You can find <a href="/calendar">open hours for free usage here.</a></p>
         </div>
     </div>
 </div>
@@ -33,7 +33,7 @@
         <img src="images/social/Discord.png" alt="Discord" />
         <p>Discord</p>
     </a>
-    <a class="link" href="https://twitch.tv/CalPoly_Esports">
+    <a class="link" href="https://twitch.tv/CalPolyEsports">
         <img src="images/social/Twitch.png" alt="Twitch" />
         <p>Twitch</p>
     </a>
