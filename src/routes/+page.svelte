@@ -21,7 +21,7 @@
             <h1>Lab Information</h1>
             <br>
             <p>Come check out our new Esports and Gaming Lab, equipped with <strong>six high-end gaming PCs!</strong></p>
-            <p>The lab is currently located in <a href="https://maps.calpoly.edu/place/bldg-014-0">Building 14</a>, Room 233. You can find <a href="/calendar">open hours for free usage here.</a></p>
+            <p>The lab is currently located in <a href="https://maps.calpoly.edu/place/bldg-014-0">Building 14</a>, Room 305. You can find <a href="/calendar">open hours for free usage here.</a></p>
         </div>
     </div>
 </div>
