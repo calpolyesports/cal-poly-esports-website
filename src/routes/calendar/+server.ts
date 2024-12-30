@@ -29,8 +29,8 @@ export const POST: RequestHandler = async (event) => {
         location,
         locationLink,
         description,
-        usesLab,
-        showPublic,
+        usesLab: usesLab ?? false,
+        showPublic: showPublic ?? false,
     } as Event;
 
     const newId = await db.addEvent(newDoc);

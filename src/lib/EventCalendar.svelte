@@ -22,7 +22,6 @@
     import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
     import { onMount } from 'svelte';
-    import { enhance } from "$app/forms";
 	import { slide } from 'svelte/transition';
 
     export let events: WithStringId<Event>[];

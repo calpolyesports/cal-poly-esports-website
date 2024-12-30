@@ -11,7 +11,7 @@
     //////////////////////
 
     const sendAddEvent = async (event: ModalEvent): Promise<WithStringId<Event> | undefined> => {
-        const response = await fetch("/admin", {
+        const response = await fetch("/calendar", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -28,7 +28,7 @@
     };
     
     const sendUpdateEvent = async (id: string, event: ModalEvent): Promise<WithStringId<Event> | undefined> => {
-        const response = await fetch(`/admin/${id}`, {
+        const response = await fetch(`/calendar/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
