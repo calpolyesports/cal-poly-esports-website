@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-    export type ModalEvent {
+    export type ModalEvent = {
         title: string;
         start: Date;
         end: Date;
@@ -8,7 +8,7 @@
         description?: string;
         usesLab: boolean;
         showPublic: boolean;
-    }
+    };
 </script>
 
 <script lang="ts">
@@ -23,6 +23,7 @@
     import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
     import { onMount } from 'svelte';
     import { enhance } from "$app/forms";
+	import { slide } from 'svelte/transition';
 
     export let events: WithStringId<Event>[];
     export let clubs: WithStringId<Club>[];
@@ -126,6 +127,20 @@
         ec.setOption('events', filteredEvents.map(convertToCalendarEvent));
     };
 
+    function verifyEvent(event: ModalEvent): ModalErrors {
+        let errors = {} as ModalErrors;
+
+        if (!event.showPublic && !event.usesLab) {
+            errors['usesLab'] = "An event must either be public or use the lab!";
+        }
+
+        if (event.end <= event.start) {
+            errors['end'] = "End time must be after start time!";
+        }
+
+        return errors;
+    }
+
     const toggleLabEvents = () => {
         showLabEvents = !showLabEvents;
         syncCalendarWithEvents();
@@ -135,17 +150,6 @@
         showPublicEvents = !showPublicEvents;
         syncCalendarWithEvents();
     };
-
-    function formatDate(date: Date = new Date()): string {
-        return date.toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true,
-        });
-    }
 
     ////////////////////
     // EVENT HANDLERS //
@@ -166,6 +170,13 @@
 
     const onSubmitAdd = async (modalFields: FilledModalFields) => {
         const newEvent = rawModalInfoToModalEvent(modalFields);
+
+        const errors = verifyEvent(newEvent);
+        // TODO: fix
+        if (errors !== empty) {
+            return errors;
+        }
+
         const event = await sendAddEvent(newEvent);
         if (event) {
             // correct date timezones for calendar
@@ -199,6 +210,13 @@
             return {} as ModalErrors;
         }
         const updatedEventInfo = rawModalInfoToModalEvent(modalFields);
+        
+        const errors = verifyEvent(updatedEventInfo);
+        // TODO: fix
+        if (errors !== empty) {
+            return errors;
+        }
+
         const updatedEvent = await sendUpdateEvent(selectedEvent._id, updatedEventInfo);
         if (updatedEvent) {
             // correct date timezones for calendar
@@ -405,19 +423,6 @@
         text-underline-offset: 2rem;
     }
 
-    h2 {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-top: 1rem;
-    }
-
-    h3 {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin: 0;
-        color: var(--cal-poly-secondary);
-    }
-
     a {
         font-size: 1.25rem;
         margin: 0;
@@ -476,39 +481,5 @@
 
     .filter-button:hover {
         opacity: 0.8;
-    }
-
-    .ethernet-availability {
-        text-align: center;
-    }
-
-    .ethernet-availability h3 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        color: var(--cal-poly-secondary);
-    }
-
-    .ethernet-availability table {
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-        border-collapse: collapse;
-        font-size: 1.25rem;
-    }
-
-    .ethernet-availability th, .ethernet-availability td {
-        border: 1px solid #ccc;
-        padding: 0.5rem;
-        text-align: center;
-    }
-
-    .ethernet-availability th {
-        background-color: var(--cal-poly-secondary);
-        color: white;
-        font-weight: bold;
-    }
-
-    .ethernet-availability td {
-        background-color: #f9f9f9;
     }
 </style>

@@ -82,36 +82,6 @@
             }
         });
 
-        // TODO: migrate all this logic
-
-        // const hasShowPublicField = fields.some(field => field.name === 'showPublic');
-        // const hasUsesLabField = fields.some(field => field.name === 'usesLab');
-
-        // if (hasShowPublicField && hasUsesLabField && !bindings['showPublic'] && !bindings['usesLab']) {
-        //     validationError = 'An event must either be public or use the lab!';
-        //     return;
-        // } else {
-        //     validationError = '';
-        // }
-
-        // const startTime = new Date(bindings['start'] as string);
-        // const endTime = new Date(bindings['end'] as string);
-        
-        // if (endTime <= startTime) {
-        //     timeError = 'End time must be after start time!';
-        //     return;
-        // } else {
-        //     timeError = '';
-        // }
-
-        // const requiredFields = ['Title', 'Start', 'End', 'Club', 'Location'];
-        // for (const field of requiredFields) {
-        //     if (fields.some(f => f.name.toLowerCase() === field.toLowerCase()) && !bindings[field.toLowerCase()]) {
-        //         validationError = `${field} is required!`;
-        //         return;
-        //     }
-        // }
-
         errors = await callback(formData);
         // TODO: how tf do i do this
         if (errors === empty) {
