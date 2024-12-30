@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
-    import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+    import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
 
     export let game: WithStringId<RosterGame>;
     export let team: WithStringId<RosterTeam>;
@@ -17,13 +17,12 @@
     }
 
     let editMemberModal: ModalForm;
-    let selectedFile: File | null = null;
 
     const modalFields = [
-        { name: 'name', type: 'text' },
-        { name: 'username', type: 'text' },
-        { name: 'role', type: 'text' },
-        { name: 'picture', type: 'file', accept:".jpg, .jpeg, .png, .webp", onFileChange: true },
+        { name: 'name', type: 'text', required: true },
+        { name: 'username', type: 'text', required: true },
+        { name: 'role', type: 'text', required: true },
+        { name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true },
     ] as ModalFieldDefinition[];
     
     //////////////////////-
@@ -72,17 +71,15 @@
         formData.append('name', modalFields.name as string);
         formData.append('username', modalFields.username as string);
         formData.append('role', modalFields.role as string);
-        if (selectedFile) {
-            formData.append('picture', selectedFile);
-        }
+        formData.append('picture', modalFields.picture as File);
 
         const updated = await sendUpdateMember(player._id, formData);
         if (updated) {
             player = updated;
             team.members = team.members.map(m => m._id === player._id ? player : m);
         }
-        selectedFile = null;
-        editMemberModal.hideModal();
+
+        return {} as ModalErrors;
     };
 
     const onSubmitDelete = async (values: FilledModalFields) => {
@@ -90,18 +87,8 @@
         if (deleted) {
             onRemove(player._id);
         }
-        selectedFile = null;
-        editMemberModal.hideModal();
-    };
 
-    const onFileChange = (event: CustomEvent) => {
-        const { file } = event.detail;
-
-        if (file) {
-            selectedFile = file;
-        } else {
-            console.error("File selection is invalid in MEMBERGRID");
-        }
+        return {} as ModalErrors;
     };
 </script>
 
@@ -128,8 +115,7 @@
         actions={[
             { name: 'Submit', callback: onSubmitEdit },
             { name: 'Delete', callback: onSubmitDelete },
-        ]} 
-        on:fileChange={onFileChange}
+        ]}
     />
 {/if}
 

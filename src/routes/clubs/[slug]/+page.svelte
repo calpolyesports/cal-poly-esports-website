@@ -2,9 +2,9 @@
     import { page } from '$app/stores';
     import { get } from 'svelte/store';
     import AboutText from './AboutText.svelte';
-	import type { WithStringId, Club, BoardMember } from '$lib/types';
+	import type { WithStringId, Club } from '$lib/types';
     import ModalForm from '$lib/ModalForm.svelte';
-    import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+    import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
 
     export let data;
     let club: WithStringId<Club> | undefined;
@@ -25,12 +25,10 @@
     let editMemberModal: ModalForm;
     let selectedMemberIndex: number | undefined;
 
-    let selectedFile: File | null = null;
-
     const memberModalFields = [
-        { name: 'name', type: 'text' },
-        { name: 'position', type: 'text' },
-        { name: 'profileImage', type: 'file', accept:".jpg, .jpeg, .png, .webp" },
+        { name: 'name', type: 'text', required: true },
+        { name: 'position', type: 'text', required: true },
+        { name: 'profileImage', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true },
     ] as ModalFieldDefinition[];
 
     //////////////////////
@@ -113,9 +111,7 @@
             const formData = new FormData
             formData.append('name', fields.name as string);
             formData.append('position', fields.position as string);
-            if (selectedFile) {
-                formData.append('profileImage', selectedFile);
-            }
+            formData.append('profileImage', fields.selectedFile as File);
 
             const member = await sendAddMember(club, formData);
             if (member) {
@@ -124,7 +120,7 @@
             }
         }
 
-        selectedFile = null;
+        return {} as ModalErrors;
     };
 
     const onClickEditMember = (index: number) => {
@@ -145,9 +141,7 @@
             const formData = new FormData();
             formData.append('name', fields.name as string);
             formData.append('position', fields.position as string);
-            if (selectedFile) {
-                formData.append('profileImage', selectedFile);
-            }
+            formData.append('profileImage', fields.selectedFile as File);
             const member = await sendUpdateMember(club, selectedMemberIndex, formData);
             if (member) {
                 club.boardMembers = club.boardMembers.map((m, i) => i === selectedMemberIndex ? member : m);
@@ -155,7 +149,7 @@
             }
         }
 
-        selectedFile = null;
+        return {} as ModalErrors;
     };
 
     const onSubmitDeleteMember = async () => {
@@ -167,17 +161,7 @@
             }
         }
 
-        selectedFile = null;
-    };
-
-    const onFileChange = (event: CustomEvent) => {
-        const { file } = event.detail;
-
-        if (file) {
-            selectedFile = file;
-        } else {
-            console.error("File selection is invalid");
-        }
+        return {} as ModalErrors;
     };
 </script>
 
@@ -223,8 +207,7 @@
             fields={memberModalFields}
             actions={[
                 { name: 'Submit', callback: onSubmitAddMember },
-            ]} 
-            on:fileChange={onFileChange}
+            ]}
         />
 
         <ModalForm
@@ -234,8 +217,7 @@
             actions={[
                 { name: 'Submit', callback: onSubmitEditMember },
                 { name: 'Delete', callback: onSubmitDeleteMember },
-            ]} 
-            on:fileChange={onFileChange}
+            ]}
         />
     {/if}
 {:else}

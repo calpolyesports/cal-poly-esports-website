@@ -6,7 +6,7 @@
 	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from "$lib/types";
 	import MemberGrid from "./MemberGrid.svelte";
 	import ModalForm from '$lib/ModalForm.svelte';
-    import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+    import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
 
 	interface ModalTeam {
 		name: string;
@@ -19,7 +19,7 @@
 	let addTeamModal: ModalForm;
 
 	const teamModalFields = [
-		{ name: 'name', type: 'text' },
+		{ name: 'name', type: 'text', required: true },
 	] as ModalFieldDefinition[];
 
 	////////////////////
@@ -108,7 +108,8 @@
 				return game;
 			});
 		}
-		addTeamModal.hideModal();
+
+		return {} as ModalErrors;
 	};
 
 	const onTeamRemove = (teamId: string) => {

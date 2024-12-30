@@ -2,7 +2,7 @@
     import PlayerCard from './PlayerCard.svelte';
     import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
     import ModalForm from '$lib/ModalForm.svelte';
-    import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+    import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
     
     interface ModalMember {
         name: string;
@@ -21,19 +21,18 @@
     export let onRemove: (id: string) => void;
     
     let addMemberModal: ModalForm;
-    let selectedFile: File | null = null;
 
     const memberModalFields = [
-        { name: 'name', type: 'text' },
-        { name: 'username', type: 'text' },
-        { name: 'role', type: 'text' },
-        { name: 'picture', type: 'file', accept:".jpg, .jpeg, .png, .webp", onFileChange: true },
+        { name: 'name', type: 'text', required: true },
+        { name: 'username', type: 'text', required: true },
+        { name: 'role', type: 'text', required: true },
+        { name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true },
     ] as ModalFieldDefinition[];
 
     let editTeamModal: ModalForm;
 
     const teamModalFields = [
-        { name: 'name', type: 'text' },
+        { name: 'name', type: 'text', required: true },
     ] as ModalFieldDefinition[];
 
     //////////////////////
@@ -90,17 +89,14 @@
 
     const onSubmitAddMember = async (modalFields: FilledModalFields) => {
         const formData = new FormData();
-        formData.append('name', modalFields.name);
-        formData.append('username', modalFields.username);
-        formData.append('role', modalFields.role);
-        if (selectedFile) {
-            formData.append('picture', selectedFile);
-        }
+        formData.append('name', modalFields.name as string);
+        formData.append('username', modalFields.username as string);
+        formData.append('role', modalFields.role as string);
+        formData.append('picture', modalFields.picture as File);
 
         sendAddMember(formData);
-
-        addMemberModal.hideModal();
-        selectedFile = null;
+        
+        return {} as ModalErrors;
     };
 
     const onClickEditTeam = () => {
@@ -119,7 +115,8 @@
             team = responseTeam;
             console.log(team);
         }
-        editTeamModal.hideModal();
+        
+        return {} as ModalErrors;
     };
 
     const onSubmitDeleteTeam = async (values: FilledModalFields) => {
@@ -127,21 +124,12 @@
         if (deleted) {
             onRemove(team._id);
         }
-        editTeamModal.hideModal();
+        
+        return {} as ModalErrors;
     };
 
     const onMemberRemove = (id: string) => {
         team.members = team.members.filter(m => m._id !== id);
-    };
-
-    const onFileChange = (event: CustomEvent) => {
-        const { file } = event.detail;
-
-        if (file) {
-            selectedFile = file;
-        } else {
-            console.error("File selection is invalid in MEMBERGRID");
-        }
     };
 </script>
 
@@ -172,9 +160,7 @@
         fields={memberModalFields}
         actions={[
             { name: 'Submit', callback: onSubmitAddMember },
-        ]}
-        on:fileChange={onFileChange} 
-    />
+        ]} />
 
     <ModalForm
         bind:this={editTeamModal}
@@ -183,7 +169,7 @@
         actions={[
             { name: 'Submit', callback: onSubmitEditTeam },
             { name: 'Delete', callback: onSubmitDeleteTeam },
-        ]}  />
+        ]} />
 {/if}
 
 <style>

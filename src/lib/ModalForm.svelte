@@ -1,26 +1,24 @@
 <script lang="ts" context="module">
     export type ModalFieldDefinition = { 
-        name: string, 
+        name: string,
         type: 'date' | 'text' | 'dropdown' | 'file' | 'checkbox', 
+        required: boolean,
         options?: [string, string][],
-        accept?: string
+        validExtensions?: [string],
     };
     export type FilledModalFields = { [key: string]: string | Date | File | boolean | null };
-    export type ModalAction = { name: string, callback: (values: FilledModalFields) => Promise<void> };
+    export type ModalAction = { name: string, callback: (values: FilledModalFields) => Promise<ModalErrors> };
+    export type ModalErrors = { [key: string]: string }
 </script>
 
 <script lang="ts">
     import Modal from './Modal.svelte';
-    import { createEventDispatcher } from 'svelte';
 
     export let title = '';
     export let fields: ModalFieldDefinition[] = [];
     export let actions: ModalAction[] = [];
-
-    let fileError = '';
-    let isFileValid = true;
-    let validationError = '';
-    let timeError = '';
+    
+    let errors: ModalErrors;
 
     const bindings = fields.reduce((acc, field) => {
         if (field.type === 'file') {
@@ -32,8 +30,6 @@
         }
         return acc;
     }, {} as { [key: string]: string | File | boolean | null });
-
-    const dispatch = createEventDispatcher();
 
     let modal: Modal;
 
@@ -71,49 +67,56 @@
                 bindings[field.name] = '';
             }
         });
-        validationError = '';
-        timeError = '';
+        errors = {};
     };
 
-    async function runCallbackWithFormData(callback: (values: FilledModalFields) => Promise<void>) {
+    async function runCallbackWithFormData(callback: (values: FilledModalFields) => Promise<ModalErrors>) {
         const formData: FilledModalFields = {};
+        errors = {};
         fields.forEach(field => {
             const value = bindings[field.name];
-            formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
+            if (field.required && (value === '' || value === null)) {
+                errors[field.name] = "This field is required.";
+            } else {
+                formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
+            }
         });
 
-        const hasShowPublicField = fields.some(field => field.name === 'showPublic');
-        const hasUsesLabField = fields.some(field => field.name === 'usesLab');
+        // TODO: migrate all this logic
 
-        if (hasShowPublicField && hasUsesLabField && !bindings['showPublic'] && !bindings['usesLab']) {
-            validationError = 'An event must either be public or use the lab!';
-            return;
-        } else {
-            validationError = '';
-        }
+        // const hasShowPublicField = fields.some(field => field.name === 'showPublic');
+        // const hasUsesLabField = fields.some(field => field.name === 'usesLab');
 
-        const startTime = new Date(bindings['start'] as string);
-        const endTime = new Date(bindings['end'] as string);
+        // if (hasShowPublicField && hasUsesLabField && !bindings['showPublic'] && !bindings['usesLab']) {
+        //     validationError = 'An event must either be public or use the lab!';
+        //     return;
+        // } else {
+        //     validationError = '';
+        // }
+
+        // const startTime = new Date(bindings['start'] as string);
+        // const endTime = new Date(bindings['end'] as string);
         
-        if (endTime <= startTime) {
-            timeError = 'End time must be after start time!';
-            return;
-        } else {
-            timeError = '';
+        // if (endTime <= startTime) {
+        //     timeError = 'End time must be after start time!';
+        //     return;
+        // } else {
+        //     timeError = '';
+        // }
+
+        // const requiredFields = ['Title', 'Start', 'End', 'Club', 'Location'];
+        // for (const field of requiredFields) {
+        //     if (fields.some(f => f.name.toLowerCase() === field.toLowerCase()) && !bindings[field.toLowerCase()]) {
+        //         validationError = `${field} is required!`;
+        //         return;
+        //     }
+        // }
+
+        errors = await callback(formData);
+        // TODO: how tf do i do this
+        if (errors === empty) {
+            hideModal();
         }
-
-        const requiredFields = ['Title', 'Start', 'End', 'Club', 'Location'];
-        for (const field of requiredFields) {
-            if (fields.some(f => f.name.toLowerCase() === field.toLowerCase()) && !bindings[field.toLowerCase()]) {
-                validationError = `${field} is required!`;
-                return;
-            }
-        }
-
-        validationError = '';
-
-        await callback(formData);
-        hideModal();
     }
 
 
@@ -122,21 +125,21 @@
 
         if (input && input.files && input.files.length > 0) {
             const file = input.files[0];
-            const validExtensions = field.accept ? field.accept.split(',').map(ext => ext.trim()) : [];
+            // TODO: cleanup?
+            const validExtensions = field.validExtensions ?? ([] as unknown as [string]);
 
             const fileExtension = file.name.split('.').pop()?.toLowerCase();
             if (validExtensions.length > 0 && !validExtensions.includes(`.${fileExtension}`)) {
-                fileError = `File must be of type: ${validExtensions.join(', ')}`;
-                isFileValid = false;
+                errors[field.name] = `File must be of type: ${validExtensions.join(', ')}`;
+                bindings[field.name] = null;
             } else {
-                fileError = '';
-                isFileValid = true;
+                // TODO: does this work????????
+                delete errors[field.name];
                 bindings[field.name] = file;
             }
-
-            dispatch('fileChange', { field, file });
         } else {
-            console.error("File input or file selection is invalid");
+            errors[field.name] = "File input or file selection is invalid";
+            bindings[field.name] = null;
         }
     }
 </script>
@@ -146,7 +149,7 @@
         {#each fields as field}
             <label for={field.name}>
                 {field.name}
-                {#if ['title', 'start', 'end', 'club', 'location'].includes(field.name)}
+                {#if field.required}
                     <span class="required-asterisk">*</span>
                 {/if}
             </label>
@@ -164,30 +167,22 @@
                 <input
                     id={field.name}
                     type="file"
-                    accept={field.accept}
+                    accept={field.validExtensions?.join()}
                     on:change={(event) => handleFileChange(event, field)}
                 />
-                {#if fileError}
-                    <p class="error-message">{fileError}</p>
-                {/if}
             {:else if field.type === 'checkbox'}
+                // TODO: idk how to make this disappear
                 <input type="checkbox" id={field.name} name={field.name} bind:checked={bindings[field.name]} />
+            {/if}
+            {#if field.name in errors}
+                <p class="error-message">{errors[field.name]}</p>
             {/if}
         {/each}
 
         <br>
-
-        <!-- Validation error messages -->
-        {#if validationError}
-            <p class="error-message">{validationError}</p>
-        {/if}
-        
-        {#if timeError}
-            <p class="error-message">{timeError}</p>
-        {/if}
         
         {#each actions as action}
-            <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)} disabled={!isFileValid}>{action.name}</button>
+            <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)}>{action.name}</button>
         {/each}
     </div>
 </Modal>
