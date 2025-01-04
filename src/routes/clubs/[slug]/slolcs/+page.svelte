@@ -6,6 +6,7 @@
             name: string;
             username: string;
             role: string;
+            imageFilename?: string;
         }[];
     }
 
@@ -14,88 +15,88 @@
             year: "2023 - 2024",
             teamName: "Waffle Stompers",
             members: [
-                { name: "Jacob Iniguez", username: "jcub", role: "Top" },
-                { name: "Jesus Contreras", username: "floppitybopps", role: "Jungle" },
-                { name: "Tyler Brady", username: "BUDDA69", role: "Mid" },
-                { name: "Carlos Hernandez", username: "Billong", role: "ADC" },
-                { name: "Theo Sprouse", username: "Fear", role: "Supp" }
+                { name: "Jacob Iniguez", username: "jcub", role: "Top", imageFilename: "jcub.jpg" },
+                { name: "Jesus Contreras", username: "floppitybopps", role: "Jungle", imageFilename: "floppitybopps.jpg" },
+                { name: "Tyler Brady", username: "BUDDA69", role: "Mid", imageFilename: "BUDDA69.webp" },
+                { name: "Carlos Hernandez", username: "Billong", role: "ADC", imageFilename: "Billong.jpg" },
+                { name: "Theo Sprouse", username: "Fear", role: "Supp", imageFilename: "Fear.webp" }
             ]
         },
         {
             year: "2022 - 2023",
             teamName: "Dive Our Bot",
             members: [
-                { name: "Jason Chang", username: "headpat machine", role: "Top" },
-                { name: "Anson Chen", username: "Gyaraados", role: "Jungle" },
-                { name: "Brian Liu", username: "bliu1", role: "Mid" },
-                { name: "Valeria Iniguez", username: "Ghoulfreak", role: "ADC" },
-                { name: "Teghvir Grewal", username: "TeggyWeggy", role: "Support" }
+                { name: "Jason Chang", username: "headpat machine", role: "Top", imageFilename: "headpat_machine.jpg" },
+                { name: "Anson Chen", username: "Gyaraados", role: "Jungle", imageFilename: "Gyaraados.jpg" },
+                { name: "Brian Liu", username: "bliu1", role: "Mid", imageFilename: "bliu1.webp" },
+                { name: "Valeria Iniguez", username: "Ghoulfreak", role: "ADC", imageFilename: "Ghoulfreak.png" },
+                { name: "Teghvir Grewal", username: "TeggyWeggy", role: "Support", imageFilename: "TeggyWeggy.jpg" }
             ]
         },
         {
             year: "2021 - 2022",
             teamName: "Kitten Cwusade :3",
             members: [
-                { name: "Jacob Feinstein", username: "Pinkachu", role: "Top" },
-                { name: "John Stapakis", username: "StingingChicken", role: "Jungle" },
-                { name: "Kaveh Shafiei", username: "Yolkie", role: "Mid" },
-                { name: "Wei Zhao", username: "PokGaiWeeWee", role: "ADC" },
-                { name: "Evelyn Tay", username: "Small Fluffy Cat", role: "Support" }
+                { name: "Jacob Feinstein", username: "Pinkachu", role: "Top", imageFilename: "Pinkachu.jpg" },
+                { name: "John Stapakis", username: "StingingChicken", role: "Jungle", imageFilename: "StingingChicken.jpg" },
+                { name: "Kaveh Shafiei", username: "Yolkie", role: "Mid", imageFilename: "Yolkie.jpg" },
+                { name: "Wei Zhao", username: "PokGaiWeeWee", role: "ADC", imageFilename: "PokGaiWeeWee.jpg" },
+                { name: "Evelyn Tay", username: "Small Fluffy Cat", role: "Support", imageFilename: "Small_Fluffy_Cat.jpg" }
             ]
         },
         {
             year: "2020 - 2021",
             teamName: "Not Team Ten",
             members: [
-                { name: "Dylan Tabalan", username: "umnotsosure", role: "Top" },
-                { name: "Justin Chan", username: "Shishinik", role: "Jungle" },
-                { name: "Yicherpe Vang", username: "Ibei", role: "Mid" },
-                { name: "Laurent Hirakata", username: "hmhsl", role: "ADC" },
-                { name: "Kenneth Thai", username: "LionwingsX", role: "Support" }
+                { name: "Dylan Tabalan", username: "umnotsosure", role: "Top", imageFilename: "umnotsosure.jpg" },
+                { name: "Justin Chan", username: "Shishinik", role: "Jungle", imageFilename: "Shishinik.jpg" },
+                { name: "Yicherpe Vang", username: "Ibei", role: "Mid", imageFilename: "Ibei.jpg" },
+                { name: "Laurent Hirakata", username: "hmhsl", role: "ADC", imageFilename: "hmhsl.jpg" },
+                { name: "Kenneth Thai", username: "LionwingsX", role: "Support", imageFilename: "LionwingsX.jpg" }
             ]
         },
         {
             year: "2019 - 2020",
             teamName: "___",
             members: [
-                { name: "Scott Seno", username: "FuzzyHamster", role: "Top" },
-                { name: "Alex Halaszynski", username: "MrMooraf", role: "Jungle" },
-                { name: "Sam Park", username: "Rampakslue", role: "Mid" },
-                { name: "Wei Zhao", username: "PokGaiWeeWee", role: "ADC" },
-                { name: "Anthony Tyler", username: "EdibleTeddyBear", role: "Support" }
+                { name: "Scott Seno", username: "FuzzyHamster", role: "Top", imageFilename: "FuzzyHamster.jpeg" },
+                { name: "Alex Halaszynski", username: "MrMooraf", role: "Jungle", imageFilename: "MrMooraf.jpg" },
+                { name: "Sam Park", username: "Rampakslue", role: "Mid", imageFilename: "Rampakslue.jpg" },
+                { name: "Wei Zhao", username: "PokGaiWeeWee", role: "ADC", imageFilename: "PokGaiWeeWee2.jpg" },
+                { name: "Anthony Tyler", username: "EdibleTeddyBear", role: "Support", imageFilename: "EdibleTeddyBear.jpg" }
             ]
         },
         {
             year: "2018 - 2019",
             teamName: "Team 7",
             members: [
-                { name: "Eric Ying", username: "Freuclid", role: "Top" },
-                { name: "Nathan Hamilton", username: "Nathamilton", role: "Jungle" },
-                { name: "Dario Delgadillo", username: "RedDragon0001", role: "Mid" },
-                { name: "Kyle Van", username: "An0lized", role: "ADC" },
-                { name: "Earianne Bihis", username: "Scarletlover", role: "Support" }
+                { name: "Eric Ying", username: "Freuclid", role: "Top", imageFilename: "Freuclid.jpg" },
+                { name: "Nathan Hamilton", username: "Nathamilton", role: "Jungle", imageFilename: "Nathamilton.jpg" },
+                { name: "Dario Delgadillo", username: "RedDragon0001", role: "Mid", imageFilename: "RedDragon0001.jpg" },
+                { name: "Kyle Van", username: "An0lized", role: "ADC", imageFilename: "An0lized.jpg" },
+                { name: "Earianne Bihis", username: "Scarletlover", role: "Support", imageFilename: "Scarletlover.jpg" }
             ]
         },
         {
             year: "2017 - 2018",
             teamName: "Meme Team",
             members: [
-                { name: "Scott Seno", username: "FuzzyHamster", role: "Top" },
-                { name: "Nick Nordheim", username: "Arceus411", role: "Jungle" },
-                { name: "Kobe Phan", username: "Dischord", role: "Mid" },
-                { name: "Lucas Kalin", username: "Lucas", role: "ADC" },
-                { name: "Garrett Cheng", username: "Paperplate", role: "Support" }
+                { name: "Scott Seno", username: "FuzzyHamster", role: "Top", imageFilename: "FuzzyHamster2.jpg" },
+                { name: "Nick Nordheim", username: "Arceus411", role: "Jungle", imageFilename: "Arceus411.jpg" },
+                { name: "Kobe Phan", username: "Dischord", role: "Mid", imageFilename: "Dischord.jpg" },
+                { name: "Lucas Kalin", username: "Lucas", role: "ADC", imageFilename: "Lucas.jpg" },
+                { name: "Garrett Cheng", username: "Paperplate", role: "Support", imageFilename: "Paperplate.jpg" }
             ]
         },
         {
             year: "2016 - 2017",
             teamName: "Team 1der",
             members: [
-                { name: "Sam Verkruyse", username: "Sprucegroose", role: "Top" },
-                { name: "Matt Halvorson", username: "MsterChief-Batman", role: "Jungle" },
-                { name: "Scott Kuphaldt", username: "Soccerstar007", role: "Mid" },
-                { name: "Ian Fireman", username: "Worlds Best Noob", role: "ADC" },
-                { name: "Earianne Bihis", username: "Scarletlover", role: "Support" }
+                { name: "Sam Verkruyse", username: "Sprucegroose", role: "Top", imageFilename: "Sprucegroose.jpg" },
+                { name: "Matt Halvorson", username: "MsterChief-Batman", role: "Jungle", imageFilename: "MsterChief-Batman.jpg" },
+                { name: "Scott Kuphaldt", username: "Soccerstar007", role: "Mid", imageFilename: "Soccerstar007.jpg" },
+                { name: "Ian Fireman", username: "Worlds Best Noob", role: "ADC", imageFilename: "Worlds_Best_Noob.jpg" },
+                { name: "Earianne Bihis", username: "Scarletlover", role: "Support", imageFilename: "Scarletlover2.jpg" }
             ]
         }
     ];
@@ -109,20 +110,25 @@
 
 <div class="description">
     <p>SLOLCS is a friendly SLOLERS sponsored tournament between members of the club. Each team consists of 5 members of varying skill ranges that compete against one another.</p>
-    <p><b>2023 - 2024 SLOLCS has completed! The winners are below, and stay tuned for next years Tournament!</b></p>
+    <p><b>2023 - 2024 SLOLCS has completed! The winners are below, and stay tuned for next year's Tournament!</b></p>
 </div>
 
 <div class="winners">
     <h2>Past Winners</h2>
     {#each winners as winner}
-        <h3>{winner.year} SLOLCS Champions</h3>
-        <h4>{winner.teamName}</h4>
+        <h4>{winner.year} SLOLCS Champions</h4>
+        <h3>{winner.teamName}</h3>
         <div class="members">
             {#each winner.members as member}
                 <div class="member">
-                    <p>{member.name}</p>
-                    <p><b>{member.username}</b></p>
-                    <p>{member.role}</p>
+                    <div class="member-background-image">
+                        <img src={`https://cpsloesports.blob.core.windows.net/slolcs/cards/${member.imageFilename}`} alt={member.name} />
+                    </div>
+                    <div class="member-info">
+                        <p>{member.name}</p>
+                        <p><b>{member.username}</b></p>
+                        <p>{member.role}</p>
+                    </div>
                 </div>
             {/each}
         </div>
@@ -164,19 +170,49 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        margin: 3rem 0;
-
+        flex-wrap: wrap;
+        margin-top: 3rem;
+        margin-bottom: 5rem;
+        gap: 1rem;
     }
 
     div.member {
-        width: 100%;
+        width: 20rem;
+        height: 10rem;
+        position: relative;
+        padding: 0.5rem;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
     }
 
-    div.member > p {
+    div.member-info p {
         margin: 0;
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        color: white;
+        text-shadow: 0 0 0.5rem rgba(0, 0, 0, 1);
+    }
+
+    div.member-background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: black;
+        border-radius: 1rem;
+    }
+
+    div.member-background-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        opacity: 0.7;
     }
 
     h1 {
@@ -188,8 +224,8 @@
     h2 {
         text-align: center;
         font-size: 4rem;
-        margin-top: 1rem;
-        margin-bottom: 3rem;
+        margin-top: 0rem;
+        margin-bottom: 5rem;
         text-decoration-line: underline;
         text-decoration-color: var(--cal-poly-secondary);
         text-decoration-thickness: 0.3rem;
@@ -198,7 +234,7 @@
 
     h3 {
         text-align: center;
-        font-size: 2.5rem;
+        font-size: 3rem;
         margin: 0rem;
     }
 
