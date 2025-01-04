@@ -19,7 +19,7 @@
                 { name: "Jesus Contreras", username: "floppitybopps", role: "Jungle", imageFilename: "floppitybopps.jpg" },
                 { name: "Tyler Brady", username: "BUDDA69", role: "Mid", imageFilename: "BUDDA69.webp" },
                 { name: "Carlos Hernandez", username: "Billong", role: "ADC", imageFilename: "Billong.jpg" },
-                { name: "Theo Sprouse", username: "Fear", role: "Supp", imageFilename: "Fear.webp" }
+                { name: "Theo Sprouse", username: "Fear", role: "Support", imageFilename: "Fear.webp" }
             ]
         },
         {
@@ -37,7 +37,7 @@
             year: "2021 - 2022",
             teamName: "Kitten Cwusade :3",
             members: [
-                { name: "Jacob Feinstein", username: "Pinkachu", role: "Top", imageFilename: "Pinkachu.jpg" },
+                { name: "Lyra Feinstein", username: "Pinkachu", role: "Top", imageFilename: "Pinkachu.jpg" },
                 { name: "John Stapakis", username: "StingingChicken", role: "Jungle", imageFilename: "StingingChicken.jpg" },
                 { name: "Kaveh Shafiei", username: "Yolkie", role: "Mid", imageFilename: "Yolkie.jpg" },
                 { name: "Wei Zhao", username: "PokGaiWeeWee", role: "ADC", imageFilename: "PokGaiWeeWee.jpg" },
