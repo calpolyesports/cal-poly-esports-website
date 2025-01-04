@@ -171,8 +171,7 @@
         const newEvent = rawModalInfoToModalEvent(modalFields);
 
         const errors = verifyEvent(newEvent);
-        // TODO: fix
-        if (errors !== empty) {
+        if (Object.keys(errors).length !== 0) {
             return errors;
         }
 
@@ -211,8 +210,7 @@
         const updatedEventInfo = rawModalInfoToModalEvent(modalFields);
         
         const errors = verifyEvent(updatedEventInfo);
-        // TODO: fix
-        if (errors !== empty) {
+        if (Object.keys(errors).length !== 0) {
             return errors;
         }
 

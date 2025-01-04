@@ -83,8 +83,7 @@
         });
 
         errors = await callback(formData);
-        // TODO: how tf do i do this
-        if (errors === empty) {
+        if (Object.keys(errors).length === 0) {
             hideModal();
         }
     }
