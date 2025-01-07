@@ -12,7 +12,7 @@
 
     const winners: WinningTeam[] = [
         {
-            year: "2023 - 2024",
+            year: "2024",
             teamName: "Waffle Stompers",
             members: [
                 { name: "Jacob Iniguez", username: "jcub", role: "Top", imageFilename: "jcub.jpg" },
@@ -23,7 +23,7 @@
             ]
         },
         {
-            year: "2022 - 2023",
+            year: "2023",
             teamName: "Dive Our Bot",
             members: [
                 { name: "Jason Chang", username: "headpat machine", role: "Top", imageFilename: "headpat_machine.jpg" },
@@ -34,7 +34,7 @@
             ]
         },
         {
-            year: "2021 - 2022",
+            year: "2022",
             teamName: "Kitten Cwusade :3",
             members: [
                 { name: "Lyra Feinstein", username: "Pinkachu", role: "Top", imageFilename: "Pinkachu.jpg" },
@@ -45,7 +45,7 @@
             ]
         },
         {
-            year: "2020 - 2021",
+            year: "2021",
             teamName: "Not Team Ten",
             members: [
                 { name: "Dylan Tabalan", username: "umnotsosure", role: "Top", imageFilename: "umnotsosure.jpg" },
@@ -56,7 +56,7 @@
             ]
         },
         {
-            year: "2019 - 2020",
+            year: "2020",
             teamName: "___",
             members: [
                 { name: "Scott Seno", username: "FuzzyHamster", role: "Top", imageFilename: "FuzzyHamster.jpeg" },
@@ -67,7 +67,7 @@
             ]
         },
         {
-            year: "2018 - 2019",
+            year: "2019",
             teamName: "Team 7",
             members: [
                 { name: "Eric Ying", username: "Freuclid", role: "Top", imageFilename: "Freuclid.jpg" },
@@ -78,7 +78,7 @@
             ]
         },
         {
-            year: "2017 - 2018",
+            year: "2018",
             teamName: "Meme Team",
             members: [
                 { name: "Scott Seno", username: "FuzzyHamster", role: "Top", imageFilename: "FuzzyHamster2.jpg" },
@@ -89,7 +89,7 @@
             ]
         },
         {
-            year: "2016 - 2017",
+            year: "2017",
             teamName: "Team 1der",
             members: [
                 { name: "Sam Verkruyse", username: "Sprucegroose", role: "Top", imageFilename: "Sprucegroose.jpg" },
@@ -109,8 +109,7 @@
 </div>
 
 <div class="description">
-    <p>SLOLCS is a friendly SLOLERS sponsored tournament between members of the club. Each team consists of 5 members of varying skill ranges that compete against one another.</p>
-    <p><b>2023 - 2024 SLOLCS has completed! The winners are below, and stay tuned for next year's Tournament!</b></p>
+    <p>Cal Poly League of Legends proudly hosts SLOLCS, an intramural tournament where members of the club compete against one another in balanced teams throughout the quarter for the championship title!</p>
 </div>
 
 <div class="winners">
@@ -156,6 +155,14 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+    }
+
+    div.description {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
     }
 
     div.winners {
@@ -219,6 +226,7 @@
         text-align: center;
         color: white;
         font-size: 10rem;
+        text-shadow: 0 0 1.5rem rgba(0, 0, 0, 0.8);
     }
 
     h2 {
@@ -248,5 +256,38 @@
         font-size: 2rem;
         margin: 2rem;
         text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        div.header {
+            height: 10rem;
+        }
+
+        h1 {
+            font-size: 4rem;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+        }
+
+        h4 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            font-size: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        div.member {
+            width: 15rem;
+            height: 7.5rem;
+        }
     }
 </style>
