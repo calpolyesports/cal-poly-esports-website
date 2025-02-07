@@ -81,6 +81,12 @@ const boardMemberSchema = new Schema({
     profileImage: String,
 }, { _id: false });
 
+const clubEventSchema = new Schema({
+    name: { type: String, required: true },
+    url: { type: String, required: true },
+    image: { type: String, required: true },
+}, { _id: false });
+
 const clubSchema = new Schema({
     clubName: { type: String, required: true },
     fullName: { type: String, required: true },
@@ -90,5 +96,6 @@ const clubSchema = new Schema({
     urlName: { type: String, required: true },
     color: { type: String, required: true },
     display: { type: Boolean, default: true },
+    events: [clubEventSchema],
 });
 export const ClubModel = model('Club', clubSchema);

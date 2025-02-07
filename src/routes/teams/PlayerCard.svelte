@@ -115,7 +115,11 @@
     <div class="bottom-shadow"></div>
     <div class="text">
         <p>{player.name}</p>
-        <h1>{player.username}</h1>
+        {#if player.username.length > 11}
+            <h1 class="smaller-username">{player.username}</h1>
+        {:else}
+            <h1>{player.username}</h1>
+        {/if}
         <h2>{player.role}</h2>
     </div>
 </div>
@@ -171,6 +175,11 @@
         height: 100%;
         object-fit: cover;
         z-index: -1;
+        transition: 0.2s;
+    }
+
+    div.player-card:hover img {
+        transform: scale(1.05);
     }
 
     div.bottom-shadow {
@@ -187,6 +196,15 @@
         position: relative;
         z-index: 1;
         text-align: center;
+        transition: 0.2s;
+    }
+
+    div.player-card:hover div.text {
+        transform: scale(1.05);
+    }
+
+    h1.smaller-username {
+        font-size: 1.5rem;
     }
 
     h1, h2, p {
