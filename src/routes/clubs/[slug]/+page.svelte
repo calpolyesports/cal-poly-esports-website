@@ -5,6 +5,7 @@
 	import type { WithStringId, Club, BoardMember } from '$lib/types';
     import ModalForm from '$lib/ModalForm.svelte';
     import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+	import ClubEventLink from './ClubEventLink.svelte';
 
     export let data;
     let club: WithStringId<Club> | undefined;
@@ -195,6 +196,15 @@
         <AboutText html={club.aboutHtml} />
     {/if}
 
+    {#if club.events.length > 0}
+        <div class="club-events">
+            <h2>Events</h2>
+            {#each club.events as event}
+                <ClubEventLink {event} />
+            {/each}
+        </div>
+    {/if}
+
     {#if club.boardMembers.length > 0 || canEdit}
         <h2>Board Members</h2>
         {#if canEdit}
@@ -254,15 +264,39 @@
         text-underline-offset: 2rem;
     }
 
+    h2 {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        text-decoration-line: underline;
+        text-decoration-color: var(--cal-poly-secondary);
+        text-decoration-thickness: 0.2rem;
+        text-underline-offset: 1rem;
+    }
+
     @media (max-width: 768px) {
         h1 {
             text-underline-offset: 1rem;
+        }
+
+        h1 {
+            text-underline-offset: 0.7rem;
         }
     }
 
     p {
         font-size: 1.5rem;
         margin-bottom: 2rem;
+    }
+
+    div.club-events {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+        margin: 3rem 0;
     }
 
     ul.board-members {
