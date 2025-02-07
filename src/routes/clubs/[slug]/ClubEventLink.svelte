@@ -30,6 +30,7 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: 0.2s;
     }
 
     .club-event-link p {
@@ -44,5 +45,15 @@
         color: white;
         font-size: 6rem;
         text-shadow: 0 0 1.5rem rgba(0, 0, 0, 0.8);
+        transition: 0.2s;
+        pointer-events: none;
+    }
+
+    .club-event-link img:hover {
+        transform: scale(1.05);
+    }
+
+    .club-event-link img:hover + p {
+        transform: scale(1.1);
     }
 </style>

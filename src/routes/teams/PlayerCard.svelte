@@ -175,6 +175,11 @@
         height: 100%;
         object-fit: cover;
         z-index: -1;
+        transition: 0.2s;
+    }
+
+    div.player-card:hover img {
+        transform: scale(1.05);
     }
 
     div.bottom-shadow {
@@ -191,6 +196,11 @@
         position: relative;
         z-index: 1;
         text-align: center;
+        transition: 0.2s;
+    }
+
+    div.player-card:hover div.text {
+        transform: scale(1.05);
     }
 
     h1.smaller-username {
