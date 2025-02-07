@@ -115,7 +115,11 @@
     <div class="bottom-shadow"></div>
     <div class="text">
         <p>{player.name}</p>
-        <h1>{player.username}</h1>
+        {#if player.username.length > 11}
+            <h1 class="smaller-username">{player.username}</h1>
+        {:else}
+            <h1>{player.username}</h1>
+        {/if}
         <h2>{player.role}</h2>
     </div>
 </div>
@@ -187,6 +191,10 @@
         position: relative;
         z-index: 1;
         text-align: center;
+    }
+
+    h1.smaller-username {
+        font-size: 1.5rem;
     }
 
     h1, h2, p {
