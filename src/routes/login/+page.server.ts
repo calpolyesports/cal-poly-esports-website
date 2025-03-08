@@ -1,7 +1,7 @@
 import { lucia } from '$lib/server/auth';
 import { UserModel } from '$lib/server/models';
 import { fail, redirect } from '@sveltejs/kit';
-import { verify } from '@node-rs/argon2';
+import { verify, hash } from '@node-rs/argon2';
 import { ObjectId } from 'mongodb';
 
 import type { ServerLoad, Actions } from '@sveltejs/kit';
@@ -59,6 +59,13 @@ export const actions: Actions = {
                 message: 'Invalid username or password'
             });
         }
+
+        console.log(await hash("flipreset", {
+			memoryCost: 19456,
+			timeCost: 2,
+			outputLen: 32,
+			parallelism: 1,
+        }));
 
         const session = await lucia.createSession(existingUser._id.toString(), {});
         const sessionCookie = lucia.createSessionCookie(session.id);
