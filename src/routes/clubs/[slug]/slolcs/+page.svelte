@@ -12,6 +12,17 @@
 
     const winners: WinningTeam[] = [
         {
+            year: "2025",
+            teamName: "Baron Brawling Lovers",
+            members: [
+                { name: "Justin Chan", username: "shishinik", role: "Top", imageFilename: "shishinik.jpg" },
+                { name: "Jesus Contreras", username: "floppitybopps", role: "Jungle", imageFilename: "floppitybopps2.jpg" },
+                { name: "Ranen Javelona", username: "Raycovel", role: "Mid", imageFilename:"Raycovel.jpg" },
+                { name: "Nick Hernandez", username: "Headon", role: "ADC", imageFilename: "Headon.jpg" },
+                { name: "Aaron Guerrero", username: "ELIGMApp", role: "Support", imageFilename: "ELIGMApp.jpg" }
+            ]
+        },
+        {
             year: "2024",
             teamName: "Waffle Stompers",
             members: [
@@ -121,7 +132,7 @@
             {#each winner.members as member}
                 <div class="member">
                     <div class="member-background-image">
-                        <img src={`https://cpsloesports.blob.core.windows.net/slolcs/cards/${member.imageFilename}`} alt={member.name} />
+                        <img src={`https://cpsloesports.blob.core.windows.net/events/slolcs/cards/${member.imageFilename}`} alt={member.name} />
                     </div>
                     <div class="member-info">
                         <p>{member.name}</p>
@@ -143,7 +154,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background-image: url('https://cpsloesports.blob.core.windows.net/slolcs/slolcs_background.jpg');
+        background-image: url('https://cpsloesports.blob.core.windows.net/events/slolcs/slolcs_background.jpg');
         background-size: cover;
     }
 
