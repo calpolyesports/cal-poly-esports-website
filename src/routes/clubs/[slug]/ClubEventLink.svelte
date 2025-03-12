@@ -23,6 +23,13 @@
         overflow: hidden;
     }
 
+    @media (max-width: 768px) {
+        .club-event-link {
+            width: 100%;
+            height: 7rem;
+        }
+    }
+
     .club-event-link img {
         position: absolute;
         top: 0;
@@ -47,6 +54,13 @@
         text-shadow: 0 0 1.5rem rgba(0, 0, 0, 0.8);
         transition: 0.2s;
         pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+        .club-event-link p {
+            top: -50%;
+            font-size: 4rem;
+        }
     }
 
     .club-event-link img:hover {
