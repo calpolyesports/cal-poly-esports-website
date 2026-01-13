@@ -62,10 +62,17 @@ export interface Club {
     urlName: string;
     color: string;
     display: boolean;
+    events: ClubEvent[];
 }
 
 export interface BoardMember {
     name: string;
     position: string;
     profileImage: string;
+}
+
+export interface ClubEvent {
+    name: string;
+    url: string;
+    image: string;
 }
