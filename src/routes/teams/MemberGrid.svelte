@@ -1,202 +1,209 @@
 <script lang="ts">
-    import PlayerCard from './PlayerCard.svelte';
-    import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
-    import ModalForm from '$lib/ModalForm.svelte';
-    import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
-    
-    interface ModalMember {
-        name: string;
-        username: string;
-        role: string;
-        picture: string;
-    }
+	import PlayerCard from './PlayerCard.svelte';
+	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
+	import ModalForm from '$lib/ModalForm.svelte';
+	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
 
-    interface ModalTeam {
-        name: string;
-    }
-    
-    export let game: WithStringId<RosterGame>;
-    export let team: WithStringId<RosterTeam>;
-    export let isAdmin: boolean;
-    export let onRemove: (id: string) => void;
-    
-    let addMemberModal: ModalForm;
+	interface ModalTeam {
+		name: string;
+	}
 
-    const memberModalFields = [
-        { name: 'name', type: 'text', required: true },
-        { name: 'username', type: 'text', required: true },
-        { name: 'role', type: 'text', required: true },
-        { name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true },
-    ] as ModalFieldDefinition[];
+	let {
+		game,
+		team,
+		isAdmin,
+		onRemove
+	}: {
+		game: WithStringId<RosterGame>;
+		team: WithStringId<RosterTeam>;
+		isAdmin: boolean;
+		onRemove: (id: string) => void;
+	} = $props();
 
-    let editTeamModal: ModalForm;
+	let addMemberModal: ModalForm | undefined = $state(undefined);
 
-    const teamModalFields = [
-        { name: 'name', type: 'text', required: true },
-    ] as ModalFieldDefinition[];
+	const memberModalFields = [
+		{ name: 'name', type: 'text', required: true },
+		{ name: 'username', type: 'text', required: true },
+		{ name: 'role', type: 'text', required: true },
+		{ name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true }
+	] as ModalFieldDefinition[];
 
-    //////////////////////
-    // API INTERACTIONS //
-    //////////////////////
+	let editTeamModal: ModalForm | undefined = $state(undefined);
 
-    const sendAddMember = async (formData: any): Promise<WithStringId<RosterMember> | undefined> => {
-        const response = await fetch(`/teams/${game._id}/${team._id}`, {
-            method: 'POST',
-            body: formData,
-        });
+	const teamModalFields = [
+		{ name: 'name', type: 'text', required: true }
+	] as ModalFieldDefinition[];
 
-        if (response.ok) {
-            const data = await response.json();
-            team.members = [...team.members, data.member];
-        }
+	//////////////////////
+	// API INTERACTIONS //
+	//////////////////////
 
-        return undefined;
-    };
+	const sendAddMember = async (
+		formData: FormData
+	): Promise<WithStringId<RosterMember> | undefined> => {
+		const response = await fetch(`/teams/${game._id}/${team._id}`, {
+			method: 'POST',
+			body: formData
+		});
 
-    const sendUpdateTeam = async (id: string, team: ModalTeam): Promise<WithStringId<RosterTeam> | undefined> => {
-        const response = await fetch(`/teams/${game._id}/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(team),
-        });
+		if (response.ok) {
+			const data = await response.json();
+			team.members = [...team.members, data.member];
+		}
 
-        if (response.ok) {
-            const data = await response.json();
-            return data.team;
-        }
+		return undefined;
+	};
 
-        return undefined;
-    };
+	const sendUpdateTeam = async (
+		id: string,
+		team: ModalTeam
+	): Promise<WithStringId<RosterTeam> | undefined> => {
+		const response = await fetch(`/teams/${game._id}/${id}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(team)
+		});
 
-    const sendDeleteTeam = async (id: string): Promise<boolean> => {
-        const response = await fetch(`/teams/${game._id}/${id}`, {
-            method: 'DELETE',
-        });
+		if (response.ok) {
+			const data = await response.json();
+			return data.team;
+		}
 
-        return response.ok;
-    };
+		return undefined;
+	};
 
-    ////////////////////
-    // EVENT HANDLERS //
-    ////////////////////
+	const sendDeleteTeam = async (id: string): Promise<boolean> => {
+		const response = await fetch(`/teams/${game._id}/${id}`, {
+			method: 'DELETE'
+		});
 
-    const onClickAddMember = () => {
-        addMemberModal.clearFields();
-        addMemberModal.showModal();
-    };
+		return response.ok;
+	};
 
-    const onSubmitAddMember = async (modalFields: FilledModalFields) => {
-        const formData = new FormData();
-        formData.append('name', modalFields.name as string);
-        formData.append('username', modalFields.username as string);
-        formData.append('role', modalFields.role as string);
-        formData.append('picture', modalFields.picture as File);
+	////////////////////
+	// EVENT HANDLERS //
+	////////////////////
 
-        sendAddMember(formData);
-        
-        return {} as ModalErrors;
-    };
+	const onClickAddMember = () => {
+		addMemberModal?.clearFields();
+		addMemberModal?.showModal();
+	};
 
-    const onClickEditTeam = () => {
-        editTeamModal.fillFields({
-            name: team.name,
-        });
-        editTeamModal.showModal();
-    };
+	const onSubmitAddMember = async (modalFields: FilledModalFields) => {
+		const formData = new FormData();
+		formData.append('name', modalFields.name as string);
+		formData.append('username', modalFields.username as string);
+		formData.append('role', modalFields.role as string);
+		formData.append('picture', modalFields.picture as File);
 
-    const onSubmitEditTeam = async (values: FilledModalFields) => {
-        const updatedTeam = {
-            name: values.name as string,
-        };
-        const responseTeam = await sendUpdateTeam(team._id, updatedTeam);
-        if (responseTeam) {
-            team = responseTeam;
-            console.log(team);
-        }
-        
-        return {} as ModalErrors;
-    };
+		sendAddMember(formData);
 
-    const onSubmitDeleteTeam = async (values: FilledModalFields) => {
-        const deleted = await sendDeleteTeam(team._id);
-        if (deleted) {
-            onRemove(team._id);
-        }
-        
-        return {} as ModalErrors;
-    };
+		return {} as ModalErrors;
+	};
 
-    const onMemberRemove = (id: string) => {
-        team.members = team.members.filter(m => m._id !== id);
-    };
+	const onClickEditTeam = () => {
+		editTeamModal?.fillFields({
+			name: team.name
+		});
+		editTeamModal?.showModal();
+	};
+
+	const onSubmitEditTeam = async (values: FilledModalFields) => {
+		const updatedTeam = {
+			name: values.name as string
+		};
+		const responseTeam = await sendUpdateTeam(team._id, updatedTeam);
+		if (responseTeam) {
+			team = responseTeam;
+			console.log(team);
+		}
+
+		return {} as ModalErrors;
+	};
+
+	const onSubmitDeleteTeam = async () => {
+		const deleted = await sendDeleteTeam(team._id);
+		if (deleted) {
+			onRemove(team._id);
+		}
+
+		return {} as ModalErrors;
+	};
+
+	const onMemberRemove = (id: string) => {
+		team.members = team.members.filter((m) => m._id !== id);
+	};
 </script>
 
 <div class="box">
-    <h2>{team.name}</h2>
-    {#if isAdmin}
-        <div class="buttons">
-            <button class="button-small" on:click={onClickAddMember}>Add Member</button>
-            <button class="button-small" on:click={onClickEditTeam}>Edit Team</button>
-        </div>
-    {/if}
-    <div class="member-grid">
-        {#each team.members as member}
-            <PlayerCard
-                game={game}
-                team={team}
-                player={member}
-                {isAdmin}
-                onRemove={onMemberRemove} />
-        {/each}
-    </div>
+	<h2>{team.name}</h2>
+	{#if isAdmin}
+		<div class="buttons">
+			<button class="button-small" onclick={onClickAddMember}>Add Member</button>
+			<button class="button-small" onclick={onClickEditTeam}>Edit Team</button>
+		</div>
+	{/if}
+	<div class="member-grid">
+		{#each team.members as member, i (member._id)}
+			<PlayerCard
+				{game}
+				{team}
+				player={member}
+				playerIndex={i}
+				{isAdmin}
+				onRemove={onMemberRemove}
+			/>
+		{/each}
+	</div>
 </div>
 
 {#if isAdmin}
-    <ModalForm
-        bind:this={addMemberModal}
-        title="Add Member"
-        fields={memberModalFields}
-        actions={[
-            { name: 'Submit', callback: onSubmitAddMember },
-        ]} />
+	<ModalForm
+		bind:this={addMemberModal}
+		title="Add Member"
+		fields={memberModalFields}
+		actions={[{ name: 'Submit', callback: onSubmitAddMember }]}
+	/>
 
-    <ModalForm
-        bind:this={editTeamModal}
-        title="Edit Team"
-        fields={teamModalFields}
-        actions={[
-            { name: 'Submit', callback: onSubmitEditTeam },
-            { name: 'Delete', callback: onSubmitDeleteTeam },
-        ]} />
+	<ModalForm
+		bind:this={editTeamModal}
+		title="Edit Team"
+		fields={teamModalFields}
+		actions={[
+			{ name: 'Submit', callback: onSubmitEditTeam },
+			{ name: 'Delete', callback: onSubmitDeleteTeam }
+		]}
+	/>
 {/if}
 
 <style>
 	div.box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 		margin: 1rem 0;
 		width: 100%;
 	}
 
-    h2 {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-top: 2rem;
-        text-align: center;
-    }
+	h2 {
+		font-size: 2rem;
+		font-weight: bold;
+		margin-top: 2rem;
+		text-align: center;
+	}
 
-    div.member-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+	div.member-grid {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
 
-    div.buttons {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-    }
+	div.buttons {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+	}
 </style>

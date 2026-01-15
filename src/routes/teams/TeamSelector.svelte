@@ -1,25 +1,31 @@
 <!-- from https://svelte.dev/repl/cf05bd4a4ca14fb8ace8b6cdebbb58da?version=3.17.0 -->
 
 <script lang="ts">
-	import { onDestroy, onMount } from "svelte";
+	import { onDestroy, onMount } from 'svelte';
 
-	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from "$lib/types";
-	import MemberGrid from "./MemberGrid.svelte";
+	import type { WithStringId, RosterGame, RosterTeam } from '$lib/types';
+	import MemberGrid from './MemberGrid.svelte';
 	import ModalForm from '$lib/ModalForm.svelte';
-    import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
+	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
 
 	interface ModalTeam {
 		name: string;
 	}
 
-	export let games: WithStringId<RosterGame>[] = [];
-	export let adminFor: string[];
-	let activeGameId = games.length > 0 ? games[0]._id : '';
+	let {
+		games,
+		adminFor
+	}: {
+		games: WithStringId<RosterGame>[];
+		adminFor: string[];
+	} = $props();
+
+	let activeGameId = $derived(games.length > 0 ? games[0]._id : '');
 
 	let addTeamModal: ModalForm;
 
 	const teamModalFields = [
-		{ name: 'name', type: 'text', required: true },
+		{ name: 'name', type: 'text', required: true }
 	] as ModalFieldDefinition[];
 
 	////////////////////
@@ -29,14 +35,14 @@
 	function moveUnderline(instant: boolean) {
 		let element = document.getElementById(activeGameId.toString());
 		if (element) {
-			let underline = document.querySelector(".underline") as HTMLElement;
+			let underline = document.querySelector('.underline') as HTMLElement;
 			underline.style.width = `${element.clientWidth}px`;
 			let bottomPos = element.offsetTop + element.clientHeight;
 			underline.style.transform = `translate(${element.offsetLeft}px, ${bottomPos}px)`;
 			if (instant) {
-				underline.style.transition = "none";
+				underline.style.transition = 'none';
 			} else {
-				underline.style.transition = "width 0.5s, transform 0.5s";
+				underline.style.transition = 'width 0.5s, transform 0.5s';
 			}
 		}
 	}
@@ -55,7 +61,7 @@
 			}, 100);
 		});
 		content.style.visibility = 'visible';
-		
+
 		window.addEventListener('resize', () => moveUnderline(true));
 	});
 
@@ -75,7 +81,7 @@
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(newTeam),
+			body: JSON.stringify(newTeam)
 		});
 
 		if (response.ok) {
@@ -97,11 +103,11 @@
 
 	const onSubmitAddTeam = async (values: FilledModalFields) => {
 		const newTeam = {
-			name: values.name as string,
+			name: values.name as string
 		};
 		const team = await sendAddTeam(newTeam);
 		if (team) {
-			games = games.map(game => {
+			games = games.map((game) => {
 				if (game._id === activeGameId) {
 					game.teams.push(team);
 				}
@@ -113,9 +119,9 @@
 	};
 
 	const onTeamRemove = (teamId: string) => {
-		games = games.map(game => {
+		games = games.map((game) => {
 			if (game._id === activeGameId) {
-				game.teams = game.teams.filter(team => team._id !== teamId);
+				game.teams = game.teams.filter((team) => team._id !== teamId);
 			}
 			return game;
 		});
@@ -124,29 +130,30 @@
 
 <div class="content">
 	<ul>
-		{#each games as game}
-			<li class={activeGameId === game._id ? 'active' : ''} id="{game._id.toString()}">
-				<button class="icon" on:click={handleClick(game._id)}>
+		{#each games as game (game._id)}
+			<li class={activeGameId === game._id ? 'active' : ''} id={game._id.toString()}>
+				<button class="icon" onclick={handleClick(game._id)}>
 					<img src={game.icon} alt={game.name} />
 				</button>
 			</li>
 		{/each}
 	</ul>
-	
+
 	<div class="underline"></div>
-	
-	{#each games as game}
+
+	{#each games as game (game._id)}
 		{#if activeGameId == game._id}
 			<h1>{game.name}</h1>
 			{#if adminFor.includes(game.adminRole)}
-				<button class="button-small" on:click={onClickAddTeam}>Add Team</button>
+				<button class="button-small" onclick={onClickAddTeam}>Add Team</button>
 			{/if}
-			{#each game.teams as team}
+			{#each game.teams as team (team._id)}
 				<MemberGrid
-					game={game}
-					team={team}
+					{game}
+					{team}
 					isAdmin={adminFor.includes(game.adminRole)}
-					onRemove={onTeamRemove} />
+					onRemove={onTeamRemove}
+				/>
 			{/each}
 		{/if}
 	{/each}
@@ -156,9 +163,8 @@
 	bind:this={addTeamModal}
 	title="Add Team"
 	fields={teamModalFields}
-	actions={[
-		{ name: 'Submit', callback: onSubmitAddTeam },
-	]} />
+	actions={[{ name: 'Submit', callback: onSubmitAddTeam }]}
+/>
 
 <style>
 	.content {
@@ -205,7 +211,9 @@
 		width: 0;
 		height: 0.2rem;
 		background-color: var(--true-neutral);
-		transition: width 0.5s, transform 0.5s;
+		transition:
+			width 0.5s,
+			transform 0.5s;
 		margin: 1rem 0;
 	}
 

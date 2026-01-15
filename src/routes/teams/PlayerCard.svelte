@@ -2,41 +2,40 @@
 	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
 
-    import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
+	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
 
-	export let game: WithStringId<RosterGame>;
-	export let team: WithStringId<RosterTeam>;
-	export let player: WithStringId<RosterMember>;
-	export let isAdmin: boolean;
-	export let onRemove: (id: string) => void;
+	let {
+		game,
+		team,
+		player,
+		playerIndex,
+		isAdmin,
+		onRemove
+	}: {
+		game: WithStringId<RosterGame>;
+		team: WithStringId<RosterTeam>;
+		player: WithStringId<RosterMember>;
+		playerIndex: number;
+		isAdmin: boolean;
+		onRemove: (id: string) => void;
+	} = $props();
 
-	interface ModalMember {
-		name: string;
-		username: string;
-		role: string;
-		picture: File;
-	}
+	let editMemberModal: ModalForm | undefined = $state(undefined);
 
-    let editMemberModal: ModalForm;
+	const modalFields = [
+		{ name: 'name', type: 'text', required: true },
+		{ name: 'username', type: 'text', required: true },
+		{ name: 'role', type: 'text', required: true },
+		{ name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true }
+	] as ModalFieldDefinition[];
 
-    const modalFields = [
-        { name: 'name', type: 'text', required: true },
-        { name: 'username', type: 'text', required: true },
-        { name: 'role', type: 'text', required: true },
-        { name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true },
-    ] as ModalFieldDefinition[];
-
-    //////////////////////-
-    // API INTERACTIONS //
-    //////////////////////
-
-	//////////////////////-
+	//////////////////////
 	// API INTERACTIONS //
 	//////////////////////
 
 	const sendUpdateMember = async (
 		id: string,
-		formData: any
+		formData: FormData
 	): Promise<WithStringId<RosterMember> | undefined> => {
 		const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
 			method: 'PUT',
@@ -56,34 +55,48 @@
 			method: 'DELETE'
 		});
 
-    const onSubmitEdit = async (modalFields: FilledModalFields) => {
-        const formData = new FormData();
-        formData.append('name', modalFields.name as string);
-        formData.append('username', modalFields.username as string);
-        formData.append('role', modalFields.role as string);
-        formData.append('picture', modalFields.picture as File);
+		return response.ok;
+	};
 
-        const updated = await sendUpdateMember(player._id, formData);
-        if (updated) {
-            player = updated;
-            team.members = team.members.map(m => m._id === player._id ? player : m);
-        }
+	const onClick = () => {
+		if (!isAdmin) return;
+		editMemberModal?.fillFields({
+			name: player.name,
+			username: player.username,
+			role: player.role,
+			picture: player.picture
+		});
+		editMemberModal?.showModal();
+	};
 
-        return {} as ModalErrors;
-    };
+	const onSubmitEdit = async (modalFields: FilledModalFields) => {
+		const formData = new FormData();
+		formData.append('name', modalFields.name as string);
+		formData.append('username', modalFields.username as string);
+		formData.append('role', modalFields.role as string);
+		formData.append('picture', modalFields.picture as File);
 
-    const onSubmitDelete = async (values: FilledModalFields) => {
-        const deleted = await sendDeleteMember(player._id);
-        if (deleted) {
-            onRemove(player._id);
-        }
+		const updated = await sendUpdateMember(player._id, formData);
+		if (updated) {
+			player = updated;
+			team.members = team.members.map((m) => (m._id === player._id ? player : m));
+		}
 
-        return {} as ModalErrors;
-    };
+		return {} as ModalErrors;
+	};
+
+	const onSubmitDelete = async () => {
+		const deleted = await sendDeleteMember(player._id);
+		if (deleted) {
+			onRemove(player._id);
+		}
+
+		return {} as ModalErrors;
+	};
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-<div class="player-card" on:click={onClick}>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<div role="button" tabindex={playerIndex} class="player-card" onclick={onClick}>
 	{#if player.picture}
 		<div class="picture-container">
 			<img src="{player.picture}?t={Date.now()}" alt={player.username} />

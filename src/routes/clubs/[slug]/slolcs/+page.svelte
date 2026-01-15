@@ -326,19 +326,19 @@
 
 <div class="description">
 	<p>
-		Cal Poly League of Legends proudly hosts SLOLCS, an intramural tournament where members of
-		the club compete against one another in balanced teams throughout the quarter for the
-		championship title!
+		Cal Poly League of Legends proudly hosts SLOLCS, an intramural tournament where members of the
+		club compete against one another in balanced teams throughout the quarter for the championship
+		title!
 	</p>
 </div>
 
 <div class="winners">
 	<h2>Past Winners</h2>
-	{#each winners as winner}
+	{#each winners as winner (winner.year)}
 		<h4>{winner.year} SLOLCS Champions</h4>
 		<h3>{winner.teamName}</h3>
 		<div class="members">
-			{#each winner.members as member}
+			{#each winner.members as member (member.username)}
 				<div class="member">
 					<div class="member-background-image">
 						<img

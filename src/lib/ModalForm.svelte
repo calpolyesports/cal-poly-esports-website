@@ -1,203 +1,239 @@
-<script lang="ts" context="module">
-    export type ModalFieldDefinition = { 
-        name: string,
-        type: 'date' | 'text' | 'dropdown' | 'file' | 'checkbox', 
-        required: boolean,
-        options?: [string, string][],
-        validExtensions?: [string],
-    };
-    export type FilledModalFields = { [key: string]: string | Date | File | boolean | null };
-    export type ModalAction = { name: string, callback: (values: FilledModalFields) => Promise<ModalErrors> };
-    export type ModalErrors = { [key: string]: string }
+<script lang="ts" module>
+	export type ModalFieldDefinition = {
+		name: string;
+		type: 'date' | 'text' | 'dropdown' | 'file' | 'checkbox';
+		required: boolean;
+		options?: [string, string][];
+		validExtensions?: [string];
+	};
+	export type FilledModalFields = { [key: string]: string | Date | File | boolean | null };
+	export type ModalAction = {
+		name: string;
+		callback: (values: FilledModalFields) => Promise<ModalErrors>;
+	};
+	export type ModalErrors = { [key: string]: string };
 </script>
 
 <script lang="ts">
-    import Modal from './Modal.svelte';
+	import Modal from './Modal.svelte';
 
-    export let title = '';
-    export let fields: ModalFieldDefinition[] = [];
-    export let actions: ModalAction[] = [];
-    
-    let errors: ModalErrors;
+	let {
+		title = '',
+		fields = [],
+		actions = []
+	}: {
+		title: string;
+		fields: ModalFieldDefinition[] | undefined;
+		actions: ModalAction[] | undefined;
+	} = $props();
 
-    const bindings = fields.reduce((acc, field) => {
-        if (field.type === 'file') {
-            acc[field.name] = null;
-        } else if (field.type === 'checkbox') {
-            acc[field.name] = false;
-        } else {
-            acc[field.name] = '';
-        }
-        return acc;
-    }, {} as { [key: string]: string | File | boolean | null });
+	let errors: ModalErrors = $state({});
 
-    let modal: Modal;
+	const bindings = $derived(
+		fields.reduce(
+			(acc, field) => {
+				if (field.type === 'file') {
+					acc[field.name] = null;
+				} else if (field.type === 'checkbox') {
+					acc[field.name] = false;
+				} else {
+					acc[field.name] = '';
+				}
+				return acc;
+			},
+			{} as { [key: string]: string | File | boolean | null }
+		)
+	);
 
-    export const showModal = () => {
-        modal.showModal();
-    };
+	let modal: Modal;
 
-    export const hideModal = () => {
-        modal.hideModal();
-    };
+	export const showModal = () => {
+		modal.showModal();
+	};
 
-    export const fillFields = (values: FilledModalFields) => {
-        clearFields();
-        fields.forEach(field => {
-            const value = values[field.name];
-            if (field.type === 'date') {
-                const originalTime = new Date(value as string);
-                const adjustedTime = new Date(originalTime.getTime() - originalTime.getTimezoneOffset() * 60000);
-                bindings[field.name] = adjustedTime.toISOString().slice(0, 16);
-            } else if (field.type === "checkbox") {
-                bindings[field.name] = value as boolean;
-            } else if (field.type !== 'file' && value) {
-                bindings[field.name] = value.toString();
-            }
-        });
-    };
+	export const hideModal = () => {
+		modal.hideModal();
+	};
 
-    export const clearFields = () => {
-        fields.forEach(field => {
-            if (field.type === 'file') {
-                bindings[field.name] = null;
-            } else if (field.type === 'checkbox') {
-                bindings[field.name] = false;
-            } else {
-                bindings[field.name] = '';
-            }
-        });
-        errors = {};
-    };
+	export const fillFields = (values: FilledModalFields) => {
+		clearFields();
+		fields.forEach((field) => {
+			const value = values[field.name];
+			if (field.type === 'date') {
+				const originalTime = new Date(value as string);
+				const adjustedTime = new Date(
+					originalTime.getTime() - originalTime.getTimezoneOffset() * 60000
+				);
+				bindings[field.name] = adjustedTime.toISOString().slice(0, 16);
+			} else if (field.type === 'checkbox') {
+				bindings[field.name] = value as boolean;
+			} else if (field.type !== 'file' && value) {
+				bindings[field.name] = value.toString();
+			}
+		});
+	};
 
-    async function runCallbackWithFormData(callback: (values: FilledModalFields) => Promise<ModalErrors>) {
-        const formData: FilledModalFields = {};
-        errors = {};
-        fields.forEach(field => {
-            const value = bindings[field.name];
-            if (field.required && (value === '' || value === null)) {
-                errors[field.name] = "This field is required.";
-            } else {
-                formData[field.name] = field.type === 'date' ? new Date(value as any) : value;
-            }
-        });
+	export const clearFields = () => {
+		fields.forEach((field) => {
+			if (field.type === 'file') {
+				bindings[field.name] = null;
+			} else if (field.type === 'checkbox') {
+				bindings[field.name] = false;
+			} else {
+				bindings[field.name] = '';
+			}
+		});
+		errors = {};
+	};
 
-        errors = await callback(formData);
-        if (Object.keys(errors).length === 0) {
-            hideModal();
-        }
-    }
+	async function runCallbackWithFormData(
+		callback: (values: FilledModalFields) => Promise<ModalErrors>
+	) {
+		const formData: FilledModalFields = {};
+		errors = {};
+		fields.forEach((field) => {
+			const value = bindings[field.name];
+			if (field.required && (value === '' || value === null)) {
+				errors[field.name] = 'This field is required.';
+			} else {
+				if (field.type === 'date') {
+					if (typeof value === 'string') {
+						formData[field.name] = value ? new Date(value) : null;
+					} else {
+						errors[field.name] = 'Invalid date type. Please contact support.';
+					}
+				} else {
+					formData[field.name] = value;
+				}
+			}
+		});
 
+		errors = await callback(formData);
+		if (Object.keys(errors).length === 0) {
+			hideModal();
+		}
+	}
 
-    function handleFileChange(event: Event, field: ModalFieldDefinition) {
-        const input = event.target as HTMLInputElement;
+	function handleFileChange(event: Event, field: ModalFieldDefinition) {
+		const input = event.target as HTMLInputElement;
 
-        if (input && input.files && input.files.length > 0) {
-            const file = input.files[0];
-            // TODO: cleanup?
-            const validExtensions = field.validExtensions ?? ([] as unknown as [string]);
+		if (input && input.files && input.files.length > 0) {
+			const file = input.files[0];
+			// TODO: cleanup?
+			const validExtensions = field.validExtensions ?? ([] as unknown as [string]);
 
-            const fileExtension = file.name.split('.').pop()?.toLowerCase();
-            if (validExtensions.length > 0 && !validExtensions.includes(`.${fileExtension}`)) {
-                errors[field.name] = `File must be of type: ${validExtensions.join(', ')}`;
-                bindings[field.name] = null;
-            } else {
-                // TODO: does this work????????
-                delete errors[field.name];
-                bindings[field.name] = file;
-            }
-        } else {
-            errors[field.name] = "File input or file selection is invalid";
-            bindings[field.name] = null;
-        }
-    }
+			const fileExtension = file.name.split('.').pop()?.toLowerCase();
+			if (validExtensions.length > 0 && !validExtensions.includes(`.${fileExtension}`)) {
+				errors[field.name] = `File must be of type: ${validExtensions.join(', ')}`;
+				bindings[field.name] = null;
+			} else {
+				// TODO: does this work????????
+				delete errors[field.name];
+				bindings[field.name] = file;
+			}
+		} else {
+			errors[field.name] = 'File input or file selection is invalid';
+			bindings[field.name] = null;
+		}
+	}
 </script>
 
 <Modal bind:this={modal} bind:title>
-    <div class="form">
-        {#each fields as field}
-            <label for={field.name}>
-                {field.name}
-                {#if field.required}
-                    <span class="required-asterisk">*</span>
-                {/if}
-            </label>
-            {#if field.type === 'date'}
-                <input type="datetime-local" id={field.name} name={field.name} bind:value={bindings[field.name]} />
-            {:else if field.type === 'text'}
-                <input type="text" id={field.name} name={field.name} bind:value={bindings[field.name]} />
-            {:else if field.type === 'dropdown' && field.options}
-                <select id={field.name} name={field.name} bind:value={bindings[field.name]}>
-                    {#each field.options as option}
-                        <option value={option[0]}>{option[1]}</option>
-                    {/each}
-                </select>
-            {:else if field.type === 'file'}
-                <input
-                    id={field.name}
-                    type="file"
-                    accept={field.validExtensions?.join()}
-                    on:change={(event) => handleFileChange(event, field)}
-                />
-            {:else if field.type === 'checkbox'}
-                // TODO: idk how to make this disappear
-                <input type="checkbox" id={field.name} name={field.name} bind:checked={bindings[field.name]} />
-            {/if}
-            {#if field.name in errors}
-                <p class="error-message">{errors[field.name]}</p>
-            {/if}
-        {/each}
+	<div class="form">
+		{#each fields as field (field.name)}
+			<label for={field.name}>
+				{field.name}
+				{#if field.required}
+					<span class="required-asterisk">*</span>
+				{/if}
+			</label>
+			{#if field.type === 'date'}
+				<input
+					type="datetime-local"
+					id={field.name}
+					name={field.name}
+					bind:value={bindings[field.name]}
+				/>
+			{:else if field.type === 'text'}
+				<input type="text" id={field.name} name={field.name} bind:value={bindings[field.name]} />
+			{:else if field.type === 'dropdown' && field.options}
+				<select id={field.name} name={field.name} bind:value={bindings[field.name]}>
+					{#each field.options as option (option[0])}
+						<option value={option[0]}>{option[1]}</option>
+					{/each}
+				</select>
+			{:else if field.type === 'file'}
+				<input
+					id={field.name}
+					type="file"
+					accept={field.validExtensions?.join()}
+					onchange={(event) => handleFileChange(event, field)}
+				/>
+			{:else if field.type === 'checkbox'}
+				<input
+					type="checkbox"
+					id={field.name}
+					name={field.name}
+					bind:checked={bindings[field.name] as boolean}
+				/>
+			{/if}
+			{#if field.name in errors}
+				<p class="error-message">{errors[field.name]}</p>
+			{/if}
+		{/each}
 
-        <br>
-        
-        {#each actions as action}
-            <button class="button-medium" on:click={() => runCallbackWithFormData(action.callback)}>{action.name}</button>
-        {/each}
-    </div>
+		<br />
+
+		{#each actions as action (action.name)}
+			<button class="button-medium" onclick={() => runCallbackWithFormData(action.callback)}
+				>{action.name}</button
+			>
+		{/each}
+	</div>
 </Modal>
 
 <style>
-    div.form {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 30rem;
-        margin: 1rem auto;
-    }
+	div.form {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		width: 30rem;
+		margin: 1rem auto;
+	}
 
-    label {
-        font-size: 1rem;
-        margin-top: 1rem;
-        font-weight: bold;
-        text-transform: capitalize;
-    }
+	label {
+		font-size: 1rem;
+		margin-top: 1rem;
+		font-weight: bold;
+		text-transform: capitalize;
+	}
 
-    input {
-        font-size: 1.25rem;
-        padding: 0.5rem;
-        width: 100%;
-    }
+	input {
+		font-size: 1.25rem;
+		padding: 0.5rem;
+		width: 100%;
+	}
 
-    select {
-        font-size: 1.25rem;
-        padding: 0.5rem;
-        width: 100%;
-    }
+	select {
+		font-size: 1.25rem;
+		padding: 0.5rem;
+		width: 100%;
+	}
 
-    .button-medium:disabled {
-        background-color: gray;
-        cursor: not-allowed;
-    }
+	.button-medium:disabled {
+		background-color: gray;
+		cursor: not-allowed;
+	}
 
-    .error-message {
-        color: red;
-        font-size: 0.9rem;
-        margin-top: 0.5rem;
-    }
+	.error-message {
+		color: red;
+		font-size: 0.9rem;
+		margin-top: 0.5rem;
+	}
 
-    .required-asterisk {
-        color: red;
-        margin-left: 5px;
-    }
+	.required-asterisk {
+		color: red;
+		margin-left: 5px;
+	}
 </style>

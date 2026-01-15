@@ -1,33 +1,21 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { get } from 'svelte/store';
 	import AboutText from './AboutText.svelte';
 	import type { WithStringId, Club } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
-	import type {
-		ModalFieldDefinition,
-		FilledModalFields,
-		ModalErrors
-	} from '$lib/ModalForm.svelte';
+	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
 	import ClubEventLink from './ClubEventLink.svelte';
+	import type { PageData } from './$types';
 
-	export let data;
-	let club: WithStringId<Club> | undefined;
-	let canEdit: boolean = false;
+	let { data }: { data: PageData } = $props();
+	let club: WithStringId<Club> | undefined = $derived(data.club);
 
-	$: {
-		const { slug } = get(page).params;
-		if (slug) {
-			club = data.club;
-			canEdit = Boolean(data.adminFor.find((admin) => admin.urlName === club?.urlName));
-		}
-	}
+	let canEdit = $derived(Boolean(data.adminFor.find((admin) => admin.urlName === club?.urlName)));
 
-	let editingAbout = false;
+	let editingAbout = $state(false);
 
-	let addMemberModal: ModalForm;
+	let addMemberModal: ModalForm | undefined = $state(undefined);
 
-	let editMemberModal: ModalForm;
+	let editMemberModal: ModalForm | undefined = $state(undefined);
 	let selectedMemberIndex: number | undefined;
 
 	const memberModalFields = [
@@ -61,7 +49,7 @@
 		}
 	};
 
-	const sendAddMember = async (club: Club, formData: any) => {
+	const sendAddMember = async (club: Club, formData: FormData) => {
 		const response = await fetch(`/clubs/${club.urlName}/board`, {
 			method: 'POST',
 			body: formData
@@ -73,7 +61,7 @@
 		}
 	};
 
-	const sendUpdateMember = async (club: Club, memberIndex: number, formData: any) => {
+	const sendUpdateMember = async (club: Club, memberIndex: number, formData: FormData) => {
 		const response = await fetch(`/clubs/${club.urlName}/board/${memberIndex}`, {
 			method: 'PUT',
 			body: formData
@@ -112,8 +100,8 @@
 	};
 
 	const onClickAddMember = () => {
-		addMemberModal.clearFields();
-		addMemberModal.showModal();
+		addMemberModal?.clearFields();
+		addMemberModal?.showModal();
 	};
 
 	const onSubmitAddMember = async (fields: FilledModalFields) => {
@@ -126,7 +114,7 @@
 			const member = await sendAddMember(club, formData);
 			if (member) {
 				club.boardMembers = [...club.boardMembers, member];
-				addMemberModal.hideModal();
+				addMemberModal?.hideModal();
 			}
 		}
 
@@ -138,11 +126,11 @@
 		const member = club?.boardMembers[index];
 		if (member) {
 			selectedMemberIndex = index;
-			editMemberModal.fillFields({
+			editMemberModal?.fillFields({
 				name: member.name,
 				position: member.position
 			});
-			editMemberModal.showModal();
+			editMemberModal?.showModal();
 		}
 	};
 
@@ -157,7 +145,7 @@
 				club.boardMembers = club.boardMembers.map((m, i) =>
 					i === selectedMemberIndex ? member : m
 				);
-				editMemberModal.hideModal();
+				editMemberModal?.hideModal();
 			}
 		}
 
@@ -169,7 +157,7 @@
 			const deleted = await sendDeleteMember(club, selectedMemberIndex);
 			if (deleted) {
 				club.boardMembers = club.boardMembers.filter((_, i) => i !== selectedMemberIndex);
-				editMemberModal.hideModal();
+				editMemberModal?.hideModal();
 			}
 		}
 
@@ -185,11 +173,11 @@
 			<a href="https://www.markdownguide.org/basic-syntax/">here</a>.
 		</p>
 		<textarea bind:value={club.aboutText}></textarea>
-		<button class="button-medium" on:click={onSubmitEditAbout}>Save</button>
+		<button class="button-medium" onclick={onSubmitEditAbout}>Save</button>
 	{:else}
 		{#if canEdit}
 			<br />
-			<button class="button-medium" on:click={onClickEditAbout}>Edit</button>
+			<button class="button-medium" onclick={onClickEditAbout}>Edit</button>
 		{/if}
 		<AboutText html={club.aboutHtml} />
 	{/if}
@@ -197,7 +185,7 @@
 	{#if club.events.length > 0}
 		<div class="club-events">
 			<h2>Events</h2>
-			{#each club.events as event}
+			{#each club.events as event (event.name)}
 				<ClubEventLink {event} />
 			{/each}
 		</div>
@@ -206,12 +194,13 @@
 	{#if club.boardMembers.length > 0 || canEdit}
 		<h2>Board Members</h2>
 		{#if canEdit}
-			<button class="button-medium" on:click={onClickAddMember}>Add Board Member</button>
+			<button class="button-medium" onclick={onClickAddMember}>Add Board Member</button>
 		{/if}
 		<ul class="board-members">
-			{#each club.boardMembers as member, i}
-				<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-				<div on:click={() => onClickEditMember(i)}>
+			{#each club.boardMembers as member, i (member.name)}
+				<!-- TODO: no more svelte-ignore -->
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<div role="button" tabindex={i} onclick={() => onClickEditMember(i)}>
 					<li>
 						{#if member.profileImage}
 							<img src={member.profileImage} alt={member.name} />
