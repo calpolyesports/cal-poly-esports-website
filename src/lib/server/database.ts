@@ -1,270 +1,507 @@
-import { connect } from 'mongoose';
 import { env } from '$env/dynamic/private';
-import { ObjectId } from 'mongodb';
+import { ObjectId, type WithId } from 'mongodb';
 import DOMPurify from 'isomorphic-dompurify';
 import { marked } from 'marked';
 import { BlobServiceClient } from '@azure/storage-blob';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import * as models from './models';
 import * as types from '../types';
+import * as serverTypes from './types';
 
-console.log("Connecting to MongoDB...");
-await connect(env.DB_CONN_STRING!);
-console.log("Connected to MongoDB");
+const sasUrl = env.PLAYER_PORTRAIT_BLOB;
 
-const sasUrl = env.PLAYER_PORTRAIT_BLOB!;
+const client = new MongoClient(env.DB_CONN_STRING, {
+	serverApi: {
+		version: ServerApiVersion.v1,
+		strict: true,
+		deprecationErrors: true
+	}
+});
 
-export async function getEvents(adminFor?: string[], publicOnly: boolean = false) {
-    const query: any = {};
-    if (publicOnly) {
-        query.showPublic = true;
-    }
-
-    const response = await models.EventModel.find(query).lean();
-    const clubs = await models.ClubModel.find().lean();
-    return response.map((event) => {
-        const club = clubs.find(club => club.urlName === event.club);
-        return {
-            ...event,
-            backgroundColor: club?.color ?? '#154734',
-            editable: adminFor?.includes(event.club) ?? false,
-        };
-    });
+async function run() {
+	try {
+		// Connect the client to the server	(optional starting in v4.7)
+		await client.connect();
+		// Send a ping to confirm a successful connection
+		await client.db('admin').command({ ping: 1 });
+		console.log('Pinged your deployment. You successfully connected to MongoDB!');
+	} finally {
+		// Ensures that the client will close when you finish/error
+		await client.close();
+	}
 }
 
-export async function getEventById(id: ObjectId, adminFor?: string[], usesLabOnly: boolean = false) {
-    const query: any = { _id: id };
-    if (usesLabOnly) {
-        query.usesLab = true;
-    }
+export async function getEvents(
+	adminFor?: string[],
+	publicOnly: boolean = false
+): Promise<WithId<types.Event>[]> {
+	const database = client.db(env.DB_NAME);
 
-    const eventDoc = await models.EventModel.findOne(query).lean();
-    if (!eventDoc) return null;
+	const eventsCollection = database.collection<serverTypes.Event>('events');
+	const clubsCollection = database.collection<types.Club>('clubs');
 
-    const clubDoc = await models.ClubModel.findOne({ urlName: eventDoc.club }).lean();
-    const event = {
-        ...eventDoc,
-        backgroundColor: clubDoc ? clubDoc.color : '#154734',
-        editable: adminFor?.includes(eventDoc.club) ?? false,
-    };
-    return event;
+	const query: {
+		showPublic?: boolean;
+	} = {};
+	if (publicOnly) {
+		query.showPublic = true;
+	}
+
+	const eventsCursor = eventsCollection.find(query);
+	const events = await eventsCursor.toArray();
+
+	const clubsCursor = clubsCollection.find();
+	const clubs = await clubsCursor.toArray();
+
+	return events.map((event) => {
+		const club = clubs.find((club) => club.urlName === event.club);
+		return {
+			...event,
+			backgroundColor: club?.color ?? '#154734',
+			editable: adminFor?.includes(event.club) ?? false
+		};
+	});
 }
 
-export async function addEvent(event: types.Event) {
-    const newEvent = new models.EventModel(event);
-    if (!event.usesLab) {
-        newEvent.usesLab = false;
-    }
-    await newEvent.save();
-    return newEvent._id;
+export async function getEventById(
+	id: ObjectId,
+	adminFor?: string[],
+	usesLabOnly: boolean = false
+): Promise<WithId<types.Event> | null> {
+	const database = client.db(env.DB_NAME);
+
+	const eventsCollection = database.collection<serverTypes.Event>('events');
+	const clubsCollection = database.collection<types.Club>('clubs');
+
+	const query: {
+		_id: ObjectId;
+		usesLab?: boolean;
+	} = { _id: id };
+	if (usesLabOnly) {
+		query.usesLab = true;
+	}
+
+	const eventDoc = await eventsCollection.findOne(query);
+	if (!eventDoc) return null;
+
+	const clubDoc = await clubsCollection.findOne({ urlName: eventDoc.club });
+	const event = {
+		...eventDoc,
+		backgroundColor: clubDoc ? clubDoc.color : '#154734',
+		editable: adminFor?.includes(eventDoc.club) ?? false
+	};
+	return event;
 }
 
-export async function updateEvent(id: ObjectId, event: types.Event) {
-    await models.EventModel.updateOne({
-        _id: id,
-    }, event);
+export async function addEvent(event: serverTypes.Event): Promise<ObjectId> {
+	const database = client.db(env.DB_NAME);
+	const eventsCollection = database.collection<serverTypes.Event>('events');
+	const result = await eventsCollection.insertOne(event);
+	return result.insertedId;
 }
 
-export async function deleteEvent(id: ObjectId) {
-    await models.EventModel.deleteOne({ _id: id });
+export async function updateEvent(
+	id: ObjectId,
+	event: Partial<serverTypes.Event>
+): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const eventsCollection = database.collection<serverTypes.Event>('events');
+	const result = await eventsCollection.updateOne({ _id: id }, { $set: event });
+	return result.matchedCount > 0;
 }
 
-export async function getRosterGames() {
-    const allGameDocs = await models.RosterGameModel.find().lean()
-        .populate({
-            path: 'teams',
-            populate: { path: 'members' }
-        });
-    return allGameDocs;
+export async function deleteEvent(id: ObjectId): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const eventsCollection = database.collection<serverTypes.Event>('events');
+	const result = await eventsCollection.deleteOne({ _id: id });
+	return result.deletedCount > 0;
 }
 
-export async function getRosterGameById(id: ObjectId) {
-    const gameDoc = await models.RosterGameModel.findOne({ _id: id }).lean()
-        .populate({
-            path: 'teams',
-            populate: { path: 'members' }
-        });
-    return gameDoc;
+export async function getRosterGames(): Promise<WithId<types.RosterGame>[]> {
+	const database = client.db(env.DB_NAME);
+	const gamesCollection = database.collection<types.RosterGame>('rosters');
+	const gamesCursor = gamesCollection.find();
+	const games = await gamesCursor.toArray();
+	return games;
 }
 
-export async function getRosterTeams() {
-    const allTeamDocs = await models.RosterTeamModel.find().lean()
-        .populate('members');
-    return allTeamDocs;
+export async function getRosterGameById(id: ObjectId): Promise<WithId<types.RosterGame> | null> {
+	const database = client.db(env.DB_NAME);
+	const gamesCollection = database.collection<types.RosterGame>('rosters');
+	const gameDoc = await gamesCollection.findOne({ _id: id });
+	return gameDoc;
 }
 
-export async function getRosterTeamById(id: ObjectId) {
-    const teamDoc = await models.RosterTeamModel.findOne({ _id: id }).lean()
-        .populate('members');
-    return teamDoc;
+export async function getRosterTeams(gameId: ObjectId): Promise<types.RosterTeam[] | null> {
+	return (await getRosterGameById(gameId))?.teams || null;
 }
 
-export async function addRosterTeam(gameId: ObjectId, team: types.RosterTeam) {
-    const gameDoc = await models.RosterGameModel.findOne({ _id: gameId });
-    if (!gameDoc) return null;
-    const newTeam = new models.RosterTeamModel(team);
-    await newTeam.save();
-    gameDoc.teams.push(newTeam._id);
-    await gameDoc.save();
-    return newTeam._id;
+export async function getRosterTeamById(
+	gameId: ObjectId,
+	teamId: string
+): Promise<types.RosterTeam | null> {
+	return (await getRosterGameById(gameId))?.teams.find((team) => team.id === teamId) || null;
 }
 
-export async function updateRosterTeam(id: ObjectId, team: types.RosterTeam) {
-    await models.RosterTeamModel.updateOne({
-        _id: id,
-    }, team);
+export async function addRosterTeam(gameId: ObjectId, team: types.RosterTeam): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const gamesCollection = database.collection<types.RosterGame>('rosters');
+
+	const result = await gamesCollection.updateOne(
+		{ _id: gameId },
+		{
+			$push: { teams: team }
+		}
+	);
+
+	return result.matchedCount > 0;
 }
 
-export async function deleteRosterTeam(gameId: ObjectId, teamId: ObjectId) {
-    const gameDoc = await models.RosterGameModel.findOne({ _id: gameId });
-    if (!gameDoc) return;
-    const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
-    if (!teamDoc) return;
-    const memberIds = teamDoc.members.map(member => member._id);
-    await models.RosterMemberModel.deleteMany({ _id: { $in: memberIds } });
-    await teamDoc.deleteOne();
-    gameDoc.teams = gameDoc.teams.filter(team => team.toString() !== teamId.toString());
-    await gameDoc.save();
+export async function updateRosterTeam(
+	gameId: ObjectId,
+	teamId: string,
+	team: Partial<types.RosterTeam>
+): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const gamesCollection = database.collection<types.RosterGame>('rosters');
+
+	const result = await gamesCollection.updateOne(
+		{ _id: gameId },
+		{
+			$set: {
+				'teams.$[team]': team
+			}
+		},
+		{
+			arrayFilters: [{ 'team.id': teamId }]
+		}
+	);
+
+	return result.matchedCount > 0;
 }
 
-export async function getRosterMembers() {
-    const allMemberDocs = await models.RosterMemberModel.find().lean();
-    return allMemberDocs;
+export async function deleteRosterTeam(gameId: ObjectId, teamId: string): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const gamesCollection = database.collection<types.RosterGame>('rosters');
+
+	const result = await gamesCollection.updateOne(
+		{ _id: gameId },
+		{
+			$pull: {
+				teams: { id: teamId }
+			}
+		}
+	);
+
+	return result.matchedCount > 0;
 }
 
-export async function getRosterMemberById(id: ObjectId) {
-    const memberDoc = await models.RosterMemberModel.findOne({ _id: id }).lean();
-    return memberDoc;
+export async function getRosterMembers(
+	gameId: ObjectId,
+	teamId: string
+): Promise<types.RosterMember[] | null> {
+	return (await getRosterTeamById(gameId, teamId))?.members || null;
 }
 
-export async function addRosterMember(teamId: ObjectId, member: types.RosterMember) {
-    const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
-    if (!teamDoc) return null;
-    const newMember = new models.RosterMemberModel(member);
-    await newMember.save();
-    teamDoc.members.push(newMember._id);
-    await teamDoc.save();
-    return newMember._id;
+export async function getRosterMemberById(
+	gameId: ObjectId,
+	teamId: string,
+	memberId: string
+): Promise<types.RosterMember | null> {
+	return (
+		(await getRosterTeamById(gameId, teamId))?.members.find((member) => member.id === memberId) ||
+		null
+	);
 }
 
-export async function updateRosterMember(id: ObjectId, member: types.RosterMember) {
-    await models.RosterMemberModel.updateOne({
-        _id: id,
-    }, member);
+export async function addRosterMember(
+	gameId: ObjectId,
+	teamId: string,
+	member: types.RosterMember
+): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const gamesCollection = database.collection<types.RosterGame>('rosters');
+
+	const result = await gamesCollection.updateOne(
+		{ _id: gameId },
+		{
+			$push: {
+				'teams.$[team].members': member
+			}
+		},
+		{
+			arrayFilters: [{ 'team.id': teamId }]
+		}
+	);
+
+	return result.matchedCount > 0;
 }
 
-export async function deleteRosterMember(teamId: ObjectId, memberId: ObjectId) {
-    const teamDoc = await models.RosterTeamModel.findOne({ _id: teamId });
-    if (!teamDoc) return;
+export async function updateRosterMember(
+	gameId: ObjectId,
+	teamId: string,
+	memberId: string,
+	member: Partial<types.RosterMember>
+): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const gamesCollection = database.collection<types.RosterGame>('rosters');
 
-    const memberDoc = await models.RosterMemberModel.findOne({ _id: memberId });
-    if (!memberDoc) return;
+	const result = await gamesCollection.updateOne(
+		{ _id: gameId },
+		{
+			$set: {
+				'teams.$[team].members.$[member]': member
+			}
+		},
+		{
+			arrayFilters: [{ 'team.id': teamId }, { 'member.id': memberId }]
+		}
+	);
 
-    if (memberDoc.picture) {
-        try {
-            await deleteFileFromAzure(memberDoc.picture, 'players');
-        } catch (error) {
-            console.error('Error deleting picture from Azure:', error);
-        }
-    }
-
-    await models.RosterMemberModel.deleteOne({ _id: memberId });
-    await teamDoc.save();
+	return result.matchedCount > 0;
 }
 
-export async function getArticles() {
-    const response = await models.ArticleModel.find().lean();
-    return response;
+export async function deleteRosterMember(
+	gameId: ObjectId,
+	teamId: string,
+	memberId: string
+): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const gamesCollection = database.collection<types.RosterGame>('rosters');
+
+	const member = await getRosterMemberById(gameId, teamId, memberId);
+	if (!member) return false;
+
+	if (member.picture) {
+		try {
+			await deleteFileFromAzure(member.picture, 'players');
+		} catch (error) {
+			console.error('Error deleting picture from Azure:', error);
+		}
+	}
+
+	const result = await gamesCollection.updateOne(
+		{ _id: gameId },
+		{
+			$pull: {
+				'teams.$[team].members': { id: memberId }
+			}
+		},
+		{
+			arrayFilters: [{ 'team.id': teamId }]
+		}
+	);
+
+	return result.matchedCount > 0;
 }
 
-export async function getClubs() {
-    const response = await models.ClubModel.find().lean();
-    return response;
+export async function getArticles(): Promise<WithId<types.Article>[]> {
+	const database = client.db(env.DB_NAME);
+	const articlesCollection = database.collection<types.Article>('articles');
+	const articlesCursor = articlesCollection.find();
+	const articles = await articlesCursor.toArray();
+	return articles;
 }
 
-export async function getClubByName(urlName: string) {
-    const clubDoc = await models.ClubModel.findOne({ urlName }).lean();
-    return clubDoc;
+export async function getClubs(): Promise<WithId<types.Club>[]> {
+	const database = client.db(env.DB_NAME);
+	const clubsCollection = database.collection<types.Club>('clubs');
+	const clubsCursor = clubsCollection.find();
+	const clubs = await clubsCursor.toArray();
+	return clubs;
 }
 
-export async function updateClub(id: ObjectId, club: types.Club) {
-    club.aboutHtml = DOMPurify.sanitize(await marked.parse(club.aboutText));
-    await models.ClubModel.updateOne({
-        _id: id,
-    }, club);
+export async function getClubByUrlName(urlName: string): Promise<WithId<types.Club> | null> {
+	const database = client.db(env.DB_NAME);
+	const clubsCollection = database.collection<types.Club>('clubs');
+	const clubDoc = await clubsCollection.findOne({
+		urlName: urlName
+	});
+	return clubDoc;
 }
 
-export async function addBoardMember(clubId: ObjectId, boardMember: types.BoardMember) {
-    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
-    if (!clubDoc) return null;
-    clubDoc.boardMembers.push(boardMember);
-    await clubDoc.save();
-    return boardMember;
+export async function updateClub(id: ObjectId, club: Partial<types.Club>): Promise<boolean> {
+	if (club.aboutText) {
+		club.aboutHtml = DOMPurify.sanitize(await marked.parse(club.aboutText));
+	}
+
+	const database = client.db(env.DB_NAME);
+	const clubsCollection = database.collection<types.Club>('clubs');
+	const result = await clubsCollection.updateOne(
+		{
+			_id: id
+		},
+		{ $set: club }
+	);
+
+	return result.matchedCount > 0;
 }
 
-export async function updateBoardMember(clubId: ObjectId, boardMemberIndex: number, boardMember: types.BoardMember) {
-    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
-    if (!clubDoc) return;
-    const boardMembers = clubDoc.boardMembers.toObject();
-    boardMembers[boardMemberIndex] = boardMember;
-    clubDoc.boardMembers = boardMembers
-    await clubDoc.save();
-    return boardMember;
+export async function addBoardMember(
+	clubId: ObjectId,
+	boardMember: types.BoardMember
+): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const clubsCollection = database.collection<types.Club>('clubs');
+
+	const result = await clubsCollection.updateOne(
+		{ _id: clubId },
+		{
+			$push: {
+				boardMembers: boardMember
+			}
+		}
+	);
+
+	return result.matchedCount > 0;
 }
 
-export async function deleteBoardMember(clubId: ObjectId, boardMemberIndex: number) {
-    const clubDoc = await models.ClubModel.findOne({ _id: clubId });
-    if (!clubDoc) return;
-    const boardMembers = clubDoc.boardMembers.toObject();
+export async function updateBoardMember(
+	clubId: ObjectId,
+	boardMemberId: string,
+	boardMember: Partial<types.BoardMember>
+): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const clubsCollection = database.collection<types.Club>('clubs');
 
-    const member = boardMembers[boardMemberIndex];
+	const result = await clubsCollection.updateOne(
+		{ _id: clubId },
+		{
+			$set: {
+				'boardMembers.$[boardMember]': boardMember
+			}
+		},
+		{
+			arrayFilters: [{ 'boardMember.id': boardMemberId }]
+		}
+	);
 
-    if (member.picture != 'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg') {
-        try {
-            await deleteFileFromAzure(member.profileImage, 'boards');
-        } catch (error) {
-            console.error('Error deleting picture from Azure:', error);
-        }
-    }
+	return result.matchedCount > 0;
+}
 
-    boardMembers.splice(boardMemberIndex, 1);
-    clubDoc.boardMembers = boardMembers;
-    await clubDoc.save();
+export async function deleteBoardMember(clubId: ObjectId, boardMemberId: string): Promise<boolean> {
+	const database = client.db(env.DB_NAME);
+	const clubsCollection = database.collection<types.Club>('clubs');
+
+	const club = await clubsCollection.findOne({ _id: clubId });
+	if (!club) return false;
+
+	const member = club.boardMembers.find((m) => m.id === boardMemberId);
+	if (!member) return false;
+
+	const defaultPicture =
+		'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg';
+	if (member.profileImage && member.profileImage !== defaultPicture) {
+		try {
+			await deleteFileFromAzure(member.profileImage, 'boards');
+		} catch (error) {
+			console.error('Error deleting picture from Azure:', error);
+		}
+	}
+
+	const result = await clubsCollection.updateOne(
+		{ _id: clubId },
+		{
+			$pull: {
+				boardMembers: { id: boardMemberId }
+			}
+		}
+	);
+
+	return result.matchedCount > 0;
 }
 
 export const uploadFileToBlob = async (file: File, containerName: string): Promise<string> => {
+	const arrayBuffer = await file.arrayBuffer();
+	const buffer = Buffer.from(arrayBuffer);
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+	const blobServiceClient = new BlobServiceClient(sasUrl);
+	const containerClient = blobServiceClient.getContainerClient(containerName);
+	const blobName = `${Date.now()}-${file.name}`;
+	const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-    const blobServiceClient = new BlobServiceClient(sasUrl);
-    const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobName = `${Date.now()}-${file.name}`;
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+	await blockBlobClient.uploadData(buffer, {
+		blobHTTPHeaders: {
+			blobContentType: file.type
+		}
+	});
 
-    await blockBlobClient.uploadData(buffer, {
-        blobHTTPHeaders: {
-            blobContentType: file.type,
-        },
-    });
-
-    return `${sasUrl.split('?')[0]}/${containerName}/${blobName}`;
+	return `${sasUrl.split('?')[0]}/${containerName}/${blobName}`;
 };
 
-export async function deleteFileFromAzure(pictureUrl: string, containerName: string): Promise<void> {
-    if (!pictureUrl) {
-        throw new Error('Invalid picture URL provided');
-    }
+export async function deleteFileFromAzure(
+	pictureUrl: string,
+	containerName: string
+): Promise<void> {
+	if (!pictureUrl) {
+		throw new Error('Invalid picture URL provided');
+	}
 
-    const blobServiceClient = new BlobServiceClient(sasUrl);
-    const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobName = pictureUrl.split('/').pop();
+	const blobServiceClient = new BlobServiceClient(sasUrl);
+	const containerClient = blobServiceClient.getContainerClient(containerName);
+	const blobName = pictureUrl.split('/').pop();
 
-    if (!blobName) {
-        throw new Error('Invalid blob name extracted from the URL');
-    }
+	if (!blobName) {
+		throw new Error('Invalid blob name extracted from the URL');
+	}
 
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+	const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-    await blockBlobClient.delete();
+	await blockBlobClient.delete();
 }
+
+export async function findUserByUsername(
+	username: string
+): Promise<WithId<serverTypes.User> | null> {
+	const database = client.db(env.DB_NAME);
+	const usersCollection = database.collection<serverTypes.User>('users');
+	return await usersCollection.findOne({ username });
+}
+
+export async function createUser(user: serverTypes.User): Promise<string> {
+	const database = client.db(env.DB_NAME);
+	const usersCollection = database.collection<serverTypes.User>('users');
+	const result = await usersCollection.insertOne(user);
+	return result.insertedId.toString();
+}
+
+export async function getUserById(id: string): Promise<WithId<serverTypes.User> | null> {
+	const database = client.db(env.DB_NAME);
+	const usersCollection = database.collection<serverTypes.User>('users');
+	return await usersCollection.findOne({ _id: id });
+}
+
+export async function createSession(userId: string, expiresAt: Date): Promise<string> {
+	const database = client.db(env.DB_NAME);
+	const sessionsCollection = database.collection<serverTypes.Session>('sessions');
+	const result = await sessionsCollection.insertOne({
+		_id: crypto.randomUUID(),
+		userId: userId,
+		expiresAt: expiresAt,
+		fresh: true
+	});
+	return result.insertedId;
+}
+
+export async function getSessionById(id: string): Promise<serverTypes.Session | null> {
+	const database = client.db(env.DB_NAME);
+	const sessionsCollection = database.collection<serverTypes.Session>('sessions');
+	return await sessionsCollection.findOne({ _id: id });
+}
+
+export async function deleteSession(id: string): Promise<void> {
+	const database = client.db(env.DB_NAME);
+	const sessionsCollection = database.collection<serverTypes.Session>('sessions');
+	await sessionsCollection.deleteOne({ _id: id });
+}
+
+export async function deleteExpiredSessions(): Promise<number> {
+	const database = client.db(env.DB_NAME);
+	const sessionsCollection = database.collection<serverTypes.Session>('sessions');
+	const result = await sessionsCollection.deleteMany({
+		expires_at: { $lt: new Date() }
+	});
+	return result.deletedCount;
+}
+
+run().catch(console.dir);

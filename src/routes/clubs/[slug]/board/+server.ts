@@ -1,51 +1,64 @@
-import type { RequestHandler } from "@sveltejs/kit";
-import { json } from "@sveltejs/kit";
-import * as db from "$lib/server/database";
-import type { BoardMember } from "$lib/types";
+import type { RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import * as db from '$lib/server/database';
+import type { BoardMember } from '$lib/types';
 
 export const POST: RequestHandler = async (event) => {
-    const slug = event.params.slug;
+	const slug = event.params.slug;
 
-    if (!slug) {
-        return json({
-            message: "Club not found"
-        }, { status: 404 });
-    }
-    
-    const formData = await event.request.formData();
-    const name = formData.get('name') as string;
-    const position = formData.get('position') as string;
-    const profileImageData = formData.get('profileImage') as File | null;
+	if (!slug) {
+		return json(
+			{
+				message: 'Club not found'
+			},
+			{ status: 404 }
+		);
+	}
 
-    const club = await db.getClubByName(slug);
+	const formData = await event.request.formData();
+	const name = formData.get('name') as string;
+	const position = formData.get('position') as string;
+	const profileImageData = formData.get('profileImage') as File | null;
 
-    if (!club) {
-        return json({
-            message: "Club not found"
-        }, { status: 404 });
-    }
+	const club = await db.getClubByUrlName(slug);
 
-    if (!event.locals.user?.admin_for.includes(club.urlName)) {
-        return json({
-            message: "You do not have permission to add members for this club"
-        }, { status: 403 });
-    }
+	if (!club) {
+		return json(
+			{
+				message: 'Club not found'
+			},
+			{ status: 404 }
+		);
+	}
 
-    let profileImage = 'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg';
+	if (!event.locals.user?.adminFor.includes(club.urlName)) {
+		return json(
+			{
+				message: 'You do not have permission to add members for this club'
+			},
+			{ status: 403 }
+		);
+	}
 
-    if (profileImageData) {
-        profileImage = await db.uploadFileToBlob(profileImageData, 'boards');
-    }
+	let profileImage =
+		'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg';
 
-    const newDoc = {
-        name,
-        position,
-        profileImage,
-    } as BoardMember;
+	if (profileImageData) {
+		profileImage = await db.uploadFileToBlob(profileImageData, 'boards');
+	}
 
-    const newBoardMember = await db.addBoardMember(club._id, newDoc);
+	const newDoc = {
+		name,
+		position,
+		profileImage
+	} as BoardMember;
 
-    return json({
-        member: newBoardMember
-    }, { status: 200 });
+	const newBoardMember = await db.addBoardMember(club._id, newDoc);
+
+	return json(
+		{
+			member: newBoardMember
+		},
+		{ status: 200 }
+	);
 };

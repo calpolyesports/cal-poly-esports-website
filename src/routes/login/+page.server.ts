@@ -1,8 +1,6 @@
-import { lucia } from '$lib/server/auth';
-import { UserModel } from '$lib/server/models';
+import { createSession, createSessionCookie, validatePassword } from '$lib/server/auth';
+import { findUserByUsername } from '$lib/server/database';
 import { fail, redirect } from '@sveltejs/kit';
-import { verify, hash } from '@node-rs/argon2';
-import { ObjectId } from 'mongodb';
 
 import type { ServerLoad, Actions } from '@sveltejs/kit';
 
@@ -39,7 +37,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const existingUser = await UserModel.findOne({ username });
+		const existingUser = await findUserByUsername(username);
 		if (!existingUser) {
 			return fail(400, {
 				username,
@@ -47,34 +45,16 @@ export const actions: Actions = {
 			});
 		}
 
-		const passwordIsValid = await verify(existingUser.password_hash, password, {
-			memoryCost: 19456,
-			timeCost: 2,
-			outputLen: 32,
-			parallelism: 1
-		});
-		if (!passwordIsValid) {
+		if (!validatePassword(password, existingUser.passwordHash)) {
 			return fail(400, {
 				username,
 				message: 'Invalid username or password'
 			});
 		}
 
-		console.log(
-			await hash('flipreset', {
-				memoryCost: 19456,
-				timeCost: 2,
-				outputLen: 32,
-				parallelism: 1
-			})
-		);
-
-		const session = await lucia.createSession(existingUser._id.toString(), {});
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
-			...sessionCookie.attributes
-		});
+		const session = await createSession(existingUser._id.toString());
+		const sessionCookie = createSessionCookie(session._id);
+		event.cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 		redirect(302, '/admin');
 	}
 };

@@ -1,46 +1,68 @@
-import type { RequestHandler } from "@sveltejs/kit";
-import { json } from "@sveltejs/kit";
-import * as db from "$lib/server/database";
-import * as models from "$lib/server/models";
-import { ObjectId } from "mongodb";
-import type { RosterTeam } from "$lib/types";
+import type { RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import * as db from '$lib/server/database';
+import { ObjectId } from 'mongodb';
+import type { RosterTeam } from '$lib/types';
+import { nameToId } from '$lib/server/util';
 
 export const POST: RequestHandler = async (event) => {
-    const gameId = event.params.gameId;
+	const gameId = event.params.gameId;
 
-    const body = await event.request.json();
-    const name = body.name;
+	if (!gameId) {
+		return json(
+			{
+				message: 'Missing parameters'
+			},
+			{ status: 400 }
+		);
+	}
 
-    const game = await db.getRosterGameById(new ObjectId(gameId));
+	const formData = await event.request.formData();
+	const name = formData.get('name') as string;
 
-    if (!game) {
-        return json({
-            message: "Game not found"
-        }, { status: 404 });
-    }
+	const game = await db.getRosterGameById(new ObjectId(gameId));
 
-    if (!event.locals.user?.admin_for.includes(game.adminRole)) {
-        return json({
-            message: "You do not have permission to add teams for this game"
-        }, { status: 403 });
-    }
+	if (!game) {
+		return json(
+			{
+				message: 'Game not found'
+			},
+			{ status: 404 }
+		);
+	}
 
-    const newDoc = {
-        name,
-        members: []
-    } as RosterTeam;
+	if (!event.locals.user?.adminFor.includes(game.adminRole)) {
+		return json(
+			{
+				message: 'You do not have permission to add teams for this game'
+			},
+			{ status: 403 }
+		);
+	}
 
-    const newId = await db.addRosterTeam(new ObjectId(gameId), newDoc);
+	const newDoc = {
+		id: nameToId(name),
+		name,
+		members: []
+	} as RosterTeam;
 
-    if (!newId) {
-        return json({
-            message: "Failed to add team"
-        }, { status: 500 });
-    }
+	const success = await db.addRosterTeam(new ObjectId(gameId), newDoc);
 
-    const newTeam = await db.getRosterTeamById(newId);
+	if (!success) {
+		return json(
+			{
+				message: 'Failed to add team'
+			},
+			{ status: 500 }
+		);
+	}
 
-    return json({
-        team: newTeam
-    }, { status: 200 });
+	const newTeam = await db.getRosterTeamById(new ObjectId(gameId), newDoc.id);
+
+	return json(
+		{
+			team: newTeam
+		},
+		{ status: 200 }
+	);
 };

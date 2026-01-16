@@ -3,15 +3,15 @@ import type { WithStringId, Event } from '$lib/types';
 import type { ServerLoad } from '@sveltejs/kit';
 
 export const load: ServerLoad = async (event) => {
-    const events = (await db.getEvents(event.locals.user?.admin_for, true)).map((event) => {
-        return {
-            ...event,
-            _id: event._id.toString(),
-        };
-    }) as WithStringId<Event>[];
+	const events = (await db.getEvents(event.locals.user?.adminFor, true)).map((event) => {
+		return {
+			...event,
+			_id: event._id.toString()
+		};
+	}) as WithStringId<Event>[];
 
-    return {
-        subtitle: 'Calendar',
-        events,
-    };
-}
+	return {
+		subtitle: 'Calendar',
+		events
+	};
+};

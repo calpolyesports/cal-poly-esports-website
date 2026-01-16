@@ -1,126 +1,188 @@
-import type { RequestHandler } from "@sveltejs/kit";
-import { json } from "@sveltejs/kit";
-import * as db from "$lib/server/database";
-import * as models from "$lib/server/models";
-import { ObjectId } from "mongodb";
-import type { RosterTeam, RosterMember } from "$lib/types";
+import type { RequestHandler } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import * as db from '$lib/server/database';
+import { ObjectId } from 'mongodb';
+import type { RosterTeam, RosterMember } from '$lib/types';
+import { nameToId } from '$lib/server/util';
 
 export const POST: RequestHandler = async (event) => {
-    const gameId = event.params.gameId;
-    const teamId = event.params.teamId;
+	const gameId = event.params.gameId;
+	const teamId = event.params.teamId;
 
-    const formData = await event.request.formData();
-    const name = formData.get('name') as string;
-    const username = formData.get('username') as string;
-    const role = formData.get('role') as string;
-    const pictureData = formData.get('picture') as File | null;
+	if (!gameId || !teamId) {
+		return json(
+			{
+				message: 'Missing parameters'
+			},
+			{ status: 400 }
+		);
+	}
 
-    const game = await db.getRosterGameById(new ObjectId(gameId));
+	const formData = await event.request.formData();
+	const name = formData.get('name') as string;
+	const id = nameToId(name);
+	const username = formData.get('username') as string;
+	const role = formData.get('role') as string;
+	const pictureData = formData.get('picture') as File | null;
 
-    if (!game) {
-        return json({
-            message: "Game not found"
-        }, { status: 404 });
-    }
+	const game = await db.getRosterGameById(new ObjectId(gameId));
 
-    const team = await db.getRosterTeamById(new ObjectId(teamId));
+	if (!game) {
+		return json(
+			{
+				message: 'Game not found'
+			},
+			{ status: 404 }
+		);
+	}
 
-    if (!team) {
-        return json({
-            message: "Team not found"
-        }, { status: 404 });
-    }
+	const team = game.teams.find((team) => team.id === teamId);
 
-    if (!event.locals.user?.admin_for.includes(game.adminRole)) {
-        return json({
-            message: "You do not have permission to add members for this game"
-        }, { status: 403 });
-    }
+	if (!team) {
+		return json(
+			{
+				message: 'Team not found'
+			},
+			{ status: 404 }
+		);
+	}
 
-    let picture = null;
+	if (!event.locals.user?.adminFor.includes(game.adminRole)) {
+		return json(
+			{
+				message: 'You do not have permission to add members for this game'
+			},
+			{ status: 403 }
+		);
+	}
 
-    if (pictureData) {
-        picture = await db.uploadFileToBlob(pictureData, 'players');
-    }
+	let picture = null;
 
-    const newDoc = {
-        name,
-        username,
-        role,
-        picture
-    } as unknown as RosterMember;
+	if (pictureData) {
+		picture = await db.uploadFileToBlob(pictureData, 'players');
+	}
 
-    const newId = await db.addRosterMember(new ObjectId(teamId), newDoc);
+	const newDoc = {
+		id,
+		name,
+		username,
+		role,
+		picture
+	} as RosterMember;
 
-    if (!newId) {
-        return json({
-            message: "Failed to add member"
-        }, { status: 500 });
-    }
+	const success = await db.addRosterMember(new ObjectId(gameId), teamId, newDoc);
 
-    const newMember = await db.getRosterMemberById(newId);
+	if (!success) {
+		return json(
+			{
+				message: 'Failed to add member'
+			},
+			{ status: 500 }
+		);
+	}
 
-    return json({
-        member: newMember
-    }, { status: 200 });
+	const newMember = await db.getRosterMemberById(new ObjectId(gameId), teamId, id);
+
+	return json(
+		{
+			member: newMember
+		},
+		{ status: 200 }
+	);
 };
 
 export const PUT: RequestHandler = async (event) => {
-    const gameId = event.params.gameId;
-    const teamId = event.params.teamId;
+	const gameId = event.params.gameId;
+	const teamId = event.params.teamId;
 
-    const body = await event.request.json();
-    const name = body.name;
+	if (!gameId || !teamId) {
+		return json(
+			{
+				message: 'Missing parameters'
+			},
+			{ status: 400 }
+		);
+	}
 
-    const game = await db.getRosterGameById(new ObjectId(gameId));
+	const formData = await event.request.formData();
+	const name = formData.get('name') as string;
 
-    if (!game) {
-        return json({
-            message: "Game not found"
-        }, { status: 404 });
-    }
+	const game = await db.getRosterGameById(new ObjectId(gameId));
 
-    if (!event.locals.user?.admin_for.includes(game.adminRole)) {
-        return json({
-            message: "You do not have permission to update teams for this game"
-        }, { status: 403 });
-    }
+	if (!game) {
+		return json(
+			{
+				message: 'Game not found'
+			},
+			{ status: 404 }
+		);
+	}
 
-    const newDoc = {
-        name,
-        // purposefully omit members
-    } as RosterTeam;
+	if (!event.locals.user?.adminFor.includes(game.adminRole)) {
+		return json(
+			{
+				message: 'You do not have permission to update teams for this game'
+			},
+			{ status: 403 }
+		);
+	}
 
-    await db.updateRosterTeam(new ObjectId(teamId), newDoc);
+	const newDoc = {
+		name
+		// purposefully omit members
+	} as RosterTeam;
 
-    const newTeam = await db.getRosterTeamById(new ObjectId(teamId));
+	await db.updateRosterTeam(new ObjectId(gameId), teamId, newDoc);
 
-    return json({
-        team: newTeam
-    }, { status: 200 });
+	const newTeam = await db.getRosterTeamById(new ObjectId(gameId), teamId);
+
+	return json(
+		{
+			team: newTeam
+		},
+		{ status: 200 }
+	);
 };
 
 export const DELETE: RequestHandler = async (event) => {
-    const gameId = event.params.gameId;
-    const teamId = event.params.teamId;
+	const gameId = event.params.gameId;
+	const teamId = event.params.teamId;
 
-    const game = await db.getRosterGameById(new ObjectId(gameId));
+	if (!gameId || !teamId) {
+		return json(
+			{
+				message: 'Missing parameters'
+			},
+			{ status: 400 }
+		);
+	}
 
-    if (!game) {
-        return json({
-            message: "Game not found"
-        }, { status: 404 });
-    }
+	const game = await db.getRosterGameById(new ObjectId(gameId));
 
-    if (!event.locals.user?.admin_for.includes(game.adminRole)) {
-        return json({
-            message: "You do not have permission to delete teams for this game"
-        }, { status: 403 });
-    }
+	if (!game) {
+		return json(
+			{
+				message: 'Game not found'
+			},
+			{ status: 404 }
+		);
+	}
 
-    await db.deleteRosterTeam(new ObjectId(gameId), new ObjectId(teamId));
+	if (!event.locals.user?.adminFor.includes(game.adminRole)) {
+		return json(
+			{
+				message: 'You do not have permission to delete teams for this game'
+			},
+			{ status: 403 }
+		);
+	}
 
-    return json({
-        message: "Team deleted"
-    }, { status: 200 });
+	await db.deleteRosterTeam(new ObjectId(gameId), teamId);
+
+	return json(
+		{
+			message: 'Team deleted'
+		},
+		{ status: 200 }
+	);
 };
