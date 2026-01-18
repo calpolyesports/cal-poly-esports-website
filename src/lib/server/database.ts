@@ -31,6 +31,13 @@ async function run() {
 	}
 }
 
+export function stringifyObjectId<T>(obj: WithId<T>): types.WithStringId<T> {
+	return {
+		...obj,
+		_id: obj._id.toString()
+	} as types.WithStringId<T>;
+}
+
 export async function getEvents(
 	adminFor?: string[],
 	publicOnly: boolean = false

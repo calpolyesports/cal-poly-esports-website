@@ -1,23 +1,17 @@
 <script lang="ts">
 	import PlayerCard from './PlayerCard.svelte';
-	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
+	import type { WithStringId, RosterGame, RosterTeam } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
-	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
-
-	interface ModalTeam {
-		name: string;
-	}
+	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 
 	let {
 		game,
 		team,
-		isAdmin,
-		onRemove
+		isAdmin
 	}: {
 		game: WithStringId<RosterGame>;
-		team: WithStringId<RosterTeam>;
+		team: RosterTeam;
 		isAdmin: boolean;
-		onRemove: (id: string) => void;
 	} = $props();
 
 	let addMemberModal: ModalForm | undefined = $state(undefined);
@@ -35,54 +29,6 @@
 		{ name: 'name', type: 'text', required: true }
 	] as ModalFieldDefinition[];
 
-	//////////////////////
-	// API INTERACTIONS //
-	//////////////////////
-
-	const sendAddMember = async (
-		formData: FormData
-	): Promise<WithStringId<RosterMember> | undefined> => {
-		const response = await fetch(`/teams/${game._id}/${team._id}`, {
-			method: 'POST',
-			body: formData
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			team.members = [...team.members, data.member];
-		}
-
-		return undefined;
-	};
-
-	const sendUpdateTeam = async (
-		id: string,
-		team: ModalTeam
-	): Promise<WithStringId<RosterTeam> | undefined> => {
-		const response = await fetch(`/teams/${game._id}/${id}`, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(team)
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			return data.team;
-		}
-
-		return undefined;
-	};
-
-	const sendDeleteTeam = async (id: string): Promise<boolean> => {
-		const response = await fetch(`/teams/${game._id}/${id}`, {
-			method: 'DELETE'
-		});
-
-		return response.ok;
-	};
-
 	////////////////////
 	// EVENT HANDLERS //
 	////////////////////
@@ -92,49 +38,11 @@
 		addMemberModal?.showModal();
 	};
 
-	const onSubmitAddMember = async (modalFields: FilledModalFields) => {
-		const formData = new FormData();
-		formData.append('name', modalFields.name as string);
-		formData.append('username', modalFields.username as string);
-		formData.append('role', modalFields.role as string);
-		formData.append('picture', modalFields.picture as File);
-
-		sendAddMember(formData);
-
-		return {} as ModalErrors;
-	};
-
 	const onClickEditTeam = () => {
 		editTeamModal?.fillFields({
 			name: team.name
 		});
 		editTeamModal?.showModal();
-	};
-
-	const onSubmitEditTeam = async (values: FilledModalFields) => {
-		const updatedTeam = {
-			name: values.name as string
-		};
-		const responseTeam = await sendUpdateTeam(team._id, updatedTeam);
-		if (responseTeam) {
-			team = responseTeam;
-			console.log(team);
-		}
-
-		return {} as ModalErrors;
-	};
-
-	const onSubmitDeleteTeam = async () => {
-		const deleted = await sendDeleteTeam(team._id);
-		if (deleted) {
-			onRemove(team._id);
-		}
-
-		return {} as ModalErrors;
-	};
-
-	const onMemberRemove = (id: string) => {
-		team.members = team.members.filter((m) => m._id !== id);
 	};
 </script>
 
@@ -147,15 +55,8 @@
 		</div>
 	{/if}
 	<div class="member-grid">
-		{#each team.members as member, i (member._id)}
-			<PlayerCard
-				{game}
-				{team}
-				player={member}
-				playerIndex={i}
-				{isAdmin}
-				onRemove={onMemberRemove}
-			/>
+		{#each team.members as member, i (member.id)}
+			<PlayerCard {game} {team} player={member} playerIndex={i} {isAdmin} />
 		{/each}
 	</div>
 </div>
@@ -165,16 +66,17 @@
 		bind:this={addMemberModal}
 		title="Add Member"
 		fields={memberModalFields}
-		actions={[{ name: 'Submit', callback: onSubmitAddMember }]}
+		actions={[{ name: 'Submit', action: `/teams/${game._id}/${team.id}/create` }]}
 	/>
 
 	<ModalForm
 		bind:this={editTeamModal}
 		title="Edit Team"
 		fields={teamModalFields}
+		extraInfo={{ id: team.id }}
 		actions={[
-			{ name: 'Submit', callback: onSubmitEditTeam },
-			{ name: 'Delete', callback: onSubmitDeleteTeam }
+			{ name: 'Submit', action: `/teams/${game._id}/edit` },
+			{ name: 'Delete', action: `/teams/${game._id}/delete` }
 		]}
 	/>
 {/if}

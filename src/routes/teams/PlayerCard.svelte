@@ -2,22 +2,20 @@
 	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
 
-	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
+	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 
 	let {
 		game,
 		team,
 		player,
 		playerIndex,
-		isAdmin,
-		onRemove
+		isAdmin
 	}: {
 		game: WithStringId<RosterGame>;
-		team: WithStringId<RosterTeam>;
-		player: WithStringId<RosterMember>;
+		team: RosterTeam;
+		player: RosterMember;
 		playerIndex: number;
 		isAdmin: boolean;
-		onRemove: (id: string) => void;
 	} = $props();
 
 	let editMemberModal: ModalForm | undefined = $state(undefined);
@@ -29,34 +27,9 @@
 		{ name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true }
 	] as ModalFieldDefinition[];
 
-	//////////////////////
-	// API INTERACTIONS //
-	//////////////////////
-
-	const sendUpdateMember = async (
-		id: string,
-		formData: FormData
-	): Promise<WithStringId<RosterMember> | undefined> => {
-		const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
-			method: 'PUT',
-			body: formData
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			return data.member;
-		}
-
-		return undefined;
-	};
-
-	const sendDeleteMember = async (id: string): Promise<boolean> => {
-		const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
-			method: 'DELETE'
-		});
-
-		return response.ok;
-	};
+	////////////////////
+	// EVENT HANDLERS //
+	////////////////////
 
 	const onClick = () => {
 		if (!isAdmin) return;
@@ -67,31 +40,6 @@
 			picture: player.picture
 		});
 		editMemberModal?.showModal();
-	};
-
-	const onSubmitEdit = async (modalFields: FilledModalFields) => {
-		const formData = new FormData();
-		formData.append('name', modalFields.name as string);
-		formData.append('username', modalFields.username as string);
-		formData.append('role', modalFields.role as string);
-		formData.append('picture', modalFields.picture as File);
-
-		const updated = await sendUpdateMember(player._id, formData);
-		if (updated) {
-			player = updated;
-			team.members = team.members.map((m) => (m._id === player._id ? player : m));
-		}
-
-		return {} as ModalErrors;
-	};
-
-	const onSubmitDelete = async () => {
-		const deleted = await sendDeleteMember(player._id);
-		if (deleted) {
-			onRemove(player._id);
-		}
-
-		return {} as ModalErrors;
 	};
 </script>
 
@@ -119,9 +67,10 @@
 		bind:this={editMemberModal}
 		title="Edit Member"
 		fields={modalFields}
+		extraInfo={{ id: player.id }}
 		actions={[
-			{ name: 'Submit', callback: onSubmitEdit },
-			{ name: 'Delete', callback: onSubmitDelete }
+			{ name: 'Submit', action: `/teams/${game._id}/${team.id}/edit` },
+			{ name: 'Delete', action: `/teams/${game._id}/${team.id}/delete` }
 		]}
 	/>
 {/if}

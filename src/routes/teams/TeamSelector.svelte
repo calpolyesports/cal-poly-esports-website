@@ -3,14 +3,10 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 
-	import type { WithStringId, RosterGame, RosterTeam } from '$lib/types';
+	import type { WithStringId, RosterGame } from '$lib/types';
 	import MemberGrid from './MemberGrid.svelte';
 	import ModalForm from '$lib/ModalForm.svelte';
-	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
-
-	interface ModalTeam {
-		name: string;
-	}
+	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 
 	let {
 		games,
@@ -71,27 +67,6 @@
 		}
 	});
 
-	//////////////////////
-	// API INTERACTIONS //
-	//////////////////////
-
-	const sendAddTeam = async (newTeam: ModalTeam): Promise<WithStringId<RosterTeam> | undefined> => {
-		const response = await fetch(`/teams/${activeGameId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(newTeam)
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			return data.team;
-		}
-
-		return undefined;
-	};
-
 	////////////////////
 	// EVENT HANDLERS //
 	////////////////////
@@ -99,32 +74,6 @@
 	const onClickAddTeam = () => {
 		addTeamModal.clearFields();
 		addTeamModal.showModal();
-	};
-
-	const onSubmitAddTeam = async (values: FilledModalFields) => {
-		const newTeam = {
-			name: values.name as string
-		};
-		const team = await sendAddTeam(newTeam);
-		if (team) {
-			games = games.map((game) => {
-				if (game._id === activeGameId) {
-					game.teams.push(team);
-				}
-				return game;
-			});
-		}
-
-		return {} as ModalErrors;
-	};
-
-	const onTeamRemove = (teamId: string) => {
-		games = games.map((game) => {
-			if (game._id === activeGameId) {
-				game.teams = game.teams.filter((team) => team._id !== teamId);
-			}
-			return game;
-		});
 	};
 </script>
 
@@ -147,13 +96,8 @@
 			{#if adminFor.includes(game.adminRole)}
 				<button class="button-small" onclick={onClickAddTeam}>Add Team</button>
 			{/if}
-			{#each game.teams as team (team._id)}
-				<MemberGrid
-					{game}
-					{team}
-					isAdmin={adminFor.includes(game.adminRole)}
-					onRemove={onTeamRemove}
-				/>
+			{#each game.teams as team (team.id)}
+				<MemberGrid {game} {team} isAdmin={adminFor.includes(game.adminRole)} />
 			{/each}
 		{/if}
 	{/each}
@@ -163,7 +107,7 @@
 	bind:this={addTeamModal}
 	title="Add Team"
 	fields={teamModalFields}
-	actions={[{ name: 'Submit', callback: onSubmitAddTeam }]}
+	actions={[{ name: 'Submit', action: `/teams/${activeGameId}?/create` }]}
 />
 
 <style>

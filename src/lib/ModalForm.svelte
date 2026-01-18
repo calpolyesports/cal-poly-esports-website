@@ -9,7 +9,7 @@
 	export type FilledModalFields = { [key: string]: string | Date | File | boolean | null };
 	export type ModalAction = {
 		name: string;
-		callback: (values: FilledModalFields) => Promise<ModalErrors>;
+		action: string;
 	};
 	export type ModalErrors = { [key: string]: string };
 </script>
@@ -18,13 +18,15 @@
 	import Modal from './Modal.svelte';
 
 	let {
-		title = '',
+		title,
 		fields = [],
-		actions = []
+		actions = [],
+		extraInfo
 	}: {
 		title: string;
-		fields: ModalFieldDefinition[] | undefined;
-		actions: ModalAction[] | undefined;
+		fields?: ModalFieldDefinition[];
+		actions?: ModalAction[];
+		extraInfo?: Record<string, string>;
 	} = $props();
 
 	let errors: ModalErrors = $state({});
@@ -85,61 +87,10 @@
 		});
 		errors = {};
 	};
-
-	async function runCallbackWithFormData(
-		callback: (values: FilledModalFields) => Promise<ModalErrors>
-	) {
-		const formData: FilledModalFields = {};
-		errors = {};
-		fields.forEach((field) => {
-			const value = bindings[field.name];
-			if (field.required && (value === '' || value === null)) {
-				errors[field.name] = 'This field is required.';
-			} else {
-				if (field.type === 'date') {
-					if (typeof value === 'string') {
-						formData[field.name] = value ? new Date(value) : null;
-					} else {
-						errors[field.name] = 'Invalid date type. Please contact support.';
-					}
-				} else {
-					formData[field.name] = value;
-				}
-			}
-		});
-
-		errors = await callback(formData);
-		if (Object.keys(errors).length === 0) {
-			hideModal();
-		}
-	}
-
-	function handleFileChange(event: Event, field: ModalFieldDefinition) {
-		const input = event.target as HTMLInputElement;
-
-		if (input && input.files && input.files.length > 0) {
-			const file = input.files[0];
-			// TODO: cleanup?
-			const validExtensions = field.validExtensions ?? ([] as unknown as [string]);
-
-			const fileExtension = file.name.split('.').pop()?.toLowerCase();
-			if (validExtensions.length > 0 && !validExtensions.includes(`.${fileExtension}`)) {
-				errors[field.name] = `File must be of type: ${validExtensions.join(', ')}`;
-				bindings[field.name] = null;
-			} else {
-				// TODO: does this work????????
-				delete errors[field.name];
-				bindings[field.name] = file;
-			}
-		} else {
-			errors[field.name] = 'File input or file selection is invalid';
-			bindings[field.name] = null;
-		}
-	}
 </script>
 
 <Modal bind:this={modal} bind:title>
-	<div class="form">
+	<form method="POST">
 		{#each fields as field (field.name)}
 			<label for={field.name}>
 				{field.name}
@@ -163,12 +114,7 @@
 					{/each}
 				</select>
 			{:else if field.type === 'file'}
-				<input
-					id={field.name}
-					type="file"
-					accept={field.validExtensions?.join()}
-					onchange={(event) => handleFileChange(event, field)}
-				/>
+				<input id={field.name} type="file" accept={field.validExtensions?.join()} />
 			{:else if field.type === 'checkbox'}
 				<input
 					type="checkbox"
@@ -184,16 +130,20 @@
 
 		<br />
 
+		{#if extraInfo}
+			{#each Object.entries(extraInfo) as [key, value] (key)}
+				<input type="hidden" name={key} {value} />
+			{/each}
+		{/if}
+
 		{#each actions as action (action.name)}
-			<button class="button-medium" onclick={() => runCallbackWithFormData(action.callback)}
-				>{action.name}</button
-			>
+			<button class="button-medium" type="submit" formaction={action.action}>{action.name}</button>
 		{/each}
-	</div>
+	</form>
 </Modal>
 
 <style>
-	div.form {
+	form {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;

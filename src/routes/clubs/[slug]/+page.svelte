@@ -2,7 +2,7 @@
 	import AboutText from './AboutText.svelte';
 	import type { WithStringId, Club } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
-	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
+	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 	import ClubEventLink from './ClubEventLink.svelte';
 	import type { PageData } from './$types';
 
@@ -16,7 +16,7 @@
 	let addMemberModal: ModalForm | undefined = $state(undefined);
 
 	let editMemberModal: ModalForm | undefined = $state(undefined);
-	let selectedMemberIndex: number | undefined;
+	let selectedMemberId: string | undefined = $state(undefined);
 
 	const memberModalFields = [
 		{ name: 'name', type: 'text', required: true },
@@ -49,38 +49,6 @@
 		}
 	};
 
-	const sendAddMember = async (club: Club, formData: FormData) => {
-		const response = await fetch(`/clubs/${club.urlName}/board`, {
-			method: 'POST',
-			body: formData
-		});
-
-		if (response.ok) {
-			const body = await response.json();
-			return body.member;
-		}
-	};
-
-	const sendUpdateMember = async (club: Club, memberIndex: number, formData: FormData) => {
-		const response = await fetch(`/clubs/${club.urlName}/board/${memberIndex}`, {
-			method: 'PUT',
-			body: formData
-		});
-
-		if (response.ok) {
-			const body = await response.json();
-			return body.member;
-		}
-	};
-
-	const sendDeleteMember = async (club: Club, memberIndex: number) => {
-		const response = await fetch(`/clubs/${club.urlName}/board/${memberIndex}`, {
-			method: 'DELETE'
-		});
-
-		return response.ok;
-	};
-
 	//////////////
 	// HANDLERS //
 	//////////////
@@ -104,64 +72,17 @@
 		addMemberModal?.showModal();
 	};
 
-	const onSubmitAddMember = async (fields: FilledModalFields) => {
-		if (club) {
-			const formData = new FormData();
-			formData.append('name', fields.name as string);
-			formData.append('position', fields.position as string);
-			formData.append('profileImage', fields.selectedFile as File);
-
-			const member = await sendAddMember(club, formData);
-			if (member) {
-				club.boardMembers = [...club.boardMembers, member];
-				addMemberModal?.hideModal();
-			}
-		}
-
-		return {} as ModalErrors;
-	};
-
-	const onClickEditMember = (index: number) => {
+	const onClickEditMember = (id: string) => {
 		if (!canEdit) return;
-		const member = club?.boardMembers[index];
+		const member = club?.boardMembers.find((m) => m.id === id);
 		if (member) {
-			selectedMemberIndex = index;
+			selectedMemberId = id;
 			editMemberModal?.fillFields({
 				name: member.name,
 				position: member.position
 			});
 			editMemberModal?.showModal();
 		}
-	};
-
-	const onSubmitEditMember = async (fields: FilledModalFields) => {
-		if (club && selectedMemberIndex !== undefined) {
-			const formData = new FormData();
-			formData.append('name', fields.name as string);
-			formData.append('position', fields.position as string);
-			formData.append('profileImage', fields.selectedFile as File);
-			const member = await sendUpdateMember(club, selectedMemberIndex, formData);
-			if (member) {
-				club.boardMembers = club.boardMembers.map((m, i) =>
-					i === selectedMemberIndex ? member : m
-				);
-				editMemberModal?.hideModal();
-			}
-		}
-
-		return {} as ModalErrors;
-	};
-
-	const onSubmitDeleteMember = async () => {
-		if (club && selectedMemberIndex !== undefined) {
-			const deleted = await sendDeleteMember(club, selectedMemberIndex);
-			if (deleted) {
-				club.boardMembers = club.boardMembers.filter((_, i) => i !== selectedMemberIndex);
-				editMemberModal?.hideModal();
-			}
-		}
-
-		return {} as ModalErrors;
 	};
 </script>
 
@@ -197,10 +118,10 @@
 			<button class="button-medium" onclick={onClickAddMember}>Add Board Member</button>
 		{/if}
 		<ul class="board-members">
-			{#each club.boardMembers as member, i (member.name)}
+			{#each club.boardMembers as member, i (member.id)}
 				<!-- TODO: no more svelte-ignore -->
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<div role="button" tabindex={i} onclick={() => onClickEditMember(i)}>
+				<div role="button" tabindex={i} onclick={() => onClickEditMember(member.id)}>
 					<li>
 						{#if member.profileImage}
 							<img src={member.profileImage} alt={member.name} />
@@ -218,16 +139,21 @@
 			bind:this={addMemberModal}
 			title="Add Board Member"
 			fields={memberModalFields}
-			actions={[{ name: 'Submit', callback: onSubmitAddMember }]}
+			actions={[{ name: 'Submit', action: '?/board/create' }]}
 		/>
 
 		<ModalForm
 			bind:this={editMemberModal}
 			title="Edit Board Member"
 			fields={memberModalFields}
+			extraInfo={selectedMemberId
+				? {
+						id: selectedMemberId
+					}
+				: undefined}
 			actions={[
-				{ name: 'Submit', callback: onSubmitEditMember },
-				{ name: 'Delete', callback: onSubmitDeleteMember }
+				{ name: 'Submit', action: '?/board/edit' },
+				{ name: 'Delete', action: '?/board/delete' }
 			]}
 		/>
 	{/if}

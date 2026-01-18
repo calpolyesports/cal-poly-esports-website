@@ -1,75 +1,17 @@
 <script lang="ts">
 	import EventCalendar from '$lib/EventCalendar.svelte';
-	import type { ModalEvent } from '$lib/EventCalendar.svelte';
-	import type { WithStringId, Event } from '$lib/types.js';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-
-	//////////////////////
-	// API INTERACTIONS //
-	//////////////////////
-
-	const sendAddEvent = async (event: ModalEvent): Promise<WithStringId<Event> | undefined> => {
-		const response = await fetch('/calendar', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(event)
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			return data.event;
-		}
-
-		return undefined;
-	};
-
-	const sendUpdateEvent = async (
-		id: string,
-		event: ModalEvent
-	): Promise<WithStringId<Event> | undefined> => {
-		const response = await fetch(`/calendar/${id}`, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(event)
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			return data.event;
-		}
-
-		return undefined;
-	};
-
-	const sendDeleteEvent = async (id: string): Promise<boolean> => {
-		const response = await fetch(`/calendar/${id}`, {
-			method: 'DELETE'
-		});
-
-		return response.ok;
-	};
 </script>
 
 <div>
 	<h1>Admin</h1>
 </div>
 
-<EventCalendar
-	events={data.events}
-	clubs={data.clubs}
-	adminFor={data.adminFor}
-	{sendAddEvent}
-	{sendUpdateEvent}
-	{sendDeleteEvent}
-/>
+<EventCalendar events={data.events} clubs={data.clubs} adminFor={data.adminFor} />
 
 <!-- Ethernet Availability Info in Table -->
 <div class="ethernet-availability">

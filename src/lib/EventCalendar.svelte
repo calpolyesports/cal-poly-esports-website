@@ -1,26 +1,9 @@
-<script lang="ts" module>
-	export type ModalEvent = {
-		title: string;
-		start: Date;
-		end: Date;
-		club: string;
-		location?: string;
-		description?: string;
-		usesLab: boolean;
-		showPublic: boolean;
-	};
-</script>
-
 <script lang="ts">
-	import { Calendar } from '@event-calendar/core';
-	import DayGrid from '@event-calendar/day-grid';
-	import TimeGrid from '@event-calendar/time-grid';
-	import List from '@event-calendar/list';
-	import Interaction from '@event-calendar/interaction';
+	import { Calendar, DayGrid, TimeGrid, List, Interaction } from '@event-calendar/core';
 	import type { WithStringId, Event, Club } from '$lib/types.js';
 	import Modal from '$lib/Modal.svelte';
 	import ModalForm from '$lib/ModalForm.svelte';
-	import type { ModalFieldDefinition, FilledModalFields, ModalErrors } from '$lib/ModalForm.svelte';
+	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { SvelteDate } from 'svelte/reactivity';
@@ -29,17 +12,11 @@
 	let {
 		events,
 		clubs,
-		adminFor,
-		sendAddEvent,
-		sendUpdateEvent,
-		sendDeleteEvent
+		adminFor
 	}: {
 		events: WithStringId<Event>[];
 		clubs: WithStringId<Club>[];
 		adminFor: WithStringId<Club>[];
-		sendAddEvent: (event: ModalEvent) => Promise<WithStringId<Event> | undefined>;
-		sendUpdateEvent: (id: string, event: ModalEvent) => Promise<WithStringId<Event> | undefined>;
-		sendDeleteEvent: (id: string) => Promise<boolean>;
 	} = $props();
 
 	const clubOptions: [string, string][] = $derived(
@@ -108,17 +85,19 @@
 			});
 			addModal.showModal();
 		},
-		eventDrop: async (event) => {
-			const editedEvent = syncEventTimeInfo(event.event);
-			if (editedEvent && !(await sendUpdateEvent(editedEvent._id, editedEvent))) {
-				event.revert();
-			}
+		eventDrop: async (_event) => {
+			// TODO: bring back this functionality
+			// const editedEvent = syncEventTimeInfo(event.event);
+			// if (editedEvent && !(await sendUpdateEvent(editedEvent._id, editedEvent))) {
+			// 	event.revert();
+			// }
 		},
-		eventResize: async (event) => {
-			const editedEvent = syncEventTimeInfo(event.event);
-			if (editedEvent && !(await sendUpdateEvent(editedEvent._id, editedEvent))) {
-				event.revert();
-			}
+		eventResize: async (_event) => {
+			// TODO: bring back this functionality
+			// const editedEvent = syncEventTimeInfo(event.event);
+			// if (editedEvent && !(await sendUpdateEvent(editedEvent._id, editedEvent))) {
+			// 	event.revert();
+			// }
 		},
 		eventClick: async (event) => {
 			const clickedEvent = event.event;
@@ -144,16 +123,6 @@
 	//////////////////////
 	// CALENDAR HELPERS //
 	//////////////////////
-
-	const syncEventTimeInfo = (event: Calendar.Event) => {
-		const targetEvent = events.find((e) => e._id === event.id);
-		if (!targetEvent) {
-			return;
-		}
-		targetEvent.start = event.start;
-		targetEvent.end = event.end;
-		return targetEvent;
-	};
 
 	const hasPermissions = (event: Event) => {
 		return adminFor.find((club) => club.urlName === event.club);
@@ -181,20 +150,6 @@
 		};
 	};
 
-	const rawModalInfoToModalEvent = (info: FilledModalFields) => {
-		return {
-			title: info.title as string,
-			start: info.start as Date,
-			end: info.end as Date,
-			club: info.club as string,
-			location: info.location === '' ? undefined : (info.location as string),
-			locationLink: info.locationLink === '' ? undefined : (info.locationLink as string),
-			description: info.description === '' ? undefined : (info.description as string),
-			showPublic: info.showPublic as boolean,
-			usesLab: info.usesLab as boolean
-		} as ModalEvent;
-	};
-
 	const syncCalendarWithEvents = () => {
 		let filteredEvents = events.filter((event) => {
 			if (showLabEvents && event.usesLab) return true;
@@ -206,20 +161,6 @@
 
 		options.events = filteredEvents.map(convertToCalendarEvent);
 	};
-
-	function verifyEvent(event: ModalEvent): ModalErrors {
-		let errors = {} as ModalErrors;
-
-		if (!event.showPublic && !event.usesLab) {
-			errors['usesLab'] = 'An event must either be public or use the lab!';
-		}
-
-		if (event.end <= event.start) {
-			errors['end'] = 'End time must be after start time!';
-		}
-
-		return errors;
-	}
 
 	const toggleLabEvents = () => {
 		showLabEvents = !showLabEvents;
@@ -248,26 +189,6 @@
 		addModal.showModal();
 	};
 
-	const onSubmitAdd = async (modalFields: FilledModalFields) => {
-		const newEvent = rawModalInfoToModalEvent(modalFields);
-
-		const errors = verifyEvent(newEvent);
-		if (Object.keys(errors).length !== 0) {
-			return errors;
-		}
-
-		const event = await sendAddEvent(newEvent);
-		if (event) {
-			// correct date timezones for calendar
-			event.start = new Date(event.start);
-			event.end = new Date(event.end);
-			events.push(event);
-			syncCalendarWithEvents();
-		}
-
-		return {} as ModalErrors;
-	};
-
 	const onClickEdit = (event: WithStringId<Event>) => {
 		selectedEvent = event;
 		editModal.fillFields({
@@ -282,43 +203,6 @@
 			usesLab: event.usesLab ?? false
 		});
 		editModal.showModal();
-	};
-
-	const onSubmitEdit = async (modalFields: FilledModalFields) => {
-		if (!selectedEvent) {
-			return {} as ModalErrors;
-		}
-		const updatedEventInfo = rawModalInfoToModalEvent(modalFields);
-
-		const errors = verifyEvent(updatedEventInfo);
-		if (Object.keys(errors).length !== 0) {
-			return errors;
-		}
-
-		const updatedEvent = await sendUpdateEvent(selectedEvent._id, updatedEventInfo);
-		if (updatedEvent) {
-			// correct date timezones for calendar
-			updatedEvent.start = new Date(updatedEvent.start);
-			updatedEvent.end = new Date(updatedEvent.end);
-			events = events.map((e) => (e._id === updatedEvent._id ? updatedEvent : e));
-			syncCalendarWithEvents();
-		}
-
-		return {} as ModalErrors;
-	};
-
-	const onSubmitDelete = async (_values: FilledModalFields) => {
-		if (!selectedEvent) {
-			return {} as ModalErrors;
-		}
-		const clickedEvent = selectedEvent;
-		const success = await sendDeleteEvent(clickedEvent._id);
-		if (success) {
-			events = events.filter((e) => e._id !== clickedEvent._id);
-			syncCalendarWithEvents();
-		}
-
-		return {} as ModalErrors;
 	};
 
 	onMount(() => {
@@ -405,16 +289,21 @@
 	bind:this={addModal}
 	title="Add Event"
 	fields={modalFields}
-	actions={[{ name: 'Submit', callback: onSubmitAdd }]}
+	actions={[{ name: 'Submit', action: 'calendar?/create' }]}
 />
 
 <ModalForm
 	bind:this={editModal}
 	title="Edit Event"
 	fields={modalFields}
+	extraInfo={selectedEvent
+		? {
+				id: selectedEvent._id
+			}
+		: undefined}
 	actions={[
-		{ name: 'Submit', callback: onSubmitEdit },
-		{ name: 'Delete', callback: onSubmitDelete }
+		{ name: 'Submit', action: 'calendar?/edit' },
+		{ name: 'Delete', action: 'calendar?/delete' }
 	]}
 />
 
