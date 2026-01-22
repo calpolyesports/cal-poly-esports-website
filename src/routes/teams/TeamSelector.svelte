@@ -2,6 +2,8 @@
 
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	import type { WithStringId, RosterGame } from '$lib/types';
 	import MemberGrid from './MemberGrid.svelte';
@@ -16,7 +18,13 @@
 		adminFor: string[];
 	} = $props();
 
-	let activeGameId = $derived(games.length > 0 ? games[0]._id : '');
+	let activeGameId = $derived.by(() => {
+		const urlGameId = $page.url.searchParams.get('game');
+		if (urlGameId && games.some((g) => g._id === urlGameId)) {
+			return urlGameId;
+		}
+		return games.length > 0 ? games[0]._id : '';
+	});
 
 	let addTeamModal: ModalForm;
 
@@ -44,8 +52,10 @@
 	}
 
 	const handleClick = (tabValue: string) => () => {
-		activeGameId = tabValue;
-		moveUnderline(false);
+		const url = new URL($page.url);
+		url.searchParams.set('game', tabValue);
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
+		goto(url, { replaceState: false, keepFocus: true, noScroll: true });
 	};
 
 	onMount(async () => {
@@ -59,6 +69,12 @@
 		content.style.visibility = 'visible';
 
 		window.addEventListener('resize', () => moveUnderline(true));
+	});
+
+	$effect(() => {
+		if (activeGameId) {
+			moveUnderline(false);
+		}
 	});
 
 	onDestroy(() => {

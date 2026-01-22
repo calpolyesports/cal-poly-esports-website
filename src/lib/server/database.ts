@@ -8,7 +8,8 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import * as types from '../types';
 import * as serverTypes from './types';
 
-const sasUrl = env.PLAYER_PORTRAIT_BLOB;
+const sasUrl = env.AZURE_STORAGE_URL;
+const azureKey = env.AZURE_STORAGE_CONNECTION_STRING;
 
 const client = new MongoClient(env.DB_CONN_STRING, {
 	serverApi: {
@@ -18,18 +19,7 @@ const client = new MongoClient(env.DB_CONN_STRING, {
 	}
 });
 
-async function run() {
-	try {
-		// Connect the client to the server	(optional starting in v4.7)
-		await client.connect();
-		// Send a ping to confirm a successful connection
-		await client.db('admin').command({ ping: 1 });
-		console.log('Pinged your deployment. You successfully connected to MongoDB!');
-	} finally {
-		// Ensures that the client will close when you finish/error
-		await client.close();
-	}
-}
+const blobServiceClient = BlobServiceClient.fromConnectionString(azureKey);
 
 export function stringifyObjectId<T>(obj: WithId<T>): types.WithStringId<T> {
 	return {
@@ -172,12 +162,15 @@ export async function updateRosterTeam(
 	const database = client.db(env.DB_NAME);
 	const gamesCollection = database.collection<types.RosterGame>('rosters');
 
+	const setFields: Record<string, unknown> = {};
+	for (const [key, value] of Object.entries(team)) {
+		setFields[`teams.$[team].${key}`] = value;
+	}
+
 	const result = await gamesCollection.updateOne(
 		{ _id: gameId },
 		{
-			$set: {
-				'teams.$[team]': team
-			}
+			$set: setFields
 		},
 		{
 			arrayFilters: [{ 'team.id': teamId }]
@@ -253,12 +246,15 @@ export async function updateRosterMember(
 	const database = client.db(env.DB_NAME);
 	const gamesCollection = database.collection<types.RosterGame>('rosters');
 
+	const setFields: Record<string, unknown> = {};
+	for (const [key, value] of Object.entries(member)) {
+		setFields[`teams.$[team].members.$[member].${key}`] = value;
+	}
+
 	const result = await gamesCollection.updateOne(
 		{ _id: gameId },
 		{
-			$set: {
-				'teams.$[team].members.$[member]': member
-			}
+			$set: setFields
 		},
 		{
 			arrayFilters: [{ 'team.id': teamId }, { 'member.id': memberId }]
@@ -371,12 +367,15 @@ export async function updateBoardMember(
 	const database = client.db(env.DB_NAME);
 	const clubsCollection = database.collection<types.Club>('clubs');
 
+	const setFields: Record<string, unknown> = {};
+	for (const [key, value] of Object.entries(boardMember)) {
+		setFields[`boardMembers.$[boardMember].${key}`] = value;
+	}
+
 	const result = await clubsCollection.updateOne(
 		{ _id: clubId },
 		{
-			$set: {
-				'boardMembers.$[boardMember]': boardMember
-			}
+			$set: setFields
 		},
 		{
 			arrayFilters: [{ 'boardMember.id': boardMemberId }]
@@ -422,7 +421,6 @@ export const uploadFileToBlob = async (file: File, containerName: string): Promi
 	const arrayBuffer = await file.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
 
-	const blobServiceClient = new BlobServiceClient(sasUrl);
 	const containerClient = blobServiceClient.getContainerClient(containerName);
 	const blobName = `${Date.now()}-${file.name}`;
 	const blockBlobClient = containerClient.getBlockBlobClient(blobName);
@@ -444,7 +442,6 @@ export async function deleteFileFromAzure(
 		throw new Error('Invalid picture URL provided');
 	}
 
-	const blobServiceClient = new BlobServiceClient(sasUrl);
 	const containerClient = blobServiceClient.getContainerClient(containerName);
 	const blobName = pictureUrl.split('/').pop();
 
@@ -510,5 +507,3 @@ export async function deleteExpiredSessions(): Promise<number> {
 	});
 	return result.deletedCount;
 }
-
-run().catch(console.dir);

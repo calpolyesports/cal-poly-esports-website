@@ -1,4 +1,5 @@
 import * as db from '$lib/server/database';
+import { nameToId } from '$lib/server/util';
 import type { BoardMember } from '$lib/types';
 import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { fail } from '@sveltejs/kit';
@@ -109,7 +110,7 @@ export const actions: Actions = {
 		);
 
 		const newDoc: BoardMember = {
-			id: crypto.randomUUID(),
+			id: nameToId(parsed.name),
 			name: parsed.name,
 			position: parsed.position,
 			profileImage: profileImageUrl
@@ -218,6 +219,14 @@ export const actions: Actions = {
 		}
 
 		const success = await db.deleteBoardMember(club._id, boardMemberId);
+
+		if (boardMember.profileImage) {
+			try {
+				await db.deleteFileFromAzure(boardMember.profileImage, PROFILE_CONTAINER);
+			} catch (error) {
+				console.error('Error deleting old profile image from Azure:', error);
+			}
+		}
 
 		if (!success) {
 			return fail(500, { message: 'Failed to delete board member' });

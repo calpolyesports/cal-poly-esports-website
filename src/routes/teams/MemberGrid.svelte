@@ -20,7 +20,7 @@
 		{ name: 'name', type: 'text', required: true },
 		{ name: 'username', type: 'text', required: true },
 		{ name: 'role', type: 'text', required: true },
-		{ name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true }
+		{ name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: false }
 	] as ModalFieldDefinition[];
 
 	let editTeamModal: ModalForm | undefined = $state(undefined);
@@ -66,7 +66,7 @@
 		bind:this={addMemberModal}
 		title="Add Member"
 		fields={memberModalFields}
-		actions={[{ name: 'Submit', action: `/teams/${game._id}/${team.id}/create` }]}
+		actions={[{ name: 'Submit', action: `/teams/${game._id}/${team.id}?/create` }]}
 	/>
 
 	<ModalForm
@@ -75,8 +75,8 @@
 		fields={teamModalFields}
 		extraInfo={{ id: team.id }}
 		actions={[
-			{ name: 'Submit', action: `/teams/${game._id}/edit` },
-			{ name: 'Delete', action: `/teams/${game._id}/delete` }
+			{ name: 'Submit', action: `/teams/${game._id}?/edit` },
+			{ name: 'Delete', action: `/teams/${game._id}?/delete` }
 		]}
 	/>
 {/if}

@@ -99,13 +99,9 @@ export const actions: Actions = {
 		}
 
 		const gameId = params.gameId;
-		const teamId = params.teamId;
 
 		if (!gameId) {
 			return fail(400, { message: 'Game ID is required' });
-		}
-		if (!teamId) {
-			return fail(400, { message: 'Team ID is required' });
 		}
 
 		let game;
@@ -119,11 +115,6 @@ export const actions: Actions = {
 			return fail(404, { message: 'Game not found' });
 		}
 
-		const team = game.teams.find((t) => t.id === teamId);
-		if (!team) {
-			return fail(404, { message: 'Team not found' });
-		}
-
 		if (!locals.user.adminFor.includes(game.adminRole)) {
 			return fail(403, { message: 'You do not have permission to edit teams for this game' });
 		}
@@ -133,6 +124,16 @@ export const actions: Actions = {
 
 		if ('error' in parsed) {
 			return fail(400, { message: parsed.error, field: parsed.field });
+		}
+
+		const teamId = body.get('id') as string;
+		if (!teamId) {
+			return fail(400, { message: 'Team ID is required' });
+		}
+
+		const team = game.teams.find((t) => t.id === teamId);
+		if (!team) {
+			return fail(404, { message: 'Team not found' });
 		}
 
 		const updatedDoc: Partial<RosterTeam> = {
@@ -150,19 +151,15 @@ export const actions: Actions = {
 		return { message: 'Team updated successfully', team: updatedTeam };
 	},
 
-	delete: async ({ locals, params }) => {
+	delete: async ({ locals, request, params }) => {
 		if (!locals.user) {
 			return fail(401, { message: 'You must be logged in to delete teams' });
 		}
 
 		const gameId = params.gameId;
-		const teamId = params.teamId;
 
 		if (!gameId) {
 			return fail(400, { message: 'Game ID is required' });
-		}
-		if (!teamId) {
-			return fail(400, { message: 'Team ID is required' });
 		}
 
 		let game;
@@ -174,6 +171,13 @@ export const actions: Actions = {
 
 		if (!game) {
 			return fail(404, { message: 'Game not found' });
+		}
+
+		const body = await request.formData();
+
+		const teamId = body.get('id') as string;
+		if (!teamId) {
+			return fail(400, { message: 'Team ID is required' });
 		}
 
 		const team = game.teams.find((t) => t.id === teamId);

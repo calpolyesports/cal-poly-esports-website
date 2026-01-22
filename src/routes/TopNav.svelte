@@ -24,7 +24,8 @@
 		<li><a href={resolve('/')} class:selected={currentPath === '/'}>Home</a></li>
 		<li>
 			<div class="dropdown">
-				<a href={resolve('/clubs')} class:selected={currentPath.startsWith('/clubs')}>Clubs</a>
+				<!-- svelte-ignore a11y_invalid_attribute -->
+				<a href="javascript:void(0)" class:selected={currentPath.startsWith('/clubs')}>Clubs</a>
 				<div class="dropdown-content">
 					{#each clubs as club (club._id)}
 						<a href={resolve('/clubs/[slug]', { slug: club.urlName })}>{club.clubName}</a>

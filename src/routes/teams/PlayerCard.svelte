@@ -69,8 +69,8 @@
 		fields={modalFields}
 		extraInfo={{ id: player.id }}
 		actions={[
-			{ name: 'Submit', action: `/teams/${game._id}/${team.id}/edit` },
-			{ name: 'Delete', action: `/teams/${game._id}/${team.id}/delete` }
+			{ name: 'Submit', action: `/teams/${game._id}/${team.id}?/edit` },
+			{ name: 'Delete', action: `/teams/${game._id}/${team.id}?/delete` }
 		]}
 	/>
 {/if}

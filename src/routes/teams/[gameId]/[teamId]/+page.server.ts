@@ -4,7 +4,7 @@ import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { fail } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
 
-const PICTURE_CONTAINER = 'players';
+const PICTURE_CONTAINER = 'portraits';
 
 interface MemberFormData {
 	name: string;
@@ -156,16 +156,12 @@ export const actions: Actions = {
 
 		const gameId = params.gameId;
 		const teamId = params.teamId;
-		const memberId = params.memberId;
 
 		if (!gameId) {
 			return fail(400, { message: 'Game ID is required' });
 		}
 		if (!teamId) {
 			return fail(400, { message: 'Team ID is required' });
-		}
-		if (!memberId) {
-			return fail(400, { message: 'Member ID is required' });
 		}
 
 		let game;
@@ -184,11 +180,6 @@ export const actions: Actions = {
 			return fail(404, { message: 'Team not found' });
 		}
 
-		const member = team.members.find((m) => m.id === memberId);
-		if (!member) {
-			return fail(404, { message: 'Member not found' });
-		}
-
 		if (!locals.user.adminFor.includes(game.adminRole)) {
 			return fail(403, { message: 'You do not have permission to edit members for this game' });
 		}
@@ -198,6 +189,16 @@ export const actions: Actions = {
 
 		if ('error' in parsed) {
 			return fail(400, { message: parsed.error, field: parsed.field });
+		}
+
+		const memberId = body.get('id') as string;
+		if (!memberId) {
+			return fail(400, { message: 'Member ID is required' });
+		}
+
+		const member = team.members.find((m) => m.id === memberId);
+		if (!member) {
+			return fail(404, { message: 'Member not found' });
 		}
 
 		const pictureData = body.get('picture');
@@ -224,23 +225,19 @@ export const actions: Actions = {
 		return { message: 'Member updated successfully', member: updatedMember };
 	},
 
-	delete: async ({ locals, params }) => {
+	delete: async ({ locals, request, params }) => {
 		if (!locals.user) {
 			return fail(401, { message: 'You must be logged in to delete members' });
 		}
 
 		const gameId = params.gameId;
 		const teamId = params.teamId;
-		const memberId = params.memberId;
 
 		if (!gameId) {
 			return fail(400, { message: 'Game ID is required' });
 		}
 		if (!teamId) {
 			return fail(400, { message: 'Team ID is required' });
-		}
-		if (!memberId) {
-			return fail(400, { message: 'Member ID is required' });
 		}
 
 		let game;
@@ -259,6 +256,12 @@ export const actions: Actions = {
 			return fail(404, { message: 'Team not found' });
 		}
 
+		const body = await request.formData();
+
+		const memberId = body.get('id') as string;
+		if (!memberId) {
+			return fail(400, { message: 'Member ID is required' });
+		}
 		const member = team.members.find((m) => m.id === memberId);
 		if (!member) {
 			return fail(404, { message: 'Member not found' });
@@ -269,6 +272,14 @@ export const actions: Actions = {
 		}
 
 		const success = await db.deleteRosterMember(new ObjectId(gameId), teamId, memberId);
+
+		if (member.picture) {
+			try {
+				await db.deleteFileFromAzure(member.picture, PICTURE_CONTAINER);
+			} catch (error) {
+				console.error('Error deleting old picture from Azure:', error);
+			}
+		}
 
 		if (!success) {
 			return fail(500, { message: 'Failed to delete member' });

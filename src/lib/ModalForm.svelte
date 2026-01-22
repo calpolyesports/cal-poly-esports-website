@@ -16,6 +16,7 @@
 
 <script lang="ts">
 	import Modal from './Modal.svelte';
+	import { enhance } from '$app/forms';
 
 	let {
 		title,
@@ -30,8 +31,11 @@
 	} = $props();
 
 	let errors: ModalErrors = $state({});
+	let formError: string = $state('');
+	let submittingAction: string | null = $state(null);
 
-	const bindings = $derived(
+	const bindings = $state(
+		// TODO: find out how to ignore this warning
 		fields.reduce(
 			(acc, field) => {
 				if (field.type === 'file') {
@@ -86,11 +90,31 @@
 			}
 		});
 		errors = {};
+		formError = '';
+		submittingAction = null;
 	};
 </script>
 
 <Modal bind:this={modal} bind:title>
-	<form method="POST">
+	<form
+		method="POST"
+		enctype="multipart/form-data"
+		use:enhance={({ action }) => {
+			submittingAction = action.searchParams.get('action');
+			return async ({ result, update }) => {
+				if (result.type === 'failure') {
+					formError = (result.data as { message?: string })?.message || 'An error occurred';
+				} else if (result.type === 'success') {
+					hideModal();
+				}
+				submittingAction = null;
+				await update();
+			};
+		}}
+	>
+		{#if formError}
+			<p class="error-message">{formError}</p>
+		{/if}
 		{#each fields as field (field.name)}
 			<label for={field.name}>
 				{field.name}
@@ -114,7 +138,12 @@
 					{/each}
 				</select>
 			{:else if field.type === 'file'}
-				<input id={field.name} type="file" accept={field.validExtensions?.join()} />
+				<input
+					id={field.name}
+					name={field.name}
+					type="file"
+					accept={field.validExtensions?.join()}
+				/>
 			{:else if field.type === 'checkbox'}
 				<input
 					type="checkbox"
@@ -137,7 +166,12 @@
 		{/if}
 
 		{#each actions as action (action.name)}
-			<button class="button-medium" type="submit" formaction={action.action}>{action.name}</button>
+			<button
+				class="button-medium"
+				type="submit"
+				formaction={action.action}
+				disabled={submittingAction === action.action}>{action.name}</button
+			>
 		{/each}
 	</form>
 </Modal>
