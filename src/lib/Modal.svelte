@@ -12,7 +12,15 @@
 	export const hideModal = () => {
 		show = false;
 	};
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && show) {
+			show = false;
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <div class="modal" style="display: {show ? 'flex' : 'none'}">
 	<div class="modal-content">

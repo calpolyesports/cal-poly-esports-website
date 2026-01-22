@@ -15,6 +15,7 @@
 </script>
 
 <script lang="ts">
+	import { tick } from 'svelte';
 	import Modal from './Modal.svelte';
 	import { enhance } from '$app/forms';
 
@@ -52,9 +53,15 @@
 	);
 
 	let modal: Modal;
+	let formElement: HTMLFormElement;
 
-	export const showModal = () => {
+	export const showModal = async () => {
 		modal.showModal();
+		await tick();
+		const focusable = formElement?.querySelector<HTMLElement>(
+			'input[type="text"], input[type="datetime-local"], select'
+		);
+		focusable?.focus();
 	};
 
 	export const hideModal = () => {
@@ -99,6 +106,7 @@
 	<form
 		method="POST"
 		enctype="multipart/form-data"
+		bind:this={formElement}
 		use:enhance={({ action }) => {
 			submittingAction = action.searchParams.get('action');
 			return async ({ result, update }) => {
