@@ -14,7 +14,7 @@
 	let { data, children }: { data: PageData; children: Snippet } = $props();
 
 	$effect(() => {
-		// TODO: Check to make sure this works
+		// TODO: Check to make sure this works (it does not lol)
 		head.title = page.data.subtitle
 			? `${page.data.subtitle} - Cal Poly Esports`
 			: 'Cal Poly Esports';

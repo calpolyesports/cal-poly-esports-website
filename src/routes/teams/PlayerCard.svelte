@@ -21,10 +21,15 @@
 	let editMemberModal: ModalForm | undefined = $state(undefined);
 
 	const modalFields = [
-		{ name: 'name', type: 'text', required: true },
-		{ name: 'username', type: 'text', required: true },
-		{ name: 'role', type: 'text', required: true },
-		{ name: 'picture', type: 'file', accept: ['.jpg', '.jpeg', '.png', '.webp'], required: true }
+		{ id: 'name', name: 'Name', type: 'text', required: true },
+		{ id: 'username', name: 'Username', type: 'text', required: true },
+		{ id: 'role', name: 'Role', type: 'text', required: true },
+		{
+			id: 'picture',
+			name: 'Picture',
+			type: 'file',
+			accept: ['.jpg', '.jpeg', '.png', '.webp']
+		}
 	] as ModalFieldDefinition[];
 
 	////////////////////

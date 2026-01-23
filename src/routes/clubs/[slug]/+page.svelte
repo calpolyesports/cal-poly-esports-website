@@ -19,10 +19,11 @@
 	let selectedMemberId: string | undefined = $state(undefined);
 
 	const memberModalFields = [
-		{ name: 'name', type: 'text', required: true },
-		{ name: 'position', type: 'text', required: true },
+		{ id: 'name', name: 'Name', type: 'text', required: true },
+		{ id: 'position', name: 'Position', type: 'text', required: true },
 		{
-			name: 'profileImage',
+			id: 'profileImage',
+			name: 'Profile Image',
 			type: 'file',
 			accept: ['.jpg', '.jpeg', '.png', '.webp'],
 			required: true

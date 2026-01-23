@@ -1,8 +1,9 @@
 <script lang="ts" module>
 	export type ModalFieldDefinition = {
+		id: string;
 		name: string;
 		type: 'date' | 'text' | 'dropdown' | 'file' | 'checkbox';
-		required: boolean;
+		required?: boolean;
 		options?: [string, string][];
 		validExtensions?: [string];
 	};
@@ -31,6 +32,7 @@
 		extraInfo?: Record<string, string>;
 	} = $props();
 
+	// TODO: this is never updated
 	let errors: ModalErrors = $state({});
 	let formError: string = $state('');
 	let submittingAction: string | null = $state(null);
@@ -40,11 +42,11 @@
 		fields.reduce(
 			(acc, field) => {
 				if (field.type === 'file') {
-					acc[field.name] = null;
+					acc[field.id] = null;
 				} else if (field.type === 'checkbox') {
-					acc[field.name] = false;
+					acc[field.id] = false;
 				} else {
-					acc[field.name] = '';
+					acc[field.id] = '';
 				}
 				return acc;
 			},
@@ -71,17 +73,17 @@
 	export const fillFields = (values: FilledModalFields) => {
 		clearFields();
 		fields.forEach((field) => {
-			const value = values[field.name];
+			const value = values[field.id];
 			if (field.type === 'date') {
 				const originalTime = new Date(value as string);
 				const adjustedTime = new Date(
 					originalTime.getTime() - originalTime.getTimezoneOffset() * 60000
 				);
-				bindings[field.name] = adjustedTime.toISOString().slice(0, 16);
+				bindings[field.id] = adjustedTime.toISOString().slice(0, 16);
 			} else if (field.type === 'checkbox') {
-				bindings[field.name] = value as boolean;
+				bindings[field.id] = value as boolean;
 			} else if (field.type !== 'file' && value) {
-				bindings[field.name] = value.toString();
+				bindings[field.id] = value.toString();
 			}
 		});
 	};
@@ -89,14 +91,13 @@
 	export const clearFields = () => {
 		fields.forEach((field) => {
 			if (field.type === 'file') {
-				bindings[field.name] = null;
+				bindings[field.id] = null;
 			} else if (field.type === 'checkbox') {
-				bindings[field.name] = false;
+				bindings[field.id] = false;
 			} else {
-				bindings[field.name] = '';
+				bindings[field.id] = '';
 			}
 		});
-		errors = {};
 		formError = '';
 		submittingAction = null;
 	};
@@ -123,49 +124,44 @@
 		{#if formError}
 			<p class="error-message">{formError}</p>
 		{/if}
-		{#each fields as field (field.name)}
-			<label for={field.name}>
-				{field.name}
-				{#if field.required}
-					<span class="required-asterisk">*</span>
+		{#each fields as field (field.id)}
+			<div class={field.type === 'checkbox' ? 'checkbox-container' : 'input-container'}>
+				<label for={field.id}>
+					{field.name}
+					{#if field.required}
+						<span class="required-asterisk">*</span>
+					{/if}
+				</label>
+				{#if field.type === 'date'}
+					<input
+						type="datetime-local"
+						id={field.id}
+						name={field.id}
+						bind:value={bindings[field.id]}
+					/>
+				{:else if field.type === 'text'}
+					<input type="text" id={field.id} name={field.id} bind:value={bindings[field.id]} />
+				{:else if field.type === 'dropdown' && field.options}
+					<select id={field.id} name={field.id} bind:value={bindings[field.id]}>
+						{#each field.options as option (option[0])}
+							<option value={option[0]}>{option[1]}</option>
+						{/each}
+					</select>
+				{:else if field.type === 'file'}
+					<input id={field.id} name={field.id} type="file" accept={field.validExtensions?.join()} />
+				{:else if field.type === 'checkbox'}
+					<input
+						type="checkbox"
+						id={field.id}
+						name={field.id}
+						bind:checked={bindings[field.id] as boolean}
+					/>
 				{/if}
-			</label>
-			{#if field.type === 'date'}
-				<input
-					type="datetime-local"
-					id={field.name}
-					name={field.name}
-					bind:value={bindings[field.name]}
-				/>
-			{:else if field.type === 'text'}
-				<input type="text" id={field.name} name={field.name} bind:value={bindings[field.name]} />
-			{:else if field.type === 'dropdown' && field.options}
-				<select id={field.name} name={field.name} bind:value={bindings[field.name]}>
-					{#each field.options as option (option[0])}
-						<option value={option[0]}>{option[1]}</option>
-					{/each}
-				</select>
-			{:else if field.type === 'file'}
-				<input
-					id={field.name}
-					name={field.name}
-					type="file"
-					accept={field.validExtensions?.join()}
-				/>
-			{:else if field.type === 'checkbox'}
-				<input
-					type="checkbox"
-					id={field.name}
-					name={field.name}
-					bind:checked={bindings[field.name] as boolean}
-				/>
-			{/if}
-			{#if field.name in errors}
-				<p class="error-message">{errors[field.name]}</p>
-			{/if}
+				{#if field.id in errors}
+					<p class="error-message">{errors[field.id]}</p>
+				{/if}
+			</div>
 		{/each}
-
-		<br />
 
 		{#if extraInfo}
 			{#each Object.entries(extraInfo) as [key, value] (key)}
@@ -173,14 +169,16 @@
 			{/each}
 		{/if}
 
-		{#each actions as action (action.name)}
-			<button
-				class="button-medium"
-				type="submit"
-				formaction={action.action}
-				disabled={submittingAction === action.action}>{action.name}</button
-			>
-		{/each}
+		<div class="actions">
+			{#each actions as action (action.name)}
+				<button
+					class="button-medium"
+					type="submit"
+					formaction={action.action}
+					disabled={submittingAction === action.action}>{action.name}</button
+				>
+			{/each}
+		</div>
 	</form>
 </Modal>
 
@@ -194,10 +192,40 @@
 		margin: 1rem auto;
 	}
 
-	label {
+	.checkbox-container {
+		margin: 0.5rem 0;
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+	}
+
+	.input-container {
+		margin: 0.5rem 0;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.actions {
+		margin-top: 2rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.input-container label {
 		font-size: 1rem;
-		margin-top: 1rem;
 		font-weight: bold;
+		text-transform: capitalize;
+	}
+
+	.checkbox-container label {
+		font-size: 1.25rem;
 		text-transform: capitalize;
 	}
 
@@ -207,10 +235,15 @@
 		width: 100%;
 	}
 
+	input[type='checkbox'] {
+		width: fit-content;
+	}
+
 	select {
 		font-size: 1.25rem;
 		padding: 0.5rem;
 		width: 100%;
+		background-color: white;
 	}
 
 	.button-medium:disabled {

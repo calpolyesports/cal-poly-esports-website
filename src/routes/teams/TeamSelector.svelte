@@ -29,7 +29,7 @@
 	let addTeamModal: ModalForm;
 
 	const teamModalFields = [
-		{ name: 'name', type: 'text', required: true }
+		{ id: 'name', name: 'Name', type: 'text', required: true }
 	] as ModalFieldDefinition[];
 
 	////////////////////
