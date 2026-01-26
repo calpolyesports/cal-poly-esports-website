@@ -25,6 +25,9 @@ jobs:
         env:
           PUBLIC_PAGE_URL: ${{ secrets.PUBLIC_PAGE_URL }}
           DB_CONN_STRING: ${{ secrets.DB_CONN_STRING }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          AZURE_STORAGE_URL: ${{ secrets.AZURE_STORAGE_URL }}
         run: |
           npm install
           npm run build
