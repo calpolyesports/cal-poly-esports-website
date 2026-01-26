@@ -417,12 +417,18 @@ export async function deleteBoardMember(clubId: ObjectId, boardMemberId: string)
 	return result.matchedCount > 0;
 }
 
-export const uploadFileToBlob = async (file: File, containerName: string): Promise<string> => {
+export const uploadFileToBlob = async (
+	file: File,
+	containerName: string,
+	subfolder?: string
+): Promise<string> => {
 	const arrayBuffer = await file.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
 
 	const containerClient = blobServiceClient.getContainerClient(containerName);
-	const blobName = `${Date.now()}-${file.name}`;
+	const blobName = subfolder
+		? `${subfolder}/${Date.now()}-${file.name}`
+		: `${Date.now()}-${file.name}`;
 	const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
 	await blockBlobClient.uploadData(buffer, {
@@ -443,7 +449,7 @@ export async function deleteFileFromAzure(
 	}
 
 	const containerClient = blobServiceClient.getContainerClient(containerName);
-	const blobName = pictureUrl.split('/').pop();
+	const blobName = pictureUrl.split(`${containerName}/`).pop();
 
 	if (!blobName) {
 		throw new Error('Invalid blob name extracted from the URL');
@@ -457,7 +463,8 @@ export async function deleteFileFromAzure(
 export async function trySwapImage(
 	profileImageData: File | null,
 	oldProfileImage: string | undefined,
-	container: string
+	container: string,
+	subfolder?: string
 ): Promise<string | undefined> {
 	if (!profileImageData || profileImageData.size === 0) {
 		return oldProfileImage;
@@ -471,7 +478,7 @@ export async function trySwapImage(
 		}
 	}
 
-	return await uploadFileToBlob(profileImageData, container);
+	return await uploadFileToBlob(profileImageData, container, subfolder);
 }
 
 export async function findUserByUsername(

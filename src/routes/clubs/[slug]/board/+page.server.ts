@@ -5,6 +5,7 @@ import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { fail } from '@sveltejs/kit';
 
 const PROFILE_CONTAINER = 'portraits';
+const BOARD_SUBFOLDER = 'boards';
 
 interface BoardMemberFormData {
 	name: string;
@@ -86,7 +87,8 @@ export const actions: Actions = {
 		const profileImageUrl = await db.trySwapImage(
 			profileImageData instanceof File ? profileImageData : null,
 			undefined,
-			PROFILE_CONTAINER
+			PROFILE_CONTAINER,
+			BOARD_SUBFOLDER
 		);
 
 		const newDoc: BoardMember = {
@@ -146,7 +148,8 @@ export const actions: Actions = {
 		const profileImageUrl = await db.trySwapImage(
 			profileImageData instanceof File ? profileImageData : null,
 			boardMember.profileImage,
-			PROFILE_CONTAINER
+			PROFILE_CONTAINER,
+			BOARD_SUBFOLDER
 		);
 
 		const updatedDoc: Partial<BoardMember> = {

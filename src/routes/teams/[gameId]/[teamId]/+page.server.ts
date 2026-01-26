@@ -5,6 +5,7 @@ import { fail } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
 
 const PICTURE_CONTAINER = 'portraits';
+const PLAYER_SUBFOLDER = 'players';
 
 interface MemberFormData {
 	name: string;
@@ -109,7 +110,8 @@ export const actions: Actions = {
 		const picture = await db.trySwapImage(
 			pictureData instanceof File ? pictureData : null,
 			undefined,
-			PICTURE_CONTAINER
+			PICTURE_CONTAINER,
+			PLAYER_SUBFOLDER
 		);
 
 		const newDoc: RosterMember = {
@@ -187,7 +189,8 @@ export const actions: Actions = {
 		const picture = await db.trySwapImage(
 			pictureData instanceof File ? pictureData : null,
 			member.picture,
-			PICTURE_CONTAINER
+			PICTURE_CONTAINER,
+			PLAYER_SUBFOLDER
 		);
 
 		const updatedDoc: Partial<RosterMember> = {
