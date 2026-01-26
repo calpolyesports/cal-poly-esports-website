@@ -1,59 +1,37 @@
 <script lang="ts">
 	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
-	import type { ModalFieldDefinition, FilledModalFields } from '$lib/ModalForm.svelte';
+	import { env } from '$env/dynamic/public';
 
-	export let game: WithStringId<RosterGame>;
-	export let team: WithStringId<RosterTeam>;
-	export let player: WithStringId<RosterMember>;
-	export let isAdmin: boolean;
-	export let onRemove: (id: string) => void;
+	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 
-	interface ModalMember {
-		name: string;
-		username: string;
-		role: string;
-		picture: File;
-	}
+	let {
+		game,
+		team,
+		player,
+		playerIndex,
+		isAdmin
+	}: {
+		game: WithStringId<RosterGame>;
+		team: RosterTeam;
+		player: RosterMember;
+		playerIndex: number;
+		isAdmin: boolean;
+	} = $props();
 
-	let editMemberModal: ModalForm;
-	let selectedFile: File | null = null;
+	let editMemberModal: ModalForm | undefined = $state(undefined);
 
 	const modalFields = [
-		{ name: 'name', type: 'text' },
-		{ name: 'username', type: 'text' },
-		{ name: 'role', type: 'text' },
-		{ name: 'picture', type: 'file', accept: '.jpg, .jpeg, .png, .webp', onFileChange: true }
-	] as ModalFieldDefinition[];
-
-	//////////////////////-
-	// API INTERACTIONS //
-	//////////////////////
-
-	const sendUpdateMember = async (
-		id: string,
-		formData: any
-	): Promise<WithStringId<RosterMember> | undefined> => {
-		const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
-			method: 'PUT',
-			body: formData
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			return data.member;
+		{ id: 'name', name: 'Name', type: 'text', required: true },
+		{ id: 'username', name: 'Username', type: 'text', required: true },
+		{ id: 'role', name: 'Role', type: 'text', required: true },
+		{
+			id: 'picture',
+			name: 'Picture',
+			type: 'file',
+			accept: ['.jpg', '.jpeg', '.png', '.webp']
 		}
-
-		return undefined;
-	};
-
-	const sendDeleteMember = async (id: string): Promise<boolean> => {
-		const response = await fetch(`/teams/${game._id}/${team._id}/${id}`, {
-			method: 'DELETE'
-		});
-
-		return response.ok;
-	};
+	] as ModalFieldDefinition[];
 
 	////////////////////
 	// EVENT HANDLERS //
@@ -61,60 +39,25 @@
 
 	const onClick = () => {
 		if (!isAdmin) return;
-		editMemberModal.fillFields({
+		editMemberModal?.fillFields({
 			name: player.name,
 			username: player.username,
 			role: player.role,
-			picture: player.picture
+			picture: player.picture || null
 		});
-		editMemberModal.showModal();
-	};
-
-	const onSubmitEdit = async (modalFields: FilledModalFields) => {
-		const formData = new FormData();
-		formData.append('name', modalFields.name as string);
-		formData.append('username', modalFields.username as string);
-		formData.append('role', modalFields.role as string);
-		if (selectedFile) {
-			formData.append('picture', selectedFile);
-		}
-
-		const updated = await sendUpdateMember(player._id, formData);
-		if (updated) {
-			player = updated;
-			team.members = team.members.map((m) => (m._id === player._id ? player : m));
-		}
-		selectedFile = null;
-		editMemberModal.hideModal();
-	};
-
-	const onSubmitDelete = async (values: FilledModalFields) => {
-		const deleted = await sendDeleteMember(player._id);
-		if (deleted) {
-			onRemove(player._id);
-		}
-		selectedFile = null;
-		editMemberModal.hideModal();
-	};
-
-	const onFileChange = (event: CustomEvent) => {
-		const { file } = event.detail;
-
-		if (file) {
-			selectedFile = file;
-		} else {
-			console.error('File selection is invalid in MEMBERGRID');
-		}
+		editMemberModal?.showModal();
 	};
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-<div class="player-card" on:click={onClick}>
-	{#if player.picture}
-		<div class="picture-container">
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<div role="button" tabindex={playerIndex} class="player-card" onclick={onClick}>
+	<div class="picture-container">
+		{#if player.picture}
 			<img src="{player.picture}?t={Date.now()}" alt={player.username} />
-		</div>
-	{/if}
+		{:else}
+			<img src={env.PUBLIC_DEFAULT_PROFILE_IMAGE} alt={player.username} />
+		{/if}
+	</div>
 	<div class="bottom-shadow"></div>
 	<div class="text">
 		<p class="player-name">{player.name}</p>
@@ -132,11 +75,11 @@
 		bind:this={editMemberModal}
 		title="Edit Member"
 		fields={modalFields}
+		extraInfo={{ id: player.id }}
 		actions={[
-			{ name: 'Submit', callback: onSubmitEdit },
-			{ name: 'Delete', callback: onSubmitDelete }
+			{ name: 'Submit', action: `/teams/${game._id}/${team.id}?/edit` },
+			{ name: 'Delete', action: `/teams/${game._id}/${team.id}?/delete` }
 		]}
-		on:fileChange={onFileChange}
 	/>
 {/if}
 

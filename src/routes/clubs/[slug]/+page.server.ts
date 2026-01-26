@@ -1,22 +1,21 @@
 import type { PageServerLoad } from './$types';
-import { getClubByName } from '$lib/server/database';
+import { getClubByUrlName } from '$lib/server/database';
 import type { WithStringId, Club } from '$lib/types';
 
 export const load: PageServerLoad = async ({ params }) => {
-    const club = await getClubByName(params.slug);
+	const club = await getClubByUrlName(params.slug);
 
-    if (!club) {
-        return {
-            status: 404,
-            error: 'Club not found',
-        };
-    }
+	if (!club) {
+		return {
+			status: 404,
+			error: 'Club not found'
+		};
+	}
 
-    return {
-        subtitle: club.clubName,
-        club: {
-            ...club,
-            _id: club._id.toString(),
-        } as WithStringId<Club>,
-    };
+	return {
+		club: {
+			...club,
+			_id: club._id.toString()
+		} as WithStringId<Club>
+	};
 };

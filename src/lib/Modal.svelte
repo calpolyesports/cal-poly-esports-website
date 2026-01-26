@@ -1,67 +1,77 @@
 <script lang="ts">
-    export let title = '';
+	import type { Snippet } from 'svelte';
 
-    let show = false;
+	let { title = $bindable(''), children }: { title: string; children: Snippet } = $props();
 
-    export const showModal = () => {
-        show = true;
-    };
+	let show = $state(false);
 
-    export const hideModal = () => {
-        show = false;
-    };
+	export const showModal = () => {
+		show = true;
+	};
+
+	export const hideModal = () => {
+		show = false;
+	};
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && show) {
+			show = false;
+		}
+	}
 </script>
 
+<svelte:window onkeydown={handleKeydown} />
+
 <div class="modal" style="display: {show ? 'flex' : 'none'}">
-    <div class="modal-content">
-        <button class="close" on:click={() => show = false}>&times;</button>
-        <h2>{title}</h2>
-        <slot />
-    </div>
+	<div class="modal-content">
+		<button class="close" onclick={() => (show = false)}>&times;</button>
+		<h2>{title}</h2>
+		{@render children()}
+	</div>
 </div>
 
 <style>
-    .modal {
-        display: none;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        z-index: 10000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgb(0,0,0);
-        background-color: rgba(0,0,0,0.4);
-    }
+	.modal {
+		display: none;
+		justify-content: center;
+		align-items: center;
+		position: fixed;
+		z-index: 10000;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		overflow: auto;
+		background-color: rgb(0, 0, 0);
+		background-color: rgba(0, 0, 0, 0.4);
+	}
 
-    .modal-content {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 2rem;
-        border: 1px solid #888;
-        width: 40rem;
-        border-radius: 1rem;
-    }
+	.modal-content {
+		background-color: #fefefe;
+		margin: auto;
+		padding: 2rem;
+		border: 1px solid #888;
+		width: 40rem;
+		border-radius: 1rem;
+	}
 
-    h2 {
-        text-align: center;
-    }
+	h2 {
+		text-align: center;
+	}
 
-    button.close {
-        color: #aaa;
-        float: right;
-        font-size: 2.5rem;
-        font-weight: bold;
-        border: none;
-        background-color: transparent;
-    }
+	button.close {
+		color: #aaa;
+		float: right;
+		font-size: 2.5rem;
+		font-weight: bold;
+		border: none;
+		background-color: transparent;
+	}
 
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
+	.close:hover,
+	.close:focus {
+		color: black;
+		text-decoration: none;
+		cursor: pointer;
+	}
 </style>

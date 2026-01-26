@@ -3,16 +3,16 @@
 <script>
 	// based on suggestions from:
 	// Inclusive Components by Heydon Pickering https://inclusive-components.design/collapsible-sections/
-	import { slide } from "svelte/transition";
+	import { slide } from 'svelte/transition';
 
-	export let headerText;
+	let { headerText, children } = $props();
 
-	let expanded = false;
+	let expanded = $state(false);
 </script>
 
 <div class="collapsible">
 	<h3>
-		<button aria-expanded={expanded} on:click={() => (expanded = !expanded)}
+		<button aria-expanded={expanded} onclick={() => (expanded = !expanded)}
 			>{headerText}
 			<svg viewBox="0 0 20 20" fill="none">
 				<path class="vert" d="M10 1V19" stroke="black" stroke-width="2" />
@@ -23,17 +23,17 @@
 
 	{#if expanded}
 		<div class="contents" in:slide out:slide>
-			<slot />
+			{@render children()}
 		</div>
 	{/if}
 </div>
 
 <style>
 	.collapsible {
-        width: 100%;
-        margin: 0.5rem 0;
+		width: 100%;
+		margin: 0.5rem 0;
 	}
-	
+
 	.contents {
 		padding: 1rem;
 	}
@@ -51,8 +51,8 @@
 		padding: 1em 0.5em;
 		background-color: #00000000; /* transparent - idk why needed???? */
 		color: #282828;
-        font-size: 1.5rem;
-        font-weight: bold;
+		font-size: 1.5rem;
+		font-weight: bold;
 		border: none;
 		cursor: pointer;
 	}

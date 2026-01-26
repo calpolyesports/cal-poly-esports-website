@@ -1,9 +1,9 @@
 <!-- routes/login/+page.svelte -->
 <script lang="ts">
-	import { enhance } from "$app/forms";
-	import type { ActionData } from './$types';
+	import { enhance } from '$app/forms';
+	import type { PageProps } from './$types';
 
-	export let form: ActionData;
+	let { form }: PageProps = $props();
 </script>
 
 <h1>Sign in</h1>

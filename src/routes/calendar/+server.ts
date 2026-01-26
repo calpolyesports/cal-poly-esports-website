@@ -1,49 +1,51 @@
-import type { RequestHandler } from "@sveltejs/kit";
-import { json } from "@sveltejs/kit";
-import * as db from "$lib/server/database";
-import type { Event } from "$lib/types";
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import * as db from '$lib/server/database';
+import { ObjectId } from 'mongodb';
 
-export const POST: RequestHandler = async (event) => {
-    const body = await event.request.json();
-    const title = body.title;
-    const start = body.start;
-    const end = body.end;
-    const club = body.club;
-    const location = body.location;
-    const locationLink = body.locationLink;
-    const description = body.description;
-    const usesLab = body.usesLab;
-    const showPublic = body.showPublic;
+export const PATCH: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) {
+		return json({ error: 'You must be logged in to update event times' }, { status: 401 });
+	}
 
-    if (!event.locals.user?.admin_for.includes(club)) {
-        return json({
-            message: "You do not have permission to add events for this club"
-        }, { status: 403 });
-    }
+	try {
+		const body = await request.json();
+		const { id, start, end } = body;
 
-    const newDoc = {
-        title,
-        start: new Date(start),
-        end: new Date(end),
-        club,
-        location,
-        locationLink,
-        description,
-        usesLab,
-        showPublic,
-    } as Event;
+		if (!id || !start || !end) {
+			return json({ error: 'Event ID, start time, and end time are required' }, { status: 400 });
+		}
 
-    const newId = await db.addEvent(newDoc);
+		const eventId = new ObjectId(id);
+		const startDate = new Date(start);
+		const endDate = new Date(end);
 
-    if (!newId) {
-        return json({
-            message: "Failed to add event"
-        }, { status: 500 });
-    }
+		if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+			return json({ error: 'Invalid date format' }, { status: 400 });
+		}
 
-    const newEvent = await db.getEventById(newId, event.locals.user?.admin_for);
+		if (startDate >= endDate) {
+			return json({ error: 'End date must be after start date' }, { status: 400 });
+		}
 
-    return json({
-        event: newEvent
-    }, { status: 200 });
-}
+		const oldEvent = await db.getEventById(eventId);
+		if (!oldEvent) {
+			return json({ error: 'Event not found' }, { status: 404 });
+		}
+
+		if (!locals.user.adminFor.includes(oldEvent.club)) {
+			return json({ error: 'You do not have permission to update this event' }, { status: 403 });
+		}
+
+		const success = await db.updateEvent(eventId, { start: startDate, end: endDate });
+
+		if (!success) {
+			return json({ error: 'Failed to update event times' }, { status: 500 });
+		}
+
+		return json({ message: 'Event times updated successfully' });
+	} catch (error) {
+		console.error('Error updating event times:', error);
+		return json({ error: 'Internal server error' }, { status: 500 });
+	}
+};
