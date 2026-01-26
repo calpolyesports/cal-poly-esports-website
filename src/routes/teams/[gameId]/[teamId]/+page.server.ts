@@ -34,25 +34,6 @@ function parseMemberFormData(body: FormData): MemberFormData | { error: string; 
 	};
 }
 
-async function handlePictureUpload(
-	pictureData: File | null,
-	oldPicture: string | undefined
-): Promise<string | undefined> {
-	if (!pictureData || pictureData.size === 0) {
-		return oldPicture;
-	}
-
-	if (oldPicture) {
-		try {
-			await db.deleteFileFromAzure(oldPicture, PICTURE_CONTAINER);
-		} catch (error) {
-			console.error('Error deleting old picture from Azure:', error);
-		}
-	}
-
-	return await db.uploadFileToBlob(pictureData, PICTURE_CONTAINER);
-}
-
 // This is not necessary but I'm leaving it here anyways
 export const load: ServerLoad = async ({ params }) => {
 	const gameId = params.gameId;
@@ -125,9 +106,10 @@ export const actions: Actions = {
 		}
 
 		const pictureData = body.get('picture');
-		const picture = await handlePictureUpload(
+		const picture = await db.trySwapImage(
 			pictureData instanceof File ? pictureData : null,
-			undefined
+			undefined,
+			PICTURE_CONTAINER
 		);
 
 		const newDoc: RosterMember = {
@@ -135,7 +117,7 @@ export const actions: Actions = {
 			name: parsed.name,
 			username: parsed.username,
 			role: parsed.role,
-			picture: picture || ''
+			picture
 		};
 
 		const success = await db.addRosterMember(new ObjectId(gameId), teamId, newDoc);
@@ -202,9 +184,10 @@ export const actions: Actions = {
 		}
 
 		const pictureData = body.get('picture');
-		const picture = await handlePictureUpload(
+		const picture = await db.trySwapImage(
 			pictureData instanceof File ? pictureData : null,
-			member.picture
+			member.picture,
+			PICTURE_CONTAINER
 		);
 
 		const updatedDoc: Partial<RosterMember> = {

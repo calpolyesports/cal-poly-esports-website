@@ -5,6 +5,7 @@
 	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 	import ClubEventLink from './ClubEventLink.svelte';
 	import type { PageData } from './$types';
+	import { env } from '$env/dynamic/public';
 
 	let { data }: { data: PageData } = $props();
 	let club: WithStringId<Club> | undefined = $derived(data.club);
@@ -98,8 +99,7 @@
 		<button class="button-medium" onclick={onSubmitEditAbout}>Save</button>
 	{:else}
 		{#if canEdit}
-			<br />
-			<button class="button-medium" onclick={onClickEditAbout}>Edit</button>
+			<button class="button-medium space-above" onclick={onClickEditAbout}>Edit</button>
 		{/if}
 		<AboutText html={club.aboutHtml} />
 	{/if}
@@ -126,8 +126,10 @@
 					<li>
 						{#if member.profileImage}
 							<img src={member.profileImage} alt={member.name} />
+						{:else}
+							<img src={env.PUBLIC_DEFAULT_PROFILE_IMAGE} alt={member.name} />
 						{/if}
-						<p>{member.name}</p>
+						<p class="bolded">{member.name}</p>
 						<p>{member.position}</p>
 					</li>
 				</div>
@@ -140,7 +142,7 @@
 			bind:this={addMemberModal}
 			title="Add Board Member"
 			fields={memberModalFields}
-			actions={[{ name: 'Submit', action: '?/board/create' }]}
+			actions={[{ name: 'Submit', action: `/clubs/${club?.urlName}/board?/create` }]}
 		/>
 
 		<ModalForm
@@ -153,8 +155,8 @@
 					}
 				: undefined}
 			actions={[
-				{ name: 'Submit', action: '?/board/edit' },
-				{ name: 'Delete', action: '?/board/delete' }
+				{ name: 'Submit', action: `/clubs/${club?.urlName}/board?/edit` },
+				{ name: 'Delete', action: `/clubs/${club?.urlName}/board?/delete` }
 			]}
 		/>
 	{/if}
@@ -194,9 +196,12 @@
 		}
 	}
 
-	p {
-		font-size: 1.5rem;
-		margin-bottom: 2rem;
+	.space-above {
+		margin-top: 2rem;
+	}
+
+	.bolded {
+		font-weight: bold;
 	}
 
 	div.club-events {
@@ -236,7 +241,8 @@
 
 	ul.board-members li p {
 		font-size: 1.2rem;
-		margin: 0.5rem 0;
+		margin: 0.2rem 0;
+		line-height: 1.2rem;
 		text-align: center;
 	}
 

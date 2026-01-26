@@ -38,7 +38,7 @@ export interface RosterMember {
 	name: string;
 	username: string;
 	role: string;
-	picture: string;
+	picture?: string;
 }
 
 export interface Article {
@@ -64,7 +64,7 @@ export interface BoardMember {
 	id: string;
 	name: string;
 	position: string;
-	profileImage: string;
+	profileImage?: string;
 }
 
 export interface ClubEvent {

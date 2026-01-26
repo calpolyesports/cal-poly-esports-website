@@ -4,14 +4,12 @@ import type { BoardMember } from '$lib/types';
 import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { fail } from '@sveltejs/kit';
 
-const DEFAULT_PROFILE_IMAGE =
-	'https://cpsloesports.blob.core.windows.net/portraits/boards/blank_person.jpeg';
-const PROFILE_CONTAINER = 'boards';
+const PROFILE_CONTAINER = 'portraits';
 
 interface BoardMemberFormData {
 	name: string;
 	position: string;
-	profileImage: string | undefined;
+	profileImage?: string;
 }
 
 function parseBoardMemberFormData(
@@ -39,25 +37,6 @@ function parseBoardMemberFormData(
 		position: position.trim(),
 		profileImage
 	};
-}
-
-async function handleProfileImageUpload(
-	profileImageData: File | null,
-	oldProfileImage: string | undefined
-): Promise<string> {
-	if (!profileImageData || profileImageData.size === 0) {
-		return oldProfileImage ?? DEFAULT_PROFILE_IMAGE;
-	}
-
-	if (oldProfileImage && oldProfileImage !== DEFAULT_PROFILE_IMAGE) {
-		try {
-			await db.deleteFileFromAzure(oldProfileImage, PROFILE_CONTAINER);
-		} catch (error) {
-			console.error('Error deleting old profile image from Azure:', error);
-		}
-	}
-
-	return await db.uploadFileToBlob(profileImageData, PROFILE_CONTAINER);
 }
 
 export const load: ServerLoad = async ({ params }) => {
@@ -104,9 +83,10 @@ export const actions: Actions = {
 		}
 
 		const profileImageData = body.get('profileImage');
-		const profileImageUrl = await handleProfileImageUpload(
+		const profileImageUrl = await db.trySwapImage(
 			profileImageData instanceof File ? profileImageData : null,
-			undefined
+			undefined,
+			PROFILE_CONTAINER
 		);
 
 		const newDoc: BoardMember = {
@@ -163,9 +143,10 @@ export const actions: Actions = {
 		}
 
 		const profileImageData = body.get('profileImage');
-		const profileImageUrl = await handleProfileImageUpload(
+		const profileImageUrl = await db.trySwapImage(
 			profileImageData instanceof File ? profileImageData : null,
-			boardMember.profileImage
+			boardMember.profileImage,
+			PROFILE_CONTAINER
 		);
 
 		const updatedDoc: Partial<BoardMember> = {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { WithStringId, RosterGame, RosterTeam, RosterMember } from '$lib/types';
 	import ModalForm from '$lib/ModalForm.svelte';
+	import { env } from '$env/dynamic/public';
 
 	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 
@@ -42,7 +43,7 @@
 			name: player.name,
 			username: player.username,
 			role: player.role,
-			picture: player.picture
+			picture: player.picture || null
 		});
 		editMemberModal?.showModal();
 	};
@@ -50,11 +51,13 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div role="button" tabindex={playerIndex} class="player-card" onclick={onClick}>
-	{#if player.picture}
-		<div class="picture-container">
+	<div class="picture-container">
+		{#if player.picture}
 			<img src="{player.picture}?t={Date.now()}" alt={player.username} />
-		</div>
-	{/if}
+		{:else}
+			<img src={env.PUBLIC_DEFAULT_PROFILE_IMAGE} alt={player.username} />
+		{/if}
+	</div>
 	<div class="bottom-shadow"></div>
 	<div class="text">
 		<p class="player-name">{player.name}</p>

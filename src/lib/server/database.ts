@@ -454,6 +454,26 @@ export async function deleteFileFromAzure(
 	await blockBlobClient.delete();
 }
 
+export async function trySwapImage(
+	profileImageData: File | null,
+	oldProfileImage: string | undefined,
+	container: string
+): Promise<string | undefined> {
+	if (!profileImageData || profileImageData.size === 0) {
+		return oldProfileImage;
+	}
+
+	if (oldProfileImage) {
+		try {
+			await deleteFileFromAzure(oldProfileImage, container);
+		} catch (error) {
+			console.error('Error deleting old profile image from Azure:', error);
+		}
+	}
+
+	return await uploadFileToBlob(profileImageData, container);
+}
+
 export async function findUserByUsername(
 	username: string
 ): Promise<WithId<serverTypes.User> | null> {

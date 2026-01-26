@@ -150,7 +150,8 @@
 	}
 
 	.dropdown-content {
-		display: none;
+		opacity: 0;
+		visibility: hidden;
 		position: absolute;
 		background-color: white;
 		width: 13rem;
@@ -160,6 +161,11 @@
 		box-sizing: border-box;
 		top: 3.15rem;
 		border-left: 8px solid var(--cal-poly-primary);
+		transform: translateY(-10px);
+		transition:
+			opacity 300ms ease,
+			transform 300ms ease,
+			visibility 300ms;
 	}
 
 	@media (max-width: 768px) {
@@ -175,8 +181,6 @@
 		padding: 0.5rem;
 		text-decoration: none;
 		display: block;
-		border-top: 1px solid var(--cal-poly-primary);
-		border-bottom: 1px solid var(--cal-poly-primary);
 		width: 100%;
 		box-sizing: border-box;
 		text-align: center;
@@ -197,6 +201,8 @@
 	}
 
 	.dropdown:hover .dropdown-content {
-		display: flex;
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
 	}
 </style>
