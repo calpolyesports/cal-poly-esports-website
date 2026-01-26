@@ -228,18 +228,20 @@
 	{#if showFilters}
 		<div class="filter-container" transition:slide>
 			<!-- Filter buttons for Lab and Public events -->
-			<div class="filter-buttons">
-				<ToggleButton
-					displayName="Lab Events"
-					color="var(--cal-poly-secondary)"
-					bind:isActive={showLabEvents}
-				/>
-				<ToggleButton
-					displayName="Public Events"
-					color="var(--cal-poly-secondary)"
-					bind:isActive={showPublicEvents}
-				/>
-			</div>
+			{#if editable}
+				<div class="filter-buttons">
+					<ToggleButton
+						displayName="Lab Events"
+						color="var(--cal-poly-secondary)"
+						bind:isActive={showLabEvents}
+					/>
+					<ToggleButton
+						displayName="Public Events"
+						color="var(--cal-poly-secondary)"
+						bind:isActive={showPublicEvents}
+					/>
+				</div>
+			{/if}
 
 			<!-- Filter buttons for specific clubs -->
 			<div class="filter-checkboxes">
