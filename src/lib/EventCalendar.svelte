@@ -26,7 +26,8 @@
 	);
 
 	let showLabEvents = $state(true);
-	let showPublicEvents = $state(true);
+	// This is pre-filtered in the backend for non-admins, so no need for default false
+	let showPrivateEvents = $state(true);
 	let visibleClubs = $derived(clubs.map((club) => club.urlName));
 	let showFilters = $state(false);
 
@@ -115,7 +116,7 @@
 			.filter((event) => {
 				// eventFilter is available, but this is easier
 				if (!showLabEvents && event.usesLab) return false;
-				if (!showPublicEvents && event.showPublic) return false;
+				if (!showPrivateEvents && !event.showPublic) return false;
 				if (!visibleClubs.includes(event.club)) return false;
 
 				return true;
@@ -141,14 +142,36 @@
 		eventDrop: async (event) => {
 			const { event: calEvent } = event;
 			const success = await updateEventTimes(calEvent.id as string, calEvent.start, calEvent.end);
-			if (!success) {
+			if (success) {
+				// Update event in local events array to reflect changes
+				events = events.map((e) =>
+					e._id === calEvent.id
+						? {
+								...e,
+								start: calEvent.start as Date,
+								end: calEvent.end as Date
+							}
+						: e
+				);
+			} else {
 				event.revert();
 			}
 		},
 		eventResize: async (event) => {
 			const { event: calEvent } = event;
 			const success = await updateEventTimes(calEvent.id as string, calEvent.start, calEvent.end);
-			if (!success) {
+			if (success) {
+				// Update event in local events array to reflect changes
+				events = events.map((e) =>
+					e._id === calEvent.id
+						? {
+								...e,
+								start: calEvent.start as Date,
+								end: calEvent.end as Date
+							}
+						: e
+				);
+			} else {
 				event.revert();
 			}
 		},
@@ -236,9 +259,9 @@
 						bind:isActive={showLabEvents}
 					/>
 					<ToggleButton
-						displayName="Public Events"
+						displayName="Private Events"
 						color="var(--cal-poly-secondary)"
-						bind:isActive={showPublicEvents}
+						bind:isActive={showPrivateEvents}
 					/>
 				</div>
 			{/if}

@@ -9,7 +9,7 @@ interface EventFormData {
 	start: Date;
 	end: Date;
 	club: string;
-	location: string | undefined;
+	location: string;
 	locationLink: string | undefined;
 	description: string | undefined;
 	usesLab: boolean;
@@ -39,6 +39,9 @@ function parseEventFormData(body: FormData): EventFormData | { error: string; fi
 	if (typeof club !== 'string' || !club.trim()) {
 		return { error: 'Club is required', field: 'club' };
 	}
+	if (typeof location !== 'string' || !club.trim()) {
+		return { error: 'Location is required', field: 'location' };
+	}
 
 	const startDate = new Date(start);
 	const endDate = new Date(end);
@@ -58,7 +61,7 @@ function parseEventFormData(body: FormData): EventFormData | { error: string; fi
 		start: startDate,
 		end: endDate,
 		club: club.trim(),
-		location: typeof location === 'string' && location.trim() ? location.trim() : undefined,
+		location: location.trim(),
 		locationLink:
 			typeof locationLink === 'string' && locationLink.trim() ? locationLink.trim() : undefined,
 		description:
@@ -73,10 +76,11 @@ function checkClubAccess(user: { adminFor: string[] }, club: string): boolean {
 }
 
 export const load: ServerLoad = async (event) => {
-	const events = (await db.getEvents(event.locals.user?.adminFor, true)).map((event) => ({
-		...event,
-		_id: event._id.toString()
-	})) as WithStringId<Event>[];
+	const publicOnly = (event.locals.user?.adminFor.length || 0) === 0;
+
+	const events = (await db.getEvents(event.locals.user?.adminFor, publicOnly)).map(
+		db.stringifyObjectId
+	) as WithStringId<Event>[];
 
 	return {
 		subtitle: 'Calendar',
