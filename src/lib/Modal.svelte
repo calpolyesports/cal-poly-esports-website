@@ -52,6 +52,9 @@
 		padding: 2rem;
 		border: 1px solid #888;
 		width: 40rem;
+		max-width: 90vw;
+		max-height: 90vh;
+		overflow-y: auto;
 		border-radius: 1rem;
 	}
 
