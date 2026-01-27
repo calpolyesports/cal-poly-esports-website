@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { Calendar, DayGrid, TimeGrid, List, Interaction } from '@event-calendar/core';
 	import type { WithStringId, Event, Club } from '$lib/types.js';
-	import Modal from '$lib/Modal.svelte';
 	import ModalForm from '$lib/ModalForm.svelte';
 	import type { ModalFieldDefinition } from '$lib/ModalForm.svelte';
 	import { slide } from 'svelte/transition';
 	import { SvelteDate } from 'svelte/reactivity';
-	import { resolve } from '$app/paths';
 	import ToggleButton from './ToggleButton.svelte';
+	import { tick } from 'svelte';
+	import ModalEvent from './ModalEvent.svelte';
 
 	let {
 		events,
@@ -33,7 +33,7 @@
 
 	let addModal: ModalForm;
 	let editModal: ModalForm;
-	let displayModal: Modal | undefined = $state(undefined);
+	let displayModal: ModalEvent | undefined = $state(undefined);
 	let selectedEvent = $state(undefined) as WithStringId<Event> | undefined;
 	let selectedEventClub = $derived(
 		selectedEvent ? clubs.find((club) => club.urlName === selectedEvent!.club) : undefined
@@ -65,17 +65,6 @@
 		return adminFor.some((club) => club.urlName === event.club);
 	};
 
-	function formatDate(date: Date = new Date()): string {
-		return date.toLocaleString('en-US', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit',
-			hour12: true
-		});
-	}
-
 	const convertToCalendarEvent = (event: WithStringId<Event>): Calendar.EventInput => {
 		return {
 			id: event._id,
@@ -105,12 +94,16 @@
 	let plugins = [DayGrid, TimeGrid, List, Interaction] as Calendar.Plugin[];
 	let options = $derived({
 		view: 'timeGridWeek',
+		views: {
+			listWeek: {
+				duration: { days: 14 }
+			}
+		},
 		dayMaxEvents: true,
 		selectable: editable,
 		editable: false,
 		eventDurationEditable: false,
 		eventStartEditable: false,
-		pointer: true, // TODO: why does this not work
 		nowIndicator: true,
 		events: events
 			.filter((event) => {
@@ -183,6 +176,8 @@
 					onClickEdit(eventInfo);
 				} else {
 					selectedEvent = eventInfo;
+					// Need to wait a tick for the modal to be created
+					await tick();
 					if (displayModal) {
 						displayModal.showModal();
 					}
@@ -199,7 +194,7 @@
 		headerToolbar: {
 			start: 'title prev,next today',
 			center: '',
-			end: 'dayGridMonth,timeGridWeek,listMonth'
+			end: 'dayGridMonth,timeGridWeek,listWeek'
 		}
 	}) as Calendar.Options;
 
@@ -311,57 +306,14 @@
 />
 
 {#if selectedEvent}
-	<Modal bind:this={displayModal} title={selectedEvent.title}>
-		{#if selectedEvent.description}
-			<p>{selectedEvent.description}</p>
-		{/if}
-		<div class="event-info">
-			{#if selectedEvent.location}
-				{#if selectedEvent.locationLink}
-					<p>
-						<em
-							>Location: <a rel="external" href={selectedEvent.locationLink} target="_blank"
-								>{selectedEvent.location}</a
-							></em
-						>
-					</p>
-				{:else}
-					<p><em>Location: {selectedEvent.location}</em></p>
-				{/if}
-			{/if}
-			{#if selectedEventClub}
-				<p>
-					<em
-						>Club: <a href={resolve('/clubs/[slug]', { slug: selectedEventClub.urlName })}
-							>{selectedEventClub.clubName ?? 'unknown'}</a
-						></em
-					>
-				</p>
-			{/if}
-			<p><em>Start: {formatDate(selectedEvent.start)}</em></p>
-			<p><em>End: {formatDate(selectedEvent.end)}</em></p>
-		</div>
-	</Modal>
+	<ModalEvent bind:this={displayModal} {selectedEvent} {selectedEventClub} />
 {/if}
 
 <style>
-	p {
-		margin: 0.5rem 0;
-		font-size: 1.25rem;
-	}
-
-	.event-info {
-		margin-top: 1rem;
-	}
-
 	.center-horizontal {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-	}
-
-	a {
-		color: var(--cal-poly-secondary);
 	}
 
 	div.filter-container {
@@ -410,5 +362,13 @@
 
 	.filter-visibility-button {
 		margin-bottom: 2rem;
+	}
+
+	:global(.ec-event-title) {
+		font-weight: bold;
+	}
+
+	:global(.ec-event) {
+		cursor: pointer;
 	}
 </style>
