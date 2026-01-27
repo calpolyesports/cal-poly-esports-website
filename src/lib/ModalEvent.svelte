@@ -27,7 +27,7 @@
 
 <Modal bind:this={displayModal} title={selectedEvent.title}>
 	{#if selectedEvent.description}
-		<p>{selectedEvent.description}</p>
+		<p class="description">{selectedEvent.description}</p>
 	{/if}
 	<div class="event-info">
 		{#if selectedEvent.location}
@@ -72,6 +72,10 @@
 		font-size: 0.95rem;
 		text-transform: uppercase;
 		margin-top: 1rem;
+	}
+
+	.description {
+		white-space: pre-line;
 	}
 
 	.event-info {

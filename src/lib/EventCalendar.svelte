@@ -52,7 +52,7 @@
 		},
 		{ id: 'location', name: 'Location', type: 'text', required: true },
 		{ id: 'locationLink', name: 'Location Link', type: 'text' },
-		{ id: 'description', name: 'Description', type: 'text' },
+		{ id: 'description', name: 'Description', type: 'textarea' },
 		{ id: 'showPublic', name: 'Show Publicly', type: 'checkbox' },
 		{ id: 'usesLab', name: 'Uses Lab', type: 'checkbox' }
 	]) as ModalFieldDefinition[];

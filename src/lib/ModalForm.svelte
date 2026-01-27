@@ -2,10 +2,11 @@
 	export type ModalFieldDefinition = {
 		id: string;
 		name: string;
-		type: 'date' | 'text' | 'dropdown' | 'file' | 'checkbox';
+		type: 'date' | 'text' | 'textarea' | 'dropdown' | 'file' | 'checkbox';
 		required?: boolean;
 		options?: [string, string][];
 		validExtensions?: [string];
+		rows?: number;
 	};
 	export type FilledModalFields = { [key: string]: string | Date | File | boolean | null };
 	export type ModalAction = {
@@ -61,7 +62,7 @@
 		modal.showModal();
 		await tick();
 		const focusable = formElement?.querySelector<HTMLElement>(
-			'input[type="text"], input[type="datetime-local"], select'
+			'input[type="text"], input[type="datetime-local"], select, textarea'
 		);
 		focusable?.focus();
 	};
@@ -146,6 +147,13 @@
 					/>
 				{:else if field.type === 'text'}
 					<input type="text" id={field.id} name={field.id} bind:value={bindings[field.id]} />
+				{:else if field.type === 'textarea'}
+					<textarea
+						id={field.id}
+						name={field.id}
+						rows={field.rows || 4}
+						bind:value={bindings[field.id]}
+					></textarea>
 				{:else if field.type === 'dropdown' && field.options}
 					<select id={field.id} name={field.id} bind:value={bindings[field.id]}>
 						{#each field.options as option (option[0])}
@@ -242,6 +250,14 @@
 
 	input[type='checkbox'] {
 		width: fit-content;
+	}
+
+	textarea {
+		font-size: 1.25rem;
+		padding: 0.5rem;
+		width: 100%;
+		resize: vertical;
+		font-family: inherit;
 	}
 
 	select {
