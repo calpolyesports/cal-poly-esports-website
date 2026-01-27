@@ -134,9 +134,14 @@
 				</label>
 				{#if field.type === 'date'}
 					<input
+						type="hidden"
+						name={field.id}
+						value={bindings[field.id] ? new Date(bindings[field.id] as string).toISOString() : ''}
+					/>
+					<input
 						type="datetime-local"
 						id={field.id}
-						name={field.id}
+						name="{field.id}_display"
 						bind:value={bindings[field.id]}
 					/>
 				{:else if field.type === 'text'}
