@@ -14,6 +14,7 @@
 	} = $props();
 
 	let currentPath: string = $derived(page.url.pathname || '/');
+	let sortedClubs = $derived([...clubs].sort((a, b) => a.clubName.localeCompare(b.clubName)));
 </script>
 
 <nav>
@@ -53,7 +54,7 @@
 					<!-- svelte-ignore a11y_invalid_attribute -->
 					<a href="javascript:void(0)" class:selected={currentPath.startsWith('/clubs')}>Clubs</a>
 					<div class="dropdown-content">
-						{#each clubs as club (club._id)}
+						{#each sortedClubs as club (club._id)}
 							<a href={resolve('/clubs/[slug]', { slug: club.urlName })}>{club.clubName}</a>
 						{/each}
 					</div>
