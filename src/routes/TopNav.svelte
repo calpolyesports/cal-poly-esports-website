@@ -82,6 +82,7 @@
 		z-index: 1000;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 		overflow: visible;
+		padding-top: 0.5rem;
 	}
 
 	.nav-inner {
@@ -175,7 +176,7 @@
 	}
 
 	.nav-logo img {
-		height: 6.5rem;
+		height: 5.5rem;
 		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 		transition: transform var(--transition-fast);
 	}
@@ -240,7 +241,7 @@
 	.dropdown > a {
 		font-family: var(--font-display);
 		color: var(--text-inverse);
-		font-size: 1.1rem;
+		font-size: 0.95rem;
 		letter-spacing: 0.08em;
 		text-decoration: none;
 		text-transform: uppercase;

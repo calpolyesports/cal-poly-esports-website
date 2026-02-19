@@ -410,11 +410,11 @@
 	}
 
 	.stream-card {
-		background: var(--surface-base);
 		border-radius: var(--radius-lg);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
+		height: 300px;
 	}
 
 	.card-header {
@@ -422,6 +422,7 @@
 		align-items: center;
 		gap: var(--space-sm);
 		padding: var(--space-md);
+		background: var(--surface-base);
 	}
 
 	.card-header h3 {
@@ -448,7 +449,6 @@
 
 	.stream-embed {
 		flex: 1;
-		min-height: 220px;
 	}
 
 	.info-card {
@@ -456,6 +456,7 @@
 		border-radius: var(--radius-lg);
 		border-top: 4px solid var(--cal-poly-secondary);
 		padding: var(--space-lg);
+		height: 200px;
 	}
 
 	.info-card h3 {
