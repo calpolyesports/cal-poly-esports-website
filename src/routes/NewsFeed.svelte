@@ -59,6 +59,14 @@
 		justify-content: flex-end;
 		text-decoration: none;
 		color: var(--neutral-bright);
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		transition: transform var(--transition-base), box-shadow var(--transition-base);
+	}
+
+	a.article:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--shadow-lg);
 	}
 
 	a.main-article {
@@ -140,7 +148,7 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		z-index: -1;
+		z-index: 0;
 	}
 
 	div.bottom-shadow {
@@ -150,12 +158,12 @@
 		width: 100%;
 		height: 100%;
 		background: linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
-		z-index: 0;
+		z-index: 1;
 	}
 
 	div.article-text {
 		position: relative;
-		z-index: 1;
+		z-index: 2;
 		margin-bottom: 1rem;
 	}
 </style>

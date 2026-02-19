@@ -11,13 +11,26 @@
 
 <style>
 	h1 {
-		font-size: 3rem;
+		font-family: var(--font-display);
+		font-size: var(--font-size-2xl);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 		font-weight: bold;
 		margin-top: 1rem;
 		text-align: center;
-		text-decoration-line: underline;
-		text-decoration-color: var(--cal-poly-secondary);
-		text-decoration-thickness: 0.2rem;
-		text-underline-offset: 2rem;
+		position: relative;
+		padding-bottom: 0.75rem;
+		margin-bottom: var(--space-lg);
+	}
+
+	h1::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 60px;
+		height: 3px;
+		background: var(--cal-poly-secondary);
 	}
 </style>

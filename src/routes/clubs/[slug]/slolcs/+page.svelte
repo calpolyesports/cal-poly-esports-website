@@ -453,14 +453,26 @@
 	}
 
 	h2 {
+		font-family: var(--font-display);
 		text-align: center;
-		font-size: 4rem;
-		margin-top: 0rem;
-		margin-bottom: 5rem;
-		text-decoration-line: underline;
-		text-decoration-color: var(--cal-poly-secondary);
-		text-decoration-thickness: 0.3rem;
-		text-underline-offset: 1.5rem;
+		font-size: var(--font-size-3xl);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-top: 0;
+		margin-bottom: var(--space-2xl);
+		position: relative;
+		padding-bottom: 0.75rem;
+	}
+
+	h2::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 60px;
+		height: 3px;
+		background: var(--cal-poly-secondary);
 	}
 
 	h3 {

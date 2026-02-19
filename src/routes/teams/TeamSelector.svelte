@@ -156,8 +156,8 @@
 	}
 
 	button img {
-		height: 3rem;
-		transition: 0.3s;
+		height: 4rem;
+		transition: transform 0.3s ease;
 	}
 
 	button img:hover {
@@ -169,8 +169,9 @@
 		top: 0;
 		left: 0;
 		width: 0;
-		height: 0.2rem;
-		background-color: var(--true-neutral);
+		height: 3px;
+		border-radius: 2px;
+		background-color: var(--cal-poly-secondary);
 		transition:
 			width 0.5s,
 			transform 0.5s;

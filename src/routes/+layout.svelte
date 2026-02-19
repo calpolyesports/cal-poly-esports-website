@@ -53,32 +53,39 @@
 			{@render children()}
 		</div>
 
-		<div class="footer">
-			<div class="column">
-				<img src="/images/Main Logo/White Logo.png" alt="Cal Poly Esports Logo" />
+		<footer class="footer">
+			<div class="footer-main">
+				<div class="column">
+					<img src="/images/Main Logo/White Logo.png" alt="Cal Poly Esports Logo" />
+				</div>
+				<div class="column">
+					<h3>Contact Us</h3>
+					<a href="https://discord.gg/sd6bUz7">Discord</a>
+					<a href="https://now.calpoly.edu/organization/esports">Cal Poly NOW</a>
+					<a href="mailto:calpolyesports@gmail.com">Email</a>
+					<a href="https://x.com/calpolyesports">Twitter</a>
+					<a href="https://www.instagram.com/calpolyesports/">Instagram</a>
+				</div>
+				<div class="column">
+					<h3>Quick Links</h3>
+					<a href={resolve('/calendar')}>Calendar</a>
+					<a href={resolve('/teams')}>Teams</a>
+					<a href={resolve('/about')}>About</a>
+					<a href={resolve('/login')}>Admin Login</a>
+				</div>
+				<div class="column clubs-column">
+					<h3>Clubs</h3>
+					<div class="clubs-grid">
+						{#each displayClubs as club (club._id)}
+							<a href={resolve('/clubs/[slug]', { slug: club.urlName })}>{club.clubName}</a>
+						{/each}
+					</div>
+				</div>
 			</div>
-			<div class="column">
-				<h3>Contact Us</h3>
-				<a href="https://discord.gg/sd6bUz7">Discord</a>
-				<a href="https://now.calpoly.edu/organization/esports">Cal Poly NOW</a>
-				<a href="mailto:calpolyesports@gmail.com">Email</a>
-				<a href="https://x.com/calpolyesports">Twitter</a>
-				<a href="https://www.instagram.com/calpolyesports/">Instagram</a>
+			<div class="footer-bottom">
+				<p>&copy; {new Date().getFullYear()} Cal Poly Esports &mdash; San Luis Obispo, CA</p>
 			</div>
-			<div class="column">
-				<h3>Quick Links</h3>
-				<a href={resolve('/calendar')}>Calendar</a>
-				<a href={resolve('/teams')}>Teams</a>
-				<a href={resolve('/about')}>About</a>
-				<a href={resolve('/login')}>Admin Login</a>
-			</div>
-			<div class="column">
-				<h3>Clubs</h3>
-				{#each displayClubs as club (club._id)}
-					<a href={resolve('/clubs/[slug]', { slug: club.urlName })}>{club.clubName}</a>
-				{/each}
-			</div>
-		</div>
+		</footer>
 	</div>
 </div>
 
@@ -127,40 +134,83 @@
 		}
 	}
 
-	div.footer {
+	.footer {
+		margin-top: var(--space-2xl);
+		width: 100%;
+		background-color: var(--cal-poly-primary);
+		color: var(--text-inverse);
+		border-top: 3px solid var(--cal-poly-secondary);
+	}
+
+	.footer-main {
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
 		justify-content: center;
-		margin-top: 5rem;
-		width: 100%;
-		background-color: var(--cal-poly-primary);
-		color: white;
+		padding: var(--space-xl) var(--space-lg);
+		max-width: var(--content-max-width);
+		margin: 0 auto;
 	}
 
 	div.column {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
+		justify-content: flex-start;
 		align-items: center;
-		height: 100%;
-		margin: 2rem 4rem;
+		margin: var(--space-lg) var(--space-xl);
 	}
 
 	div.column img {
-		height: 10rem;
+		height: 6rem;
 	}
 
 	div.column h3 {
-		font-size: 1.5rem;
-		margin: 0.2rem 0;
+		font-family: var(--font-display);
+		font-size: 1.3rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		margin: 0 0 var(--space-sm);
 		color: var(--cal-poly-secondary);
 	}
 
 	div.column a {
-		color: white;
+		color: var(--text-inverse);
 		text-decoration: none;
-		font-size: 1rem;
-		margin: 0.2rem 0;
+		font-size: var(--font-size-sm);
+		margin: 0.3rem 0;
+		transition: color var(--transition-fast);
+	}
+
+	div.column a:hover {
+		color: var(--cal-poly-secondary);
+	}
+
+	div.column.clubs-column {
+		align-items: flex-start;
+		text-align: left;
+	}
+
+	.clubs-grid {
+		columns: 2;
+		column-gap: var(--space-xl);
+	}
+
+	.clubs-grid a {
+		display: block;
+		break-inside: avoid;
+	}
+
+	.footer-bottom {
+		max-width: var(--content-max-width);
+		margin: 0 auto;
+		text-align: center;
+		padding: var(--space-md) 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	.footer-bottom p {
+		font-size: var(--font-size-sm);
+		opacity: 0.6;
+		margin: 0;
 	}
 </style>

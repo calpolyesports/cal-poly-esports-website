@@ -22,33 +22,69 @@
 	}
 
 	.about :global(h1) {
-		font-size: 2.5rem;
-		margin: 1rem 0;
-		text-decoration-line: underline;
-		text-decoration-color: var(--cal-poly-secondary);
-		text-decoration-thickness: 0.2rem;
-		text-underline-offset: 1.5rem;
+		font-family: var(--font-display);
+		font-size: var(--font-size-2xl);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: var(--space-lg) 0 var(--space-md);
 		text-align: center;
+		position: relative;
+		padding-bottom: 0.75rem;
+	}
+
+	.about :global(h1)::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 60px;
+		height: 3px;
+		background: var(--cal-poly-secondary);
 	}
 
 	.about :global(h2) {
-		font-size: 2rem;
-		margin: 1rem 0;
-		text-decoration-line: underline;
-		text-decoration-color: var(--cal-poly-secondary);
-		text-decoration-thickness: 0.2rem;
-		text-underline-offset: 1rem;
+		font-family: var(--font-display);
+		font-size: var(--font-size-xl);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: var(--space-lg) 0 var(--space-md);
 		text-align: center;
+		position: relative;
+		padding-bottom: 0.75rem;
+	}
+
+	.about :global(h2)::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 40px;
+		height: 3px;
+		background: var(--cal-poly-secondary);
 	}
 
 	.about :global(h3) {
-		font-size: 1.5rem;
-		margin: 1rem 0;
-		text-decoration-line: underline;
-		text-decoration-color: var(--cal-poly-secondary);
-		text-decoration-thickness: 0.2rem;
-		text-underline-offset: 0.5rem;
+		font-family: var(--font-display);
+		font-size: var(--font-size-lg);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: var(--space-lg) 0 var(--space-md);
 		text-align: center;
+		position: relative;
+		padding-bottom: 0.75rem;
+	}
+
+	.about :global(h3)::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 30px;
+		height: 3px;
+		background: var(--cal-poly-secondary);
 	}
 
 	.about :global(ul),

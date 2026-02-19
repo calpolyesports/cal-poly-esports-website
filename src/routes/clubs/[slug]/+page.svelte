@@ -167,33 +167,47 @@
 
 <style>
 	h1 {
+		font-family: var(--font-display);
 		text-align: center;
-		font-size: 2.5rem;
-		margin-bottom: 1rem;
-		text-decoration-line: underline;
-		text-decoration-color: var(--cal-poly-secondary);
-		text-decoration-thickness: 0.2rem;
-		text-underline-offset: 2rem;
+		font-size: var(--font-size-2xl);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: var(--space-lg);
+		position: relative;
+		padding-bottom: 0.75rem;
+	}
+
+	h1::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 60px;
+		height: 3px;
+		background: var(--cal-poly-secondary);
 	}
 
 	h2 {
+		font-family: var(--font-display);
 		text-align: center;
-		font-size: 2rem;
-		margin-bottom: 1rem;
-		text-decoration-line: underline;
-		text-decoration-color: var(--cal-poly-secondary);
-		text-decoration-thickness: 0.2rem;
-		text-underline-offset: 1rem;
+		font-size: var(--font-size-xl);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: var(--space-md);
+		position: relative;
+		padding-bottom: 0.75rem;
 	}
 
-	@media (max-width: 768px) {
-		h1 {
-			text-underline-offset: 1rem;
-		}
-
-		h1 {
-			text-underline-offset: 0.7rem;
-		}
+	h2::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 40px;
+		height: 3px;
+		background: var(--cal-poly-secondary);
 	}
 
 	.space-above {
@@ -237,6 +251,8 @@
 		border-radius: 50%;
 		margin-bottom: 1rem;
 		object-fit: cover;
+		box-shadow: var(--shadow-sm);
+		border: 3px solid var(--cal-poly-primary);
 	}
 
 	ul.board-members li p {

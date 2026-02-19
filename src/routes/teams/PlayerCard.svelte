@@ -93,11 +93,18 @@
 		width: 15rem;
 		overflow: hidden;
 		background-color: var(--neutral-bright);
-		border-radius: 1rem;
+		border-radius: var(--radius-lg);
 		padding: 1rem;
 		margin: 1rem;
 		color: var(--neutral-bright);
-		box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+		box-shadow: var(--shadow-md);
+		border-bottom: 3px solid var(--cal-poly-secondary);
+		transition: transform var(--transition-base), box-shadow var(--transition-base);
+	}
+
+	div.player-card:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--shadow-lg);
 	}
 
 	@media (max-width: 768px) {

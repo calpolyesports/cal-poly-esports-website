@@ -1,53 +1,133 @@
 :root {
+    /* === Brand Colors === */
     --cal-poly-primary: #154734;
+    --cal-poly-primary-dark: #0d2f23;
+    --cal-poly-primary-light: #1a5c44;
     --cal-poly-secondary: #BD8B13;
+    --cal-poly-secondary-dark: #9a720f;
+    --cal-poly-secondary-light: #d4a52e;
 
+    /* === Surface Colors === */
+    --surface-base: #0f0f0f;
+    --surface-elevated: #1a1a1a;
+    --surface-light: #fafafa;
+    --surface-white: #ffffff;
+
+    /* === Text Colors === */
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --text-inverse: #ffffff;
+    --text-muted: #888888;
+
+    /* === Neutrals (legacy, still used by some components) === */
     --neutral-bright: #fff;
     --neutral-semi-bright: #bdbdbd;
     --true-neutral: #898989;
     --neutral-semi-dark: #5c5c5c;
     --neutral-dark: #000;
+
+    /* === Spacing Scale === */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+    --space-2xl: 5rem;
+    --space-3xl: 8rem;
+
+    /* === Typography === */
+    --font-display: 'abolition', sans-serif;
+    --font-body: 'proxima-nova', sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-md: 1.125rem;
+    --font-size-lg: 1.5rem;
+    --font-size-xl: 2rem;
+    --font-size-2xl: 2.5rem;
+    --font-size-3xl: 3.5rem;
+    --font-size-hero: 5rem;
+
+    /* === Borders & Radius === */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+
+    /* === Shadows === */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.2);
+
+    /* === Transitions === */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 400ms ease;
+
+    /* === Layout === */
+    --content-max-width: 1200px;
+    --nav-height: 4.5rem;
+}
+
+html {
+    overflow-x: hidden;
 }
 
 body {
     margin: 0;
-    font-family: 'proxima-nova', sans-serif;
-    background-color: #f4f4f4;
+    font-family: var(--font-body);
+    background-color: var(--surface-light);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
 div.ec {
     width: 100%;
 }
 
-button.button-small {
-    background-color: var(--cal-poly-secondary);
-    color: var(--neutral-bright);
-    border: none;
-    border-radius: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    margin: 0.25rem;
-    font-size: 0.75rem;
-    cursor: pointer;
-}
-
-button.button-medium {
-    background-color: var(--cal-poly-secondary);
-    color: var(--neutral-bright);
-    border: none;
-    border-radius: 0.25rem;
-    padding: 0.5rem 1rem;
-    margin: 0.25rem;
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
+/* === Buttons === */
+button.button-small,
+button.button-medium,
 button.button-large {
     background-color: var(--cal-poly-secondary);
     color: var(--neutral-bright);
     border: none;
-    border-radius: 0.25rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+button.button-small {
+    padding: 0.25rem 0.5rem;
+    margin: 0.25rem;
+    font-size: 0.75rem;
+}
+
+button.button-medium {
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    font-size: 1.2rem;
+}
+
+button.button-large {
     padding: 0.75rem 1.5rem;
     margin: 0.25rem;
     font-size: 1.5rem;
-    cursor: pointer;
+}
+
+button.button-small:hover,
+button.button-medium:hover,
+button.button-large:hover {
+    background-color: var(--cal-poly-secondary-dark);
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    background-color: var(--true-neutral);
+    cursor: not-allowed;
+    transform: none;
 }
