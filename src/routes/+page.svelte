@@ -4,7 +4,6 @@
 
 	import { PUBLIC_PAGE_URL } from '$env/static/public';
 	import type { PageProps } from './$types';
-	import { resolve } from '$app/paths';
 
 	let { data }: PageProps = $props();
 </script>
@@ -23,14 +22,12 @@
 			<h1>Lab Information</h1>
 			<br />
 			<p>
-				Come check out our new Esports and Gaming Lab, equipped with <strong
-					>six high-end gaming PCs!</strong
-				>
+				Our Esports and Gaming Lab is currently <strong>being relocated</strong> and is
+				unavailable for public access at this time.
 			</p>
 			<p>
-				The lab is currently located in <a href="https://maps.calpoly.edu/place/bldg-014-0"
-					>Building 14</a
-				>, Room 305. You can find <a href={resolve('/calendar')}>open hours for free usage here.</a>
+				For any questions, please reach out to a board member in our
+				<a href="https://discord.gg/sd6bUz7">Discord</a>.
 			</p>
 		</div>
 	</div>
@@ -70,6 +67,16 @@
 	<img src="/images/games/CS2.jpg" alt="Counter Strike 2" />
 	<img src="/images/games/Smash.png" alt="Smash" />
 	<img src="/images/games/TF2.png" alt="Team Fortress 2" />
+</div>
+
+<h1>Sister Schools</h1>
+
+<div class="sister-schools">
+	<p>Check out esports at other Cal Poly campuses:</p>
+	<div class="school-links">
+		<a class="school-link" href="https://mybar.cpp.edu/organization/esports">Cal Poly Pomona</a>
+		<a class="school-link" href="https://www.humboldt.edu/campus-recreation/recreational-sports/clubs/e-sports">Cal Poly Humboldt</a>
+	</div>
 </div>
 
 <style>
@@ -218,5 +225,36 @@
 
 	strong {
 		color: var(--cal-poly-secondary);
+	}
+
+	div.sister-schools {
+		text-align: center;
+		margin: 4rem 0;
+	}
+
+	div.sister-schools p {
+		font-size: 1.6rem;
+		margin-bottom: 2rem;
+	}
+
+	div.school-links {
+		display: flex;
+		justify-content: center;
+		gap: 3rem;
+		flex-wrap: wrap;
+	}
+
+	a.school-link {
+		font-family: 'abolition', sans-serif;
+		font-size: 2rem;
+		color: white;
+		background-color: var(--cal-poly-primary);
+		padding: 1rem 2.5rem;
+		text-decoration: none;
+		transition: transform 0.2s;
+	}
+
+	a.school-link:hover {
+		transform: scale(1.05);
 	}
 </style>
