@@ -8,12 +8,14 @@
 	let { data }: PageProps = $props();
 
 	const featuredGames = [
-		{ name: 'Valorant', image: '/images/games/Valorant.png' },
-		{ name: 'League of Legends', image: '/images/games/LOL.png' },
-		{ name: 'Overwatch 2', image: '/images/games/Overwatch 2.png' },
-		{ name: 'Counter-Strike 2', image: '/images/games/CS2.jpg' },
-		{ name: 'Smash Bros', image: '/images/games/Smash.png' },
-		{ name: 'Team Fortress 2', image: '/images/games/TF2.png' }
+		{ name: 'Valorant', image: '/images/games/Valorant.png', slug: 'valorant' },
+		{ name: 'League of Legends', image: '/images/games/LOL.png', slug: 'league-of-legends' },
+		{ name: 'Overwatch', image: '/images/games/Overwatch.png', slug: 'overwatch' },
+		{ name: 'Counter-Strike 2', image: '/images/games/CS2.jpg', slug: 'counter-strike' },
+		{ name: 'Smash Bros', image: '/images/games/Smash.png', slug: 'smash' },
+		{ name: 'Team Fortress 2', image: '/images/games/TF2.png', slug: 'team-fortress-2' },
+		{ name: 'Rocket League', image: '/images/games/Rocket League.png', slug: 'rocket-league' },
+		{ name: 'Marvel Rivals', image: '/images/games/Marvel Rivals.jpeg', slug: 'marvel-rivals' }
 	];
 </script>
 
@@ -21,12 +23,13 @@
 <section class="hero full-width">
 	<div class="hero-overlay"></div>
 	<div class="hero-content">
-		<img class="hero-logo" src="/images/Main Logo/White Logo.png" alt="Cal Poly Esports" />
 		<h1 class="hero-title">Cal Poly Esports</h1>
 		<p class="hero-tagline">Cal Poly SLO's largest gaming community</p>
 		<div class="hero-games">
 			{#each featuredGames as game (game.name)}
-				<img class="hero-game-icon" src={game.image} alt={game.name} />
+				<a href="/clubs/{game.slug}" class="hero-game-link">
+					<img class="hero-game-icon" src={game.image} alt={game.name} />
+				</a>
 			{/each}
 		</div>
 		<div class="hero-cta">
@@ -47,11 +50,11 @@
 <!-- Section 3: Our Games + Stream -->
 <section class="games-section full-width section-green">
 	<div class="section-inner">
-		<h2 class="section-heading section-heading-light">Our Competitive Games</h2>
+		<h2 class="section-heading section-heading-light">Our Clubs</h2>
 		<div class="games-layout">
 			<div class="games-grid">
 				{#each featuredGames as game (game.name)}
-					<a href="/teams" class="game-card">
+					<a href="/clubs/{game.slug}" class="game-card">
 						<img src={game.image} alt={game.name} />
 						<span class="game-name">{game.name}</span>
 					</a>
@@ -85,38 +88,10 @@
 	</div>
 </section>
 
-<!-- Section 4: Connect With Us -->
-<section class="connect-section full-width section-light">
+<!-- Section 4: Sister Schools -->
+<section class="sister-section full-width section-light">
 	<div class="section-inner">
-		<h2 class="section-heading">Connect With Us</h2>
-		<div class="social-links">
-			<a href="https://discord.gg/sd6bUz7" class="social-link" aria-label="Discord">
-				<img src="/images/social/Discord.png" alt="" />
-				<span>Discord</span>
-			</a>
-			<a href="https://twitch.tv/CalPolyEsports" class="social-link" aria-label="Twitch">
-				<img src="/images/social/Twitch.png" alt="" />
-				<span>Twitch</span>
-			</a>
-			<a href="https://www.youtube.com/@calpolyesports" class="social-link" aria-label="YouTube">
-				<svg class="youtube-icon" viewBox="0 0 461.001 461.001" xmlns="http://www.w3.org/2000/svg">
-					<path d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728 c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137 C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123c-3.359,1.602-7.239-0.847-7.239-4.568V168.607 c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881C304.363,229.873,304.298,235.248,300.506,237.056z" fill="#FF0000"/>
-				</svg>
-				<span>YouTube</span>
-			</a>
-			<a href="https://x.com/calpolyesports" class="social-link" aria-label="Twitter/X">
-				<img src="/images/social/Twitter.png" alt="" />
-				<span>Twitter</span>
-			</a>
-			<a href="https://www.instagram.com/calpolyesports/" class="social-link" aria-label="Instagram">
-				<img src="/images/social/Instagram.png" alt="" />
-				<span>Instagram</span>
-			</a>
-		</div>
-
-		<div class="section-divider"></div>
-
-		<h3 class="connect-subheading">Sister Schools Esports Programs</h3>
+		<h2 class="section-heading">Sister Schools Esports Programs</h2>
 		<div class="sister-grid">
 			<a href="https://mybar.cpp.edu/organization/esports" class="sister-card">
 				<span class="school-name">Cal Poly Pomona</span>
@@ -194,7 +169,7 @@
 	   SECTION 1: HERO
 	   ============================================ */
 	.hero {
-		min-height: 70vh;
+		min-height: 50vh;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -226,18 +201,6 @@
 		to {
 			opacity: 1;
 			transform: translateY(0);
-		}
-	}
-
-	.hero-logo {
-		height: 8rem;
-		margin-bottom: var(--space-md);
-		filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4));
-	}
-
-	@media (max-width: 768px) {
-		.hero-logo {
-			height: 5rem;
 		}
 	}
 
@@ -379,7 +342,7 @@
 
 	.games-grid {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 		gap: var(--space-lg);
 	}
 
@@ -522,70 +485,18 @@
 		font-size: var(--font-size-sm);
 	}
 
-	/* ============================================
-	   SECTION 4: CONNECT
-	   ============================================ */
-	.connect-section {
-		padding: var(--space-2xl) 0;
-	}
-
-	.social-links {
+	/* === Hero game link === */
+	.hero-game-link {
 		display: flex;
-		justify-content: center;
-		gap: var(--space-xl);
-		flex-wrap: wrap;
-	}
-
-	.social-link {
-		display: flex;
-		flex-direction: column;
 		align-items: center;
 		text-decoration: none;
-		color: var(--text-primary);
-		transition: transform var(--transition-base);
 	}
 
-	.social-link:hover {
-		transform: translateY(-4px);
-	}
-
-	.social-link img,
-	.social-link .youtube-icon {
-		height: 3rem;
-		width: 3rem;
-		object-fit: contain;
-		margin-bottom: var(--space-sm);
-		transition: transform var(--transition-base);
-	}
-
-	.social-link:hover img,
-	.social-link:hover .youtube-icon {
-		transform: scale(1.1);
-	}
-
-	.social-link span {
-		font-family: var(--font-body);
-		font-size: var(--font-size-sm);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--text-secondary);
-	}
-
-	.section-divider {
-		width: 60px;
-		height: 1px;
-		background: var(--neutral-semi-bright);
-		margin: var(--space-xl) auto;
-	}
-
-	.connect-subheading {
-		font-family: var(--font-display);
-		font-size: var(--font-size-lg);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		text-align: center;
-		color: var(--text-primary);
-		margin: 0 0 var(--space-lg);
+	/* ============================================
+	   SECTION 4: SISTER SCHOOLS
+	   ============================================ */
+	.sister-section {
+		padding: var(--space-2xl) 0;
 	}
 
 	.sister-grid {

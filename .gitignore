@@ -19,3 +19,12 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Claude
+.claude/
+
+# Lock file
+package-lock.json
+
+# Database config
+src/lib/server/database.ts

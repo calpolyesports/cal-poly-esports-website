@@ -43,7 +43,7 @@
 	<header>
 		<TopNav
 			isAdmin={data.username !== undefined}
-			icon="/images/Main Logo/White Logo.png"
+			icon="/images/Main Logo/White Logo Filled.png"
 			clubs={displayClubs}
 		/>
 	</header>
@@ -104,6 +104,12 @@
 		div.everything {
 			position: relative;
 		}
+	}
+
+	header {
+		position: relative;
+		z-index: 100;
+		overflow: visible;
 	}
 
 	div.main-body {

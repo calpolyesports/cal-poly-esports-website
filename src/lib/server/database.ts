@@ -1,3 +1,6 @@
+import dns from 'node:dns';
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 import { env } from '$env/dynamic/private';
 import { ObjectId, type WithId } from 'mongodb';
 import DOMPurify from 'isomorphic-dompurify';
