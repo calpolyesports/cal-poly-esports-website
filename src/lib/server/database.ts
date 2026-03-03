@@ -3,7 +3,7 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 import { env } from '$env/dynamic/private';
 import { ObjectId, type WithId } from 'mongodb';
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 import { marked } from 'marked';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { MongoClient, ServerApiVersion } from 'mongodb';
@@ -328,7 +328,21 @@ export async function getClubByUrlName(urlName: string): Promise<WithId<types.Cl
 
 export async function updateClub(id: ObjectId, club: Partial<types.Club>): Promise<boolean> {
 	if (club.aboutText) {
-		club.aboutHtml = DOMPurify.sanitize(await marked.parse(club.aboutText));
+		club.aboutHtml = sanitizeHtml(await marked.parse(club.aboutText), {
+			allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+				'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img', 'pre', 'code', 'table',
+				'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'br', 'del', 'sup', 'sub'
+			]),
+			allowedAttributes: {
+				...sanitizeHtml.defaults.allowedAttributes,
+				'a': ['href', 'title', 'target', 'rel'],
+				'img': ['src', 'alt', 'title'],
+				'code': ['class'],
+				'pre': ['class'],
+				'th': ['scope'],
+				'td': ['colspan', 'rowspan']
+			}
+		});
 	}
 
 	const database = client.db(env.DB_NAME);

@@ -6,9 +6,7 @@ export default defineConfig({
 	build: {
 		rollupOptions: {
 			external: [
-				'@node-rs/argon2',
-				'isomorphic-dompurify',
-				'marked'
+				'@node-rs/argon2'
 			]
 		}
 	}

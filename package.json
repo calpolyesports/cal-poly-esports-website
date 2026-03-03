@@ -14,9 +14,9 @@
 	"dependencies": {
 		"@azure/storage-blob": "^12.29.1",
 		"@node-rs/argon2": "^2.0.2",
-		"isomorphic-dompurify": "^2.35.0",
 		"marked": "^17.0.1",
-		"mongodb": "^7.0.0"
+		"mongodb": "^7.0.0",
+		"sanitize-html": "^2.17.1"
 	},
 	"devDependencies": {
 		"@event-calendar/core": "^5.2.3",
@@ -32,6 +32,7 @@
 		"@types/eslint": "^9.6.1",
 		"@types/event-calendar__core": "^5.0.0",
 		"@types/node": "^25.0.8",
+		"@types/sanitize-html": "^2.16.0",
 		"dotenv": "^17.2.3",
 		"eslint": "^9.39.2",
 		"eslint-config-prettier": "^10.1.8",
