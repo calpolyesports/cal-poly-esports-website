@@ -252,7 +252,7 @@
 		margin-bottom: 1rem;
 		object-fit: cover;
 		box-shadow: var(--shadow-sm);
-		border: 3px solid var(--cal-poly-primary);
+		border: 3px solid var(--cal-poly-secondary);
 	}
 
 	ul.board-members li p {

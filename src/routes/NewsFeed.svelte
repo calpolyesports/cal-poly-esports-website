@@ -66,9 +66,7 @@
 		</div>
 
 		{#if articles.length > 1}
-			<button class="arrow arrow-right" onclick={next} aria-label="Next article">
-				&#8250;
-			</button>
+			<button class="arrow arrow-right" onclick={next} aria-label="Next article"> &#8250; </button>
 		{/if}
 	</div>
 {/if}
@@ -104,7 +102,9 @@
 		align-items: center;
 		justify-content: center;
 		box-shadow: var(--shadow-md);
-		transition: background-color var(--transition-fast), transform var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			transform var(--transition-fast);
 	}
 
 	.arrow:hover {
@@ -151,12 +151,16 @@
 		border-radius: var(--radius-lg);
 		overflow: hidden;
 		box-shadow: inset 0 0 0 3px var(--cal-poly-primary);
-		transition: transform var(--transition-base), box-shadow var(--transition-base);
+		transition:
+			transform var(--transition-base),
+			box-shadow var(--transition-base);
 	}
 
 	.card:hover {
 		transform: translateY(-4px);
-		box-shadow: inset 0 0 0 3px var(--cal-poly-primary), var(--shadow-lg);
+		box-shadow:
+			inset 0 0 0 3px var(--cal-poly-primary),
+			var(--shadow-lg);
 	}
 
 	/* === Center card (prominent) === */
@@ -172,7 +176,10 @@
 		height: 100%;
 		transform: scale(0.8);
 		filter: saturate(0.35) brightness(0.8);
-		transition: filter var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+		transition:
+			filter var(--transition-base),
+			transform var(--transition-base),
+			box-shadow var(--transition-base);
 	}
 
 	.card-side:hover {
@@ -208,7 +215,7 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 50%);
+		background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.25) 50%);
 		z-index: 1;
 	}
 
@@ -221,14 +228,14 @@
 
 	.card-center .card-text h2 {
 		font-family: var(--font-display);
-		font-size: 2rem;
+		font-size: 2.5rem;
 		margin: 0 0 0.3rem;
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
 	}
 
 	.card-center .card-text p {
-		font-size: 1rem;
+		font-size: 1.2rem;
 		margin: 0;
 		opacity: 0.85;
 		line-height: 1.4;

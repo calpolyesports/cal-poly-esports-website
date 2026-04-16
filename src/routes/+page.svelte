@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	import NewsFeed from './NewsFeed.svelte';
 	import TwitchEmbed from './TwitchEmbed.svelte';
 
@@ -27,14 +29,19 @@
 		<p class="hero-tagline">Cal Poly SLO's largest gaming community</p>
 		<div class="hero-games">
 			{#each featuredGames as game (game.name)}
-				<a href="/clubs/{game.slug}" class="hero-game-link">
+				<a
+					href={resolve('/clubs/[slug]', {
+						slug: game.slug
+					})}
+					class="hero-game-link"
+				>
 					<img class="hero-game-icon" src={game.image} alt={game.name} />
 				</a>
 			{/each}
 		</div>
 		<div class="hero-cta">
 			<a href="https://discord.gg/sd6bUz7" class="btn-primary">Join Our Discord</a>
-			<a href="/about" class="btn-secondary">Learn More</a>
+			<a href={resolve('/about')} class="btn-secondary">Learn More</a>
 		</div>
 	</div>
 </section>
@@ -54,7 +61,12 @@
 		<div class="games-layout">
 			<div class="games-grid">
 				{#each featuredGames as game (game.name)}
-					<a href="/clubs/{game.slug}" class="game-card">
+					<a
+						href={resolve('/clubs/[slug]', {
+							slug: game.slug
+						})}
+						class="game-card"
+					>
 						<img src={game.image} alt={game.name} />
 						<span class="game-name">{game.name}</span>
 					</a>
@@ -75,12 +87,10 @@
 				<div class="info-card">
 					<h3>Lab Information</h3>
 					<p>
-						Our Esports and Gaming Lab is currently <strong>being relocated</strong> and is
-						unavailable for public access at this time.
+						Our Esports and Gaming Lab is currently <strong>being relocated</strong> and is unavailable
+						for public access at this time.
 					</p>
-					<p>
-						For any questions, please reach out to a board member in our Discord.
-					</p>
+					<p>For any questions, please reach out to a board member in our Discord.</p>
 					<a href="https://discord.gg/sd6bUz7" class="btn-primary">Join Discord for Updates</a>
 				</div>
 			</div>
@@ -97,7 +107,10 @@
 				<span class="school-name">Cal Poly Pomona</span>
 				<span class="school-arrow">&#8594;</span>
 			</a>
-			<a href="https://www.humboldt.edu/campus-recreation/recreational-sports/clubs/e-sports" class="sister-card">
+			<a
+				href="https://www.humboldt.edu/campus-recreation/recreational-sports/clubs/e-sports"
+				class="sister-card"
+			>
 				<span class="school-name">Cal Poly Humboldt</span>
 				<span class="school-arrow">&#8594;</span>
 			</a>
@@ -140,7 +153,7 @@
 	/* === Section Headings === */
 	.section-heading {
 		font-family: var(--font-display);
-		font-size: var(--font-size-2xl);
+		font-size: var(--font-size-3xl);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		text-align: center;
@@ -159,6 +172,12 @@
 		width: 60px;
 		height: 3px;
 		background: var(--cal-poly-secondary);
+	}
+
+	@media (max-width: 768px) {
+		.section-heading {
+			font-size: var(--font-size-2xl);
+		}
 	}
 
 	.section-heading-light {
@@ -182,7 +201,11 @@
 	.hero-overlay {
 		position: absolute;
 		inset: 0;
-		background: radial-gradient(ellipse at center, rgba(26, 92, 68, 0.4) 0%, rgba(13, 47, 35, 0.95) 70%);
+		background: radial-gradient(
+			ellipse at center,
+			rgba(26, 92, 68, 0.4) 0%,
+			rgba(13, 47, 35, 0.95) 70%
+		);
 	}
 
 	.hero-content {
@@ -206,7 +229,7 @@
 
 	.hero-title {
 		font-family: var(--font-display);
-		font-size: var(--font-size-hero);
+		font-size: 6.5rem;
 		color: var(--text-inverse);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -222,7 +245,7 @@
 
 	.hero-tagline {
 		font-family: var(--font-body);
-		font-size: var(--font-size-lg);
+		font-size: var(--font-size-xl);
 		color: var(--text-inverse);
 		opacity: 0.85;
 		font-weight: 300;
@@ -249,7 +272,9 @@
 		width: 3rem;
 		object-fit: contain;
 		opacity: 0.7;
-		transition: opacity var(--transition-base), transform var(--transition-base);
+		transition:
+			opacity var(--transition-base),
+			transform var(--transition-base);
 	}
 
 	.hero-game-icon:hover {
@@ -277,15 +302,17 @@
 
 	.btn-primary {
 		font-family: var(--font-display);
-		font-size: var(--font-size-md);
+		font-size: var(--font-size-lg);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		text-decoration: none;
 		background-color: var(--cal-poly-secondary);
 		color: var(--text-inverse);
-		padding: 0.75rem 2rem;
+		padding: 0.875rem 2.25rem;
 		border-radius: var(--radius-md);
-		transition: background-color var(--transition-fast), transform var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			transform var(--transition-fast);
 	}
 
 	.btn-primary:hover {
@@ -295,16 +322,19 @@
 
 	.btn-secondary {
 		font-family: var(--font-display);
-		font-size: var(--font-size-md);
+		font-size: var(--font-size-lg);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		text-decoration: none;
 		background-color: transparent;
 		color: var(--text-inverse);
-		padding: 0.75rem 2rem;
+		padding: 0.875rem 2.25rem;
 		border: 2px solid rgba(255, 255, 255, 0.6);
 		border-radius: var(--radius-md);
-		transition: border-color var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast);
+		transition:
+			border-color var(--transition-fast),
+			transform var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.btn-secondary:hover {
@@ -334,7 +364,7 @@
 		align-items: start;
 	}
 
-	@media (max-width: 768px) {
+	@media (max-width: 900px) {
 		.games-layout {
 			grid-template-columns: 1fr;
 		}
@@ -346,9 +376,9 @@
 		gap: var(--space-lg);
 	}
 
-	@media (max-width: 768px) {
+	@media (max-width: 900px) {
 		.games-grid {
-			grid-template-columns: repeat(3, 1fr);
+			grid-template-columns: repeat(2, 1fr);
 			gap: var(--space-md);
 		}
 	}
@@ -362,7 +392,9 @@
 		padding: var(--space-lg);
 		border-radius: var(--radius-md);
 		background: rgba(255, 255, 255, 0.06);
-		transition: transform var(--transition-base), background-color var(--transition-base);
+		transition:
+			transform var(--transition-base),
+			background-color var(--transition-base);
 	}
 
 	.game-card:hover {
@@ -374,7 +406,7 @@
 		height: 4.5rem;
 		width: 4.5rem;
 		object-fit: contain;
-		margin-bottom: var(--space-sm);
+		margin-bottom: var(--space-md);
 		transition: transform var(--transition-base);
 	}
 
@@ -391,11 +423,16 @@
 			height: 3rem;
 			width: 3rem;
 		}
+
+		.game-name {
+			font-size: var(--font-size-sm);
+		}
 	}
 
 	.game-name {
 		font-family: var(--font-body);
-		font-size: var(--font-size-sm);
+		font-size: var(--font-size-md);
+		font-weight: 700;
 		color: var(--text-inverse);
 		opacity: 0.9;
 		text-transform: uppercase;
@@ -427,7 +464,7 @@
 
 	.card-header h3 {
 		font-family: var(--font-display);
-		font-size: var(--font-size-base);
+		font-size: var(--font-size-md);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--text-inverse);
@@ -443,8 +480,13 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.4; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.4;
+		}
 	}
 
 	.stream-embed {
@@ -456,12 +498,12 @@
 		border-radius: var(--radius-lg);
 		border-top: 4px solid var(--cal-poly-secondary);
 		padding: var(--space-lg);
-		height: 200px;
+		min-height: 200px;
 	}
 
 	.info-card h3 {
 		font-family: var(--font-display);
-		font-size: var(--font-size-lg);
+		font-size: var(--font-size-xl);
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
 		margin: 0 0 var(--space-sm);
@@ -469,7 +511,7 @@
 	}
 
 	.info-card p {
-		font-size: var(--font-size-sm);
+		font-size: var(--font-size-md);
 		line-height: 1.7;
 		color: rgba(255, 255, 255, 0.75);
 		margin: 0 0 var(--space-sm);
@@ -483,7 +525,23 @@
 		display: inline-block;
 		width: fit-content;
 		margin-top: var(--space-sm);
-		font-size: var(--font-size-sm);
+		font-size: var(--font-size-md);
+	}
+
+	@media (max-width: 768px) {
+		.info-card h3 {
+			font-size: var(--font-size-lg);
+		}
+
+		.info-card p {
+			font-size: var(--font-size-base);
+		}
+
+		.info-card .btn-primary {
+			width: 100%;
+			text-align: center;
+			box-sizing: border-box;
+		}
 	}
 
 	/* === Hero game link === */
@@ -520,7 +578,10 @@
 		border-left: 4px solid var(--cal-poly-primary);
 		min-width: 250px;
 		gap: var(--space-lg);
-		transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+		transition:
+			box-shadow var(--transition-base),
+			border-color var(--transition-base),
+			transform var(--transition-base);
 	}
 
 	.sister-card:hover {
@@ -531,13 +592,13 @@
 
 	.school-name {
 		font-family: var(--font-display);
-		font-size: var(--font-size-lg);
+		font-size: var(--font-size-xl);
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
 	}
 
 	.school-arrow {
-		font-size: var(--font-size-xl);
+		font-size: var(--font-size-2xl);
 		color: var(--text-muted);
 		transition: color var(--transition-fast);
 	}
