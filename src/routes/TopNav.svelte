@@ -30,7 +30,10 @@
 			</a>
 			<a href="https://www.youtube.com/@calpolyesports" aria-label="YouTube">
 				<svg class="social-icon" viewBox="0 0 461.001 461.001" xmlns="http://www.w3.org/2000/svg">
-					<path d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728 c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137 C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123c-3.359,1.602-7.239-0.847-7.239-4.568V168.607 c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881C304.363,229.873,304.298,235.248,300.506,237.056z" fill="#FF0000"/>
+					<path
+						d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728 c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137 C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123c-3.359,1.602-7.239-0.847-7.239-4.568V168.607 c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881C304.363,229.873,304.298,235.248,300.506,237.056z"
+						fill="#FF0000"
+					/>
 				</svg>
 			</a>
 			<a href="https://x.com/calpolyesports" aria-label="X">
@@ -61,10 +64,16 @@
 				</div>
 			</li>
 			<li>
-				<a href={resolve('/calendar')} class:selected={currentPath.startsWith('/calendar')}>Calendar</a>
+				<a href={resolve('/calendar')} class:selected={currentPath.startsWith('/calendar')}
+					>Calendar</a
+				>
 			</li>
-			<li><a href={resolve('/teams')} class:selected={currentPath.startsWith('/teams')}>Teams</a></li>
-			<li><a href={resolve('/about')} class:selected={currentPath.startsWith('/about')}>About</a></li>
+			<li>
+				<a href={resolve('/teams')} class:selected={currentPath.startsWith('/teams')}>Teams</a>
+			</li>
+			<li>
+				<a href={resolve('/about')} class:selected={currentPath.startsWith('/about')}>About</a>
+			</li>
 			{#if isAdmin}
 				<li>
 					<a href={resolve('/admin')} class:selected={currentPath.startsWith('/admin')}>Admin</a>
@@ -135,7 +144,9 @@
 		display: flex;
 		align-items: center;
 		opacity: 0.7;
-		transition: opacity var(--transition-fast), transform var(--transition-fast);
+		transition:
+			opacity var(--transition-fast),
+			transform var(--transition-fast);
 	}
 
 	.nav-socials a:hover {
@@ -319,7 +330,7 @@
 		position: absolute;
 		background-color: rgba(255, 255, 255, 0.97);
 		backdrop-filter: blur(10px);
-		width: 13rem;
+		width: clamp(13rem, 5rem + 40vw, 20rem);
 		box-shadow: var(--shadow-lg);
 		z-index: 1000;
 		display: flex;
@@ -356,7 +367,9 @@
 		font-size: clamp(0.9rem, 0.5rem + 1.6vw, 1.6rem);
 		letter-spacing: normal;
 		text-transform: none;
-		transition: background-color var(--transition-fast), color var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.nav-links .dropdown-content a:hover {
