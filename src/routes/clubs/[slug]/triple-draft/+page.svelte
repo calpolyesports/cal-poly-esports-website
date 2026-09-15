@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { resolve } from '$app/paths';
-	import { page } from '$app/state';
 	import { buildDraft, SLOTS, type DraftRound } from './draft';
 	import type { Hero } from './heroes';
 
@@ -73,9 +71,6 @@
 			<h1>Triple Draft</h1>
 			<p class="eyebrow">{complete ? 'Draft complete' : 'Now drafting'}</p>
 		</div>
-		<a class="back" href={resolve('/clubs/[slug]', { slug: page.params.slug ?? '' })}>
-			&larr; SLOverwatch
-		</a>
 	</header>
 
 	<div class="stage" aria-live="polite">
@@ -199,18 +194,6 @@
 		letter-spacing: 0.18em;
 		color: var(--cal-poly-secondary-dark);
 		white-space: nowrap;
-	}
-
-	a.back {
-		font-size: clamp(0.68rem, 1.5vh, 0.82rem);
-		color: var(--text-muted);
-		text-decoration: none;
-		white-space: nowrap;
-		transition: color var(--transition-fast);
-	}
-
-	a.back:hover {
-		color: var(--cal-poly-primary);
 	}
 
 	/* === Current round === */
