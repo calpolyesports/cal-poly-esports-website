@@ -38,6 +38,26 @@ function pickRandom<T>(items: T[]): T {
 	return items[Math.floor(Math.random() * items.length)];
 }
 
+function shuffle<T>(items: T[]): T[] {
+	const copy = [...items];
+	for (let i = copy.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[copy[i], copy[j]] = [copy[j], copy[i]];
+	}
+	return copy;
+}
+
+/**
+ * Randomises which role is drafted when. Tank is pinned to either end, so a
+ * team never commits to its damage and support picks around a tank slot that
+ * is still up in the air mid-draft.
+ */
+function draftOrder(): DraftSlot[] {
+	const [tank, ...rest] = SLOTS;
+	const others = shuffle(rest);
+	return Math.random() < 0.5 ? [tank, ...others] : [...others, tank];
+}
+
 /**
  * The tank triple is always one pure dive hero, one pure brawl hero, and one
  * wildcard drawn from whatever tanks are left (which is where hybrids and the
@@ -71,22 +91,16 @@ function slotOptions(slot: DraftSlot, used: Set<string>): Hero[] {
 }
 
 /**
- * Builds the five triples for a draft. A hero can only ever be offered once,
- * which matters because hybrids sit in both the main and flex pool of a role.
+ * Builds the five triples for a draft, in a randomised role order. A hero can
+ * only ever be offered once, which matters because hybrids sit in both the main
+ * and flex pool of a role.
  */
 export function buildDraft(): DraftRound[] {
 	const used = new Set<string>();
 
-	return SLOTS.map((slot) => {
+	return draftOrder().map((slot) => {
 		const options = slot.id === 'tank' ? tankOptions(used) : slotOptions(slot, used);
 		for (const hero of options) used.add(hero.key);
 		return { slot, options };
 	});
-}
-
-/** Clash Royale style: the picker takes one, the opponent is handed one of the rest at random. */
-export function awardLeftover(options: Hero[], picked: Hero): { given: Hero; discarded: Hero } {
-	const rest = options.filter((hero) => hero.key !== picked.key);
-	const given = pickRandom(rest);
-	return { given, discarded: rest.find((hero) => hero.key !== given.key)! };
 }

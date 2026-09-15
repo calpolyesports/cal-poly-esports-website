@@ -118,11 +118,16 @@
 		height: 100%;
 		overflow-x: hidden;
 		overflow-y: scroll;
+		/* Column layout so the footer is pushed to the bottom on pages whose
+		   content is shorter than the viewport, instead of leaving a gap. */
+		display: flex;
+		flex-direction: column;
 	}
 
 	@media (max-width: 768px) {
 		div.main-body {
 			height: auto;
+			min-height: 100%;
 		}
 	}
 
@@ -133,6 +138,8 @@
 		align-items: center;
 		width: 80%;
 		margin: 1rem auto;
+		/* Takes up the slack above the footer; never shrinks below its content. */
+		flex: 1 0 auto;
 	}
 
 	@media (max-width: 768px) {
