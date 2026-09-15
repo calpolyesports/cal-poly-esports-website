@@ -126,8 +126,11 @@
 			{/each}
 		</ol>
 
+		<!-- Both labels are always laid out, stacked in one cell, so the button is
+		     the width of the longer one in either state and the tray never shifts. -->
 		<button type="button" class="reset" onclick={newDraft} disabled={!ready}>
-			{complete ? 'New Draft' : 'Restart'}
+			<span class="label" class:active={complete}>New Draft</span>
+			<span class="label" class:active={!complete}>Restart</span>
 		</button>
 	</footer>
 </section>
@@ -412,6 +415,8 @@
 
 	button.reset {
 		flex: none;
+		display: grid;
+		place-items: center;
 		font-family: var(--font-display);
 		font-size: clamp(0.72rem, 1.6vh, 0.92rem);
 		text-transform: uppercase;
@@ -425,6 +430,15 @@
 		transition:
 			background var(--transition-fast),
 			color var(--transition-fast);
+	}
+
+	button.reset span.label {
+		grid-area: 1 / 1;
+		visibility: hidden;
+	}
+
+	button.reset span.label.active {
+		visibility: visible;
 	}
 
 	button.reset:hover:not(:disabled) {
