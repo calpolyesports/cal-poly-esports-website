@@ -1,5 +1,5 @@
-// Generated from the live Overwatch 2 roster; archetypes transcribed from the
-// Sloverwatch tier list. Portrait URLs are content-hashed Blizzard CDN assets,
+// Generated from the live Overwatch 2 roster; archetypes are the pools set by
+// the SLOverwatch club. Portrait URLs are content-hashed Blizzard CDN assets,
 // so they are stable for the lifetime of each hero's art.
 
 export type HeroRole = 'tank' | 'damage' | 'support';
@@ -48,7 +48,7 @@ export const heroes: Hero[] = [
 		key: 'junker-queen',
 		name: 'Junker Queen',
 		role: 'tank',
-		archetype: 'hybrid',
+		archetype: 'brawl',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/06eeecb359f311f43a8f5121d4f9f3a93c565d70b30e94ef543c05596c9a39dc.png'
 	},
@@ -112,7 +112,7 @@ export const heroes: Hero[] = [
 		key: 'hazard',
 		name: 'Hazard',
 		role: 'tank',
-		archetype: 'brawl',
+		archetype: 'hybrid',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ca48b96dbae6ea7f58ce8a5e73513c8c62b1685bdbf258020fb78bb21a008b5f.png'
 	},
@@ -368,7 +368,7 @@ export const heroes: Hero[] = [
 		key: 'juno',
 		name: 'Juno',
 		role: 'support',
-		archetype: 'main',
+		archetype: 'hybrid',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/c0167d251e57b0aa2b1e16c37d87f0e7c77263db9dd0503d77b5f2589bf3e4a0.png'
 	},
@@ -400,7 +400,7 @@ export const heroes: Hero[] = [
 		key: 'mizuki',
 		name: 'Mizuki',
 		role: 'support',
-		archetype: 'hybrid',
+		archetype: 'main',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a9733c2367e0cbd70b9316fd2e1e17028653ec56d0051ea6ff098531dc4f99fc.png'
 	},
