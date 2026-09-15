@@ -5,9 +5,9 @@
 export type HeroRole = 'tank' | 'damage' | 'support';
 
 /**
- * Where a hero sits inside their role. Tanks are split dive/brawl, damage and
- * support are split main/flex, and `hybrid` heroes belong to both pools of
- * their role.
+ * Where a hero sits inside their role. Tanks are split dive/brawl. Damage and
+ * support are split main/flex, where a `hybrid` hero belongs to both pools of
+ * its role; tanks have no hybrids.
  */
 export type HeroArchetype = 'dive' | 'brawl' | 'main' | 'flex' | 'hybrid';
 
@@ -64,7 +64,7 @@ export const heroes: Hero[] = [
 		key: 'doomfist',
 		name: 'Doomfist',
 		role: 'tank',
-		archetype: 'hybrid',
+		archetype: 'dive',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ff5c54f43ad253c7faeda9c4ed31d42582ea6b19205d197866f3dd0c0aa14c16.png'
 	},
@@ -88,7 +88,7 @@ export const heroes: Hero[] = [
 		key: 'dmon',
 		name: 'D.Mon',
 		role: 'tank',
-		archetype: 'hybrid',
+		archetype: 'brawl',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a46c60b8562fdbd0b8308396d0808f7606fba208bc67cccf3f82fe56d2c73b9d.png'
 	},
@@ -112,7 +112,7 @@ export const heroes: Hero[] = [
 		key: 'hazard',
 		name: 'Hazard',
 		role: 'tank',
-		archetype: 'hybrid',
+		archetype: 'dive',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ca48b96dbae6ea7f58ce8a5e73513c8c62b1685bdbf258020fb78bb21a008b5f.png'
 	},

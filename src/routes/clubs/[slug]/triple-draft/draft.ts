@@ -1,4 +1,4 @@
-import { heroes, pool, purePool, type Hero, type HeroArchetype, type HeroRole } from './heroes';
+import { pool, purePool, type Hero, type HeroArchetype, type HeroRole } from './heroes';
 
 export interface DraftSlot {
 	id: string;
@@ -53,23 +53,16 @@ export function draftOrder(): DraftSlot[] {
 	return [tank, ...shuffle(rest)];
 }
 
-/**
- * The tank triple is always one pure dive hero, one pure brawl hero, and one
- * wildcard drawn from whatever tanks are left (which is where hybrids and the
- * unused dive/brawl heroes come from).
- */
+/** The tank triple is always one dive hero and two different brawl heroes. */
 function tankOptions(used: Set<string>): Hero[] {
 	const free = (candidates: Hero[]) => candidates.filter((hero) => !used.has(hero.key));
 
 	const dive = pickRandom(free(purePool('tank', 'dive')));
-	const brawl = pickRandom(free(purePool('tank', 'brawl')));
-	const wildcard = pickRandom(
-		free(heroes.filter((hero) => hero.role === 'tank')).filter(
-			(hero) => hero !== dive && hero !== brawl
-		)
-	);
+	const brawlPool = free(purePool('tank', 'brawl'));
+	const firstBrawl = pickRandom(brawlPool);
+	const secondBrawl = pickRandom(brawlPool.filter((hero) => hero !== firstBrawl));
 
-	return [dive, brawl, wildcard];
+	return [dive, firstBrawl, secondBrawl];
 }
 
 /** Three distinct heroes from the slot's pool, skipping anything already drawn. */
