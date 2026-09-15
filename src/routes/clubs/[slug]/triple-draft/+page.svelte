@@ -23,6 +23,10 @@
 
 	let complete = $derived(ready && roundIndex >= SLOTS.length);
 	let currentRound = $derived(ready && !complete ? rounds[roundIndex] : null);
+	// Once the draft is done the last round stays on screen with the pick
+	// highlighted, rather than being swapped for a result view. That keeps the
+	// panel exactly the same size throughout, with no empty space to fill.
+	let shownRound = $derived(currentRound ?? rounds[rounds.length - 1]);
 
 	onMount(() => {
 		newDraft();
@@ -75,14 +79,22 @@
 	</header>
 
 	<div class="stage" aria-live="polite">
-		<h2>{complete ? 'Your Composition' : (currentRound?.slot.label ?? SLOTS[0].label)}</h2>
+		<h2>{shownRound?.slot.label ?? SLOTS[0].label}</h2>
 
-		{#if currentRound}
+		{#if shownRound}
+			{@const taken = complete ? picks[shownRound.slot.id] : null}
 			{#key roundIndex}
 				<ul class="options">
-					{#each currentRound.options as hero (hero.key)}
+					{#each shownRound.options as hero (hero.key)}
 						<li>
-							<button type="button" class="option" onclick={() => choose(hero)}>
+							<button
+								type="button"
+								class="option"
+								class:chosen={taken === hero}
+								class:passed={taken !== null && taken !== hero}
+								disabled={complete}
+								onclick={() => choose(hero)}
+							>
 								<img src={hero.portrait} alt="" width="256" height="256" />
 								<span class="option-name">{hero.name}</span>
 							</button>
@@ -90,8 +102,6 @@
 					{/each}
 				</ul>
 			{/key}
-		{:else if complete}
-			<p class="done-note">Five picks locked in &mdash; good luck out there.</p>
 		{:else}
 			<ul class="options">
 				{#each Array(3) as _, index (index)}
@@ -274,8 +284,22 @@
 			box-shadow var(--transition-fast);
 	}
 
-	button.option:hover,
-	button.option:focus-visible {
+	button.option:disabled {
+		cursor: default;
+	}
+
+	button.option.chosen {
+		border-color: var(--gold);
+		box-shadow: 0 0 0 2px var(--gold);
+	}
+
+	button.option.passed {
+		opacity: 0.4;
+		filter: grayscale(0.7);
+	}
+
+	button.option:not(:disabled):hover,
+	button.option:not(:disabled):focus-visible {
 		transform: translateY(-3px);
 		border-color: var(--gold);
 		box-shadow: 0 8px 20px rgba(21, 71, 52, 0.18);
@@ -308,12 +332,6 @@
 		text-transform: uppercase;
 		color: var(--cal-poly-primary);
 		line-height: 1.1;
-	}
-
-	p.done-note {
-		margin: 0;
-		color: var(--text-secondary);
-		font-size: clamp(0.85rem, 2vh, 1.05rem);
 	}
 
 	/* === Composition tray === */
@@ -362,6 +380,9 @@
 
 	span.slot-placeholder {
 		display: block;
+		/* Border-box so an empty slot is exactly the size of a filled one and the
+		   tray does not change height as picks come in. */
+		box-sizing: border-box;
 		border: 1px dashed rgba(21, 71, 52, 0.25);
 		background: var(--surface-white);
 	}
@@ -460,8 +481,10 @@
 			letter-spacing: 0.04em;
 		}
 
+		/* Hidden rather than removed, so a slot keeps the same height before and
+		   after it is filled and the tray does not grow during the draft. */
 		span.slot-hero.empty {
-			display: none;
+			visibility: hidden;
 		}
 
 		button.reset {
