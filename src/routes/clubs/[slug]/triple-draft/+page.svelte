@@ -380,6 +380,9 @@
 		max-width: 100%;
 		text-align: center;
 		line-height: 1.1;
+	}
+
+	span.slot-hero {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -397,7 +400,7 @@
 
 	span.slot-label {
 		font-family: var(--font-display);
-		font-size: clamp(0.52rem, 1.3vh, 0.7rem);
+		font-size: clamp(0.6rem, 1.5vh, 0.78rem);
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
 		color: var(--text-muted);
@@ -451,7 +454,13 @@
 			gap: var(--space-sm);
 		}
 
+		/* Wraps to two lines ('Main' / 'Support') so the role stays readable in
+		   a narrow column instead of being hidden. */
 		span.slot-label {
+			letter-spacing: 0.04em;
+		}
+
+		span.slot-hero.empty {
 			display: none;
 		}
 
