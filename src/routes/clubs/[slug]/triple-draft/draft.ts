@@ -66,22 +66,27 @@ function tankOptions(used: Set<string>): Hero[] {
 }
 
 /**
- * The damage and support triples are two pure heroes from the slot's own pool
- * plus one more drawn from what is left of that pool together with the role's
- * hybrids. So a triple never has more than one hybrid in it, and the third
- * option is a hybrid roughly in proportion to how many hybrids the role has.
+ * The damage and support triples are drawn one option at a time. Each option
+ * comes from the slot's own pool plus the role's hybrids, until a hybrid is
+ * drawn; from then on the remaining options come from the slot's own pool
+ * only. So a triple never has more than one hybrid, but it can sit anywhere.
  */
 function slotOptions(slot: DraftSlot, used: Set<string>): Hero[] {
-	const free = (candidates: Hero[]) => candidates.filter((hero) => !used.has(hero.key));
+	const options: Hero[] = [];
+	let hybridDrawn = false;
 
-	const pure = free(purePool(slot.role, slot.archetype));
-	const first = pickRandom(pure);
-	const second = pickRandom(pure.filter((hero) => hero !== first));
-	const third = pickRandom(
-		free(pool(slot.role, slot.archetype)).filter((hero) => hero !== first && hero !== second)
-	);
+	while (options.length < 3) {
+		const candidates = (hybridDrawn ? purePool : pool)(slot.role, slot.archetype).filter(
+			(hero) => !used.has(hero.key) && !options.includes(hero)
+		);
+		if (candidates.length === 0) break;
 
-	return [first, second, third];
+		const chosen = pickRandom(candidates);
+		options.push(chosen);
+		if (chosen.archetype === 'hybrid') hybridDrawn = true;
+	}
+
+	return options;
 }
 
 /**
