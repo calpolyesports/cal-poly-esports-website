@@ -47,15 +47,10 @@ function shuffle<T>(items: T[]): T[] {
 	return copy;
 }
 
-/**
- * Randomises which role is drafted when. Tank is pinned to either end, so a
- * team never commits to its damage and support picks around a tank slot that
- * is still up in the air mid-draft.
- */
-function draftOrder(): DraftSlot[] {
+/** Tank is always drafted first; the other four roles come up in a random order. */
+export function draftOrder(): DraftSlot[] {
 	const [tank, ...rest] = SLOTS;
-	const others = shuffle(rest);
-	return Math.random() < 0.5 ? [tank, ...others] : [...others, tank];
+	return [tank, ...shuffle(rest)];
 }
 
 /**
@@ -78,8 +73,10 @@ function tankOptions(used: Set<string>): Hero[] {
 }
 
 /** Three distinct heroes from the slot's pool, skipping anything already drawn. */
-function slotOptions(slot: DraftSlot, used: Set<string>): Hero[] {
-	const available = pool(slot.role, slot.archetype).filter((hero) => !used.has(hero.key));
+function slotOptions(slot: DraftSlot, used: Set<string>, allowHybrids: boolean): Hero[] {
+	const available = (allowHybrids ? pool : purePool)(slot.role, slot.archetype).filter(
+		(hero) => !used.has(hero.key)
+	);
 	const options: Hero[] = [];
 
 	while (options.length < 3 && options.length < available.length) {
@@ -91,16 +88,24 @@ function slotOptions(slot: DraftSlot, used: Set<string>): Hero[] {
 }
 
 /**
- * Builds the five triples for a draft, in a randomised role order. A hero can
- * only ever be offered once, which matters because hybrids sit in both the main
- * and flex pool of a role.
+ * Draws the triple for a round. Rounds are drawn as they are reached rather
+ * than all up front, because what a round can offer depends on earlier picks:
+ *
+ * - A hero is only ever offered once per draft (`used` is updated here), which
+ *   matters because hybrids sit in both the main and flex pool of a role.
+ * - A team may only pick one hybrid per role, so once a hybrid has been taken
+ *   for a role, that role's remaining round is drawn from pure heroes only.
  */
-export function buildDraft(): DraftRound[] {
-	const used = new Set<string>();
+export function drawRound(
+	slot: DraftSlot,
+	used: Set<string>,
+	picks: Record<string, Hero | null>
+): DraftRound {
+	const hybridTaken = SLOTS.some(
+		(other) => other.role === slot.role && picks[other.id]?.archetype === 'hybrid'
+	);
+	const options = slot.id === 'tank' ? tankOptions(used) : slotOptions(slot, used, !hybridTaken);
 
-	return draftOrder().map((slot) => {
-		const options = slot.id === 'tank' ? tankOptions(used) : slotOptions(slot, used);
-		for (const hero of options) used.add(hero.key);
-		return { slot, options };
-	});
+	for (const hero of options) used.add(hero.key);
+	return { slot, options };
 }

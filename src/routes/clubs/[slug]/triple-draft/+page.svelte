@@ -1,17 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { buildDraft, SLOTS, type DraftRound } from './draft';
+	import { draftOrder, drawRound, SLOTS, type DraftRound, type DraftSlot } from './draft';
 	import type { Hero } from './heroes';
 
 	// The draft is randomised, so it has to be built on the client only. Building
 	// it during SSR too would render a different draft on each side, and Svelte
 	// hydration would keep the server's portrait `src` next to the client's names.
 	let ready = $state(false);
-	let rounds = $state<DraftRound[]>([]);
+	let order = $state<DraftSlot[]>([]);
 	let roundIndex = $state(0);
+	// Each round is drawn when it is reached, since what it may offer depends on
+	// the picks made before it. This holds the round in progress, and after the
+	// last pick it keeps holding that final round for display.
+	let round = $state<DraftRound | null>(null);
 	// Keyed by slot rather than by round, because the draft order is randomised
 	// while the tray always shows the composition in its usual order.
 	let picks = $state<Record<string, Hero | null>>({});
+	// Every hero offered so far, so none is offered twice in one draft.
+	let used = new Set<string>();
 
 	// The panel is capped to the room below the nav so the draft never scrolls,
 	// but it is free to be shorter than that. Its own offset is measured rather
@@ -20,11 +26,11 @@
 	let available = $state(0);
 
 	let complete = $derived(ready && roundIndex >= SLOTS.length);
-	let currentRound = $derived(ready && !complete ? rounds[roundIndex] : null);
+	let currentRound = $derived(ready && !complete ? round : null);
 	// Once the draft is done the last round stays on screen with the pick
 	// highlighted, rather than being swapped for a result view. That keeps the
 	// panel exactly the same size throughout, with no empty space to fill.
-	let shownRound = $derived(currentRound ?? rounds[rounds.length - 1]);
+	let shownRound = $derived(ready ? round : null);
 
 	onMount(() => {
 		newDraft();
@@ -52,12 +58,15 @@
 		if (!currentRound) return;
 		picks[currentRound.slot.id] = hero;
 		roundIndex += 1;
+		if (roundIndex < order.length) round = drawRound(order[roundIndex], used, picks);
 	}
 
 	function newDraft() {
-		rounds = buildDraft();
+		order = draftOrder();
 		roundIndex = 0;
+		used = new Set();
 		picks = Object.fromEntries(SLOTS.map((slot) => [slot.id, null]));
+		round = drawRound(order[0], used, picks);
 	}
 </script>
 
