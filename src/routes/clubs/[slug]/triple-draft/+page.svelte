@@ -9,9 +9,9 @@
 	let ready = $state(false);
 	let order = $state<DraftSlot[]>([]);
 	let roundIndex = $state(0);
-	// Each round is drawn when it is reached, since what it may offer depends on
-	// the picks made before it. This holds the round in progress, and after the
-	// last pick it keeps holding that final round for display.
+	// Each round is drawn when it is reached, skipping heroes offered earlier.
+	// This holds the round in progress, and after the last pick it keeps holding
+	// that final round for display.
 	let round = $state<DraftRound | null>(null);
 	// Keyed by slot rather than by round, because the draft order is randomised
 	// while the tray always shows the composition in its usual order.
@@ -58,7 +58,7 @@
 		if (!currentRound) return;
 		picks[currentRound.slot.id] = hero;
 		roundIndex += 1;
-		if (roundIndex < order.length) round = drawRound(order[roundIndex], used, picks);
+		if (roundIndex < order.length) round = drawRound(order[roundIndex], used);
 	}
 
 	function newDraft() {
@@ -66,7 +66,7 @@
 		roundIndex = 0;
 		used = new Set();
 		picks = Object.fromEntries(SLOTS.map((slot) => [slot.id, null]));
-		round = drawRound(order[0], used, picks);
+		round = drawRound(order[0], used);
 	}
 </script>
 

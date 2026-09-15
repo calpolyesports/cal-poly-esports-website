@@ -65,39 +65,32 @@ function tankOptions(used: Set<string>): Hero[] {
 	return [dive, firstBrawl, secondBrawl];
 }
 
-/** Three distinct heroes from the slot's pool, skipping anything already drawn. */
-function slotOptions(slot: DraftSlot, used: Set<string>, allowHybrids: boolean): Hero[] {
-	const available = (allowHybrids ? pool : purePool)(slot.role, slot.archetype).filter(
-		(hero) => !used.has(hero.key)
+/**
+ * The damage and support triples are two pure heroes from the slot's own pool
+ * plus one more drawn from what is left of that pool together with the role's
+ * hybrids. So a triple never has more than one hybrid in it, and the third
+ * option is a hybrid roughly in proportion to how many hybrids the role has.
+ */
+function slotOptions(slot: DraftSlot, used: Set<string>): Hero[] {
+	const free = (candidates: Hero[]) => candidates.filter((hero) => !used.has(hero.key));
+
+	const pure = free(purePool(slot.role, slot.archetype));
+	const first = pickRandom(pure);
+	const second = pickRandom(pure.filter((hero) => hero !== first));
+	const third = pickRandom(
+		free(pool(slot.role, slot.archetype)).filter((hero) => hero !== first && hero !== second)
 	);
-	const options: Hero[] = [];
 
-	while (options.length < 3 && options.length < available.length) {
-		const chosen = pickRandom(available.filter((hero) => !options.includes(hero)));
-		options.push(chosen);
-	}
-
-	return options;
+	return [first, second, third];
 }
 
 /**
- * Draws the triple for a round. Rounds are drawn as they are reached rather
- * than all up front, because what a round can offer depends on earlier picks:
- *
- * - A hero is only ever offered once per draft (`used` is updated here), which
- *   matters because hybrids sit in both the main and flex pool of a role.
- * - A team may only pick one hybrid per role, so once a hybrid has been taken
- *   for a role, that role's remaining round is drawn from pure heroes only.
+ * Draws the triple for a round. `used` is updated with what was offered, so a
+ * hero is only ever offered once per draft, which matters because hybrids sit
+ * in both the main and flex pool of a role.
  */
-export function drawRound(
-	slot: DraftSlot,
-	used: Set<string>,
-	picks: Record<string, Hero | null>
-): DraftRound {
-	const hybridTaken = SLOTS.some(
-		(other) => other.role === slot.role && picks[other.id]?.archetype === 'hybrid'
-	);
-	const options = slot.id === 'tank' ? tankOptions(used) : slotOptions(slot, used, !hybridTaken);
+export function drawRound(slot: DraftSlot, used: Set<string>): DraftRound {
+	const options = slot.id === 'tank' ? tankOptions(used) : slotOptions(slot, used);
 
 	for (const hero of options) used.add(hero.key);
 	return { slot, options };
