@@ -56,7 +56,7 @@ export const heroes: Hero[] = [
 		key: 'domina',
 		name: 'Domina',
 		role: 'tank',
-		archetype: 'hybrid',
+		archetype: 'brawl',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/1161c112292c56c052c0ae711792fcde06e3251b98bc9709e582dd7585b5dcd6.png'
 	},
@@ -88,7 +88,7 @@ export const heroes: Hero[] = [
 		key: 'dmon',
 		name: 'D.Mon',
 		role: 'tank',
-		archetype: 'brawl',
+		archetype: 'hybrid',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a46c60b8562fdbd0b8308396d0808f7606fba208bc67cccf3f82fe56d2c73b9d.png'
 	},
