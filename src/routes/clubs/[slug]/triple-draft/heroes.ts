@@ -229,14 +229,6 @@ export const heroes: Hero[] = [
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/c93b5f0a528c40473188f77cc2a267aee7d5b6cf5c9e104105d634b4388674e2.png'
 	},
 	{
-		key: 'sombra',
-		name: 'Sombra',
-		role: 'damage',
-		archetype: 'hybrid',
-		portrait:
-			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/47727b02a16e3bd7b2447d86ae1edf11587bc320b2aecb4f2f16a7ca4ad4e8a0.png'
-	},
-	{
 		key: 'shion',
 		name: 'Shion',
 		role: 'damage',
@@ -411,6 +403,22 @@ export const heroes: Hero[] = [
 		archetype: 'hybrid',
 		portrait:
 			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4959500b495b35c0908be2abda56b53f2601b2c5cc39a1cfde8df1bffd38d66d.png'
+	},
+	{
+		key: 'sombra',
+		name: 'Sombra',
+		role: 'support',
+		archetype: 'hybrid',
+		portrait:
+			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/47727b02a16e3bd7b2447d86ae1edf11587bc320b2aecb4f2f16a7ca4ad4e8a0.png'
+	},
+	{
+		key: 'doctrine',
+		name: 'Doctrine',
+		role: 'support',
+		archetype: 'hybrid',
+		portrait:
+			'https://d15f34w2p8l1cc.cloudfront.net/overwatch/2492a15c575c12314907d0d77501ec337b4d56796bc7f03e5dfb50d415612bae.png'
 	},
 	{
 		key: 'baptiste',
